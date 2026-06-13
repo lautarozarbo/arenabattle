@@ -80,6 +80,25 @@ export async function syncStatsFromCloud() {
       favorites:     Array.isArray(data.favorites) ? data.favorites : [],
     };
     try { localStorage.setItem(LS_STATS, JSON.stringify(_cache)); } catch {}
+  } else {
+    const local = _loadLocal();
+    const def   = _defaults();
+    const hasLocal = Object.values(local.wins).some(v => v > 0)
+      || Object.values(local.losses).some(v => v > 0)
+      || Object.keys(local.charUses).length > 0;
+    if (hasLocal) {
+      _cache = local;
+      await supabase.from('user_stats').upsert({
+        user_id:       uid,
+        wins:          local.wins,
+        losses:        local.losses,
+        draws:         local.draws,
+        championships: local.championships,
+        char_uses:     local.charUses,
+        favorites:     local.favorites,
+        updated_at:    new Date().toISOString(),
+      });
+    }
   }
 }
 

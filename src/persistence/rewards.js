@@ -63,6 +63,22 @@ export async function syncRewardsFromCloud() {
       unlockedArena: data.unlocked_arena ?? {},
     };
     _saveLocal(_cache);
+  } else {
+    const local = _loadLocal();
+    const hasLocal = (local.xp ?? 0) > 0 || (local.chests ?? 0) > 0
+      || Object.keys(local.unlocked ?? {}).length > 0
+      || Object.keys(local.unlockedArena ?? {}).length > 0;
+    if (hasLocal) {
+      _cache = local;
+      await supabase.from('user_rewards').upsert({
+        user_id:        uid,
+        xp:             local.xp             ?? 0,
+        chests:         local.chests         ?? 0,
+        unlocked:       local.unlocked       ?? {},
+        unlocked_arena: local.unlockedArena  ?? {},
+        updated_at:     new Date().toISOString(),
+      });
+    }
   }
 }
 
