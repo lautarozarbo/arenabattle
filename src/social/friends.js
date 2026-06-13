@@ -1,8 +1,13 @@
 import { supabase } from '../supabase.js';
 
-let _currentTab  = 'friends';
-let _friendCode  = null;
+let _currentTab    = 'friends';
+let _friendCode    = null;
 let _friendCodeUid = null;
+
+async function _getUID() {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user?.id ?? null;
+}
 
 export function initFriends() {
   document.querySelectorAll('.friends-tab').forEach(tab => {
@@ -45,8 +50,8 @@ async function _submitCode() {
   btn.textContent = '...';
   feedback.classList.add('hidden');
 
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) {
+  const myId = await _getUID();
+  if (!myId) {
     _showFeedback(feedback, 'Tenés que iniciar sesión.', 'error');
     btn.disabled = false; btn.textContent = 'Enviar';
     return;
@@ -64,7 +69,7 @@ async function _submitCode() {
     return;
   }
 
-  if (profile.user_id === me.user.id) {
+  if (profile.user_id === myId) {
     _showFeedback(feedback, 'Ese es tu propio código.', 'error');
     btn.disabled = false; btn.textContent = 'Enviar';
     return;
@@ -73,7 +78,7 @@ async function _submitCode() {
   const { data: existing } = await supabase
     .from('friendships')
     .select('*')
-    .or(`and(requester_id.eq.${me.user.id},addressee_id.eq.${profile.user_id}),and(requester_id.eq.${profile.user_id},addressee_id.eq.${me.user.id})`)
+    .or(`and(requester_id.eq.${myId},addressee_id.eq.${profile.user_id}),and(requester_id.eq.${profile.user_id},addressee_id.eq.${myId})`)
     .maybeSingle();
 
   if (existing?.status === 'accepted') {
@@ -81,12 +86,12 @@ async function _submitCode() {
     btn.disabled = false; btn.textContent = 'Enviar';
     return;
   }
-  if (existing?.status === 'pending' && existing.requester_id === me.user.id) {
+  if (existing?.status === 'pending' && existing.requester_id === myId) {
     _showFeedback(feedback, 'Ya enviaste una solicitud a ese usuario.', 'error');
     btn.disabled = false; btn.textContent = 'Enviar';
     return;
   }
-  if (existing?.status === 'pending' && existing.addressee_id === me.user.id) {
+  if (existing?.status === 'pending' && existing.addressee_id === myId) {
     await supabase.from('friendships').update({ status: 'accepted' }).eq('id', existing.id);
     _showFeedback(feedback, `¡Ahora sos amigo de ${profile.username}!`, 'ok');
     input.value = '';
@@ -97,7 +102,7 @@ async function _submitCode() {
   }
 
   const { error } = await supabase.from('friendships').insert({
-    requester_id: me.user.id,
+    requester_id: myId,
     addressee_id: profile.user_id,
     status: 'pending',
   });
@@ -138,29 +143,29 @@ export async function openFriendsPanel() {
 }
 
 export async function refreshFriendsBadge() {
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) { _setBadge(0); return; }
+  const uid = await _getUID();
+  if (!uid) { _setBadge(0); return; }
 
   const { count } = await supabase
     .from('friendships')
     .select('*', { count: 'exact', head: true })
-    .eq('addressee_id', me.user.id)
+    .eq('addressee_id', uid)
     .eq('status', 'pending');
 
   _setBadge(count ?? 0);
 }
 
 export async function getMyFriendCode() {
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) { _friendCode = null; _friendCodeUid = null; return null; }
-  if (_friendCode && _friendCodeUid === me.user.id) return _friendCode;
+  const uid = await _getUID();
+  if (!uid) { _friendCode = null; _friendCodeUid = null; return null; }
+  if (_friendCode && _friendCodeUid === uid) return _friendCode;
   const { data } = await supabase
     .from('profiles')
     .select('friend_code')
-    .eq('user_id', me.user.id)
+    .eq('user_id', uid)
     .single();
   _friendCode    = data?.friend_code ?? null;
-  _friendCodeUid = me.user.id;
+  _friendCodeUid = uid;
   return _friendCode;
 }
 
@@ -181,13 +186,11 @@ async function _loadTab() {
   const content = document.getElementById('friends-content');
   content.innerHTML = '<div class="fr-empty">Cargando...</div>';
 
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) {
+  const uid = await _getUID();
+  if (!uid) {
     content.innerHTML = '<div class="fr-empty">Iniciá sesión para ver tus amigos.</div>';
     return;
   }
-
-  const uid = me.user.id;
   if (_currentTab === 'friends')  await _renderFriends(uid, content);
   else if (_currentTab === 'received') await _renderReceived(uid, content);
   else await _renderSent(uid, content);

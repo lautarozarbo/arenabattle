@@ -19,8 +19,8 @@ function _get() {
 }
 
 async function _getUID() {
-  const { data } = await supabase.auth.getUser();
-  return data.user?.id ?? null;
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user?.id ?? null;
 }
 
 async function _persist(s) {

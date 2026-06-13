@@ -8,10 +8,10 @@ export async function openUserProfile(userId) {
   modal.classList.remove('hidden');
   content.innerHTML = '<div class="up-loading">Cargando...</div>';
 
-  const [{ data: profile }, { data: stats }, { data: meData }] = await Promise.all([
+  const [{ data: profile }, { data: stats }, { data: sessionData }] = await Promise.all([
     supabase.from('profiles').select('username, last_seen').eq('user_id', userId).single(),
     supabase.from('user_stats').select('*').eq('user_id', userId).single(),
-    supabase.auth.getUser(),
+    supabase.auth.getSession(),
   ]);
 
   if (!profile) {
@@ -19,8 +19,7 @@ export async function openUserProfile(userId) {
     return;
   }
 
-  const me   = meData.user;
-  const myId = me?.id ?? null;
+  const myId = sessionData.session?.user?.id ?? null;
   const rel  = myId && myId !== userId ? await _getRelationship(myId, userId) : null;
 
   const s    = stats ?? {};

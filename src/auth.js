@@ -9,31 +9,34 @@ export function onLogin(cb)  { _onLoginCallback  = cb; }
 export function onLogout(cb) { _onLogoutCallback = cb; }
 
 export async function getUsername() {
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) return null;
+  const { data: s } = await supabase.auth.getSession();
+  const uid = s.session?.user?.id;
+  if (!uid) return null;
   const { data } = await supabase
     .from('profiles')
     .select('username')
-    .eq('user_id', me.user.id)
+    .eq('user_id', uid)
     .single();
   return data?.username ?? null;
 }
 
 export async function updateUsername(name) {
-  const { data: me } = await supabase.auth.getUser();
-  if (!me.user) return;
+  const { data: s } = await supabase.auth.getSession();
+  const uid = s.session?.user?.id;
+  if (!uid) return;
   await supabase.from('profiles').update({ username: name, updated_at: new Date().toISOString() })
-    .eq('user_id', me.user.id);
+    .eq('user_id', uid);
 }
 
 let _heartbeatId = null;
 
 async function _updateLastSeen() {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
+  const { data } = await supabase.auth.getSession();
+  const uid = data.session?.user?.id;
+  if (!uid) return;
   await supabase.from('profiles')
     .update({ last_seen: new Date().toISOString() })
-    .eq('user_id', data.user.id);
+    .eq('user_id', uid);
 }
 
 function _startHeartbeat() {

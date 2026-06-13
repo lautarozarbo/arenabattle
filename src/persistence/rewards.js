@@ -12,8 +12,8 @@ export const POINTS = {
 let _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
 
 async function _getUID() {
-  const { data } = await supabase.auth.getUser();
-  return data.user?.id ?? null;
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user?.id ?? null;
 }
 
 async function _persist(d) {

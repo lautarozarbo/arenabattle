@@ -7,12 +7,20 @@ export async function openLeaderboard() {
   modal.classList.remove('hidden');
   body.innerHTML = '<tr><td colspan="4" class="lb-loading">Cargando...</td></tr>';
 
-  const { data, error } = await supabase
-    .from('leaderboard')
-    .select('user_id, username, total_wins, total_losses, total_draws')
-    .limit(50);
+  let data, error;
+  try {
+    ({ data, error } = await supabase
+      .from('leaderboard')
+      .select('user_id, username, total_wins, total_losses, total_draws')
+      .limit(50));
+  } catch (e) {
+    console.error('[leaderboard] fetch error:', e);
+    body.innerHTML = `<tr><td colspan="4" class="lb-loading">Error: ${e.message}</td></tr>`;
+    return;
+  }
 
   if (error || !data?.length) {
+    console.warn('[leaderboard] error or empty:', error);
     body.innerHTML = '<tr><td colspan="4" class="lb-loading">Sin datos todavía.</td></tr>';
     return;
   }
