@@ -4,6 +4,7 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
+  { badge: "NUEVO", text: "Perfiles de usuario desde el ranking" },
   { badge: "NUEVO", text: "Registro de usuarios" },
   { badge: "NUEVO", text: "Ranking global" },
   { badge: "NUEVO", text: "Modo 2 vs 2 Relevos" },

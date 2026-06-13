@@ -219,7 +219,10 @@ onLogin((username) => {
   }
   _updateXpBar();
 });
-onLogout(() => { _savePlayerName('Invitado'); });
+onLogout(() => {
+  localStorage.removeItem('playerName');
+  _savePlayerName('Invitado');
+});
 
 document.getElementById('btn-open-leaderboard').addEventListener('click', () => {
   sfx.uiClick();
@@ -291,10 +294,9 @@ const _profilePanel    = document.getElementById("profile-panel");
 const _profileEditRow  = document.getElementById("profile-name-edit-row");
 
 function _loadPlayerName() {
-  const saved = localStorage.getItem("playerName") || "Invitado";
-  _chipName.textContent    = saved;
-  _profileName.textContent = saved;
-  _profileInput.value      = saved;
+  _chipName.textContent    = "Invitado";
+  _profileName.textContent = "Invitado";
+  _profileInput.value      = "Invitado";
 }
 _loadPlayerName();
 
