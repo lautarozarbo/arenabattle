@@ -3261,15 +3261,19 @@ td.rank {
   background: #12182b;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 18px;
-  padding: 0 24px 24px;
-  width: min(520px, 95vw);
+  padding: 0 0 24px;
+  width: min(460px, 95vw);
   max-height: 80vh;
   display: flex;
   flex-direction: column;
 }
+.leaderboard-modal .auth-modal-header {
+  padding: 16px 20px 18px;
+}
 .leaderboard-wrap {
   overflow-y: auto;
   flex: 1;
+  padding: 0 8px;
 }
 .leaderboard-table {
   width: 100%;
@@ -3277,29 +3281,62 @@ td.rank {
   font-size: 0.85rem;
 }
 .leaderboard-table thead th {
-  text-align: left;
-  padding: 8px 10px;
-  color: rgba(255,255,255,0.4);
+  text-align: center;
+  padding: 8px 12px;
+  color: rgba(255,255,255,0.35);
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   position: sticky;
   top: 0;
   background: #12182b;
 }
+.leaderboard-table thead th:nth-child(2) { text-align: left; }
 .leaderboard-table tbody tr {
   border-bottom: 1px solid rgba(255,255,255,0.05);
   transition: background 0.1s;
 }
+.leaderboard-table tbody tr:last-child { border-bottom: none; }
 .leaderboard-table tbody tr:hover { background: rgba(255,255,255,0.04); }
-.lb-row--me { background: rgba(255,255,255,0.07) !important; }
-.leaderboard-table td {
-  padding: 10px 10px;
-  color: rgba(255,255,255,0.85);
+.lb-row--me {
+  background: rgba(255,255,255,0.07) !important;
+  border-radius: 8px;
 }
-.lb-rank { width: 40px; color: rgba(255,255,255,0.4); font-size: 0.8rem; }
-.lb-name { font-weight: 500; }
-.lb-wins { color: #6ee87a; font-weight: 600; }
-.lb-rate { color: rgba(255,255,255,0.5); }
-.lb-champ { font-size: 0.85rem; }
-.lb-loading { text-align: center; color: rgba(255,255,255,0.35); padding: 32px; }
+.leaderboard-table td {
+  padding: 11px 12px;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+}
+.leaderboard-table td:nth-child(2) { text-align: left; }
+.lb-rank {
+  width: 44px;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.lb-name {
+  font-weight: 500;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-wins {
+  color: #6ee87a;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.lb-rate {
+  color: rgba(255,255,255,0.45);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.lb-loading {
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  padding: 40px;
+  font-size: 0.85rem;
+}
