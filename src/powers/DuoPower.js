@@ -308,8 +308,8 @@ export class DuoPower extends BasePower {
       ctx.stroke();
 
       // HP inside companion
+      const r = this._comp.radius;
       if (getHpVisible()) {
-        const r = this._comp.radius;
         ctx.font = `bold ${r * 0.75}px system-ui, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
