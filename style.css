@@ -3498,7 +3498,7 @@ td.rank {
 
 /* ── Profile panel: friend code ──────────────────────────────────────────── */
 .profile-friend-code {
-  margin: 10px 20px 0;
+  margin: 8px 20px 4px;
   padding: 10px 14px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);

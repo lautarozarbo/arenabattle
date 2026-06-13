@@ -59,6 +59,7 @@ function _setLoggedOut() {
   document.getElementById('auth-logged-out').classList.remove('hidden');
   document.getElementById('auth-logged-in').classList.add('hidden');
   document.getElementById('auth-user-email').textContent = '';
+  if (_heartbeatId) { clearInterval(_heartbeatId); _heartbeatId = null; }
 }
 
 function _openModal() {
@@ -110,37 +111,44 @@ export function initAuth() {
     submitBtn.disabled = true;
 
     if (_mode === 'login') {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { _showError(_translateError(error.message)); }
-      else {
-        _closeModal();
-        _setLoggedIn(data.user);
-        await _syncAndNotify();
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) _showError(_translateError(error.message));
+      // success → onAuthStateChange fires SIGNED_IN and handles the rest
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) { _showError(_translateError(error.message)); }
-      else if (data.user && !data.session) {
+      if (error) {
+        _showError(_translateError(error.message));
+      } else if (data.user && !data.session) {
         _showError('Revisá tu email para confirmar la cuenta.');
-      } else {
-        _closeModal();
-        _setLoggedIn(data.user);
-        await _syncAndNotify();
       }
+      // success with session → onAuthStateChange fires SIGNED_IN
     }
     submitBtn.disabled = false;
   });
 
-  document.getElementById('btn-logout').addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    _setLoggedOut();
-    if (_onLogoutCallback) _onLogoutCallback();
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    supabase.auth.signOut();
+    // onAuthStateChange fires SIGNED_OUT and handles cleanup
   });
 
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session?.user) {
-      _setLoggedIn(data.session.user);
-      _syncAndNotify();
+  // Single source of truth for auth state.
+  // INITIAL_SESSION: fires on page load after SDK resolves/refreshes the stored token.
+  // SIGNED_IN: fires on explicit login (form submit).
+  // SIGNED_OUT: fires on explicit logout.
+  // TOKEN_REFRESHED: fires every hour automatically — no action needed.
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION') {
+      if (session?.user) {
+        _setLoggedIn(session.user);
+        await _syncAndNotify();
+      }
+    } else if (event === 'SIGNED_IN') {
+      _closeModal();
+      _setLoggedIn(session.user);
+      await _syncAndNotify();
+    } else if (event === 'SIGNED_OUT') {
+      _setLoggedOut();
+      if (_onLogoutCallback) _onLogoutCallback();
     }
   });
 }
