@@ -817,58 +817,46 @@
             </svg>
           </button>
           <button class="char-modal-close" id="char-modal-close">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-            >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
           <div class="char-modal-preview">
-            <canvas
-              class="char-modal-circle"
-              id="char-modal-circle"
-              width="220"
-              height="130"
-            ></canvas>
-          </div>
-          <div class="skin-selector hidden" id="char-modal-skin-selector">
-            <button
-              class="skin-arrow"
-              id="char-modal-skin-prev"
-              aria-label="Skin anterior"
-            >
-              &#8249;
-            </button>
-            <div class="skin-label-group">
-              <span class="skin-label-heading">SKIN</span>
-              <span class="skin-name" id="char-modal-skin-name">Default</span>
-              <span
-                class="skin-lock-icon lock-invisible"
-                id="char-modal-skin-lock"
-                >🔒</span
-              >
-            </div>
-            <button
-              class="skin-arrow"
-              id="char-modal-skin-next"
-              aria-label="Siguiente skin"
-            >
-              &#8250;
-            </button>
+            <canvas class="char-modal-circle" id="char-modal-circle" width="220" height="130"></canvas>
           </div>
           <div class="char-modal-name" id="char-modal-name"></div>
-          <div class="char-modal-desc" id="char-modal-desc"></div>
-          <div class="char-modal-stats" id="char-modal-stats"></div>
-          <button class="btn-primary" id="char-modal-select">
-            Seleccionar
-          </button>
+
+          <!-- Tabs -->
+          <div class="char-modal-tabs">
+            <button class="char-modal-tab char-modal-tab--active" data-tab="info">Info</button>
+            <button class="char-modal-tab" data-tab="mastery">
+              Maestría
+              <span class="char-modal-mastery-dot hidden" id="char-modal-mastery-dot"></span>
+            </button>
+          </div>
+
+          <!-- Panel: Info -->
+          <div class="char-modal-panel" id="char-modal-panel-info">
+            <div class="skin-selector hidden" id="char-modal-skin-selector">
+              <button class="skin-arrow" id="char-modal-skin-prev" aria-label="Skin anterior">&#8249;</button>
+              <div class="skin-label-group">
+                <span class="skin-label-heading">SKIN</span>
+                <span class="skin-name" id="char-modal-skin-name">Default</span>
+                <span class="skin-lock-icon lock-invisible" id="char-modal-skin-lock">🔒</span>
+              </div>
+              <button class="skin-arrow" id="char-modal-skin-next" aria-label="Siguiente skin">&#8250;</button>
+            </div>
+            <div class="char-modal-desc" id="char-modal-desc"></div>
+            <div class="char-modal-stats" id="char-modal-stats"></div>
+          </div>
+
+          <!-- Panel: Maestría -->
+          <div class="char-modal-panel hidden" id="char-modal-panel-mastery">
+            <div id="char-modal-mastery-content"></div>
+          </div>
+
+          <button class="btn-primary" id="char-modal-select">Seleccionar</button>
         </div>
       </div>
     </div>

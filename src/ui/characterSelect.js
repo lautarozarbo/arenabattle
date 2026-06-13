@@ -3,7 +3,9 @@ import {
   ANIMATED_SKIN_IDS, getSkinsFor, getSelectedSkinIdx, setSelectedSkinIdx, drawCharPreview,
 } from '../skins/index.js';
 import { isSkinUnlocked } from '../persistence/rewards.js';
-import { getFavorites, isFavorite, toggleFavorite } from '../persistence/stats.js';
+import { getFavorites, isFavorite, toggleFavorite, getStats } from '../persistence/stats.js';
+import { getMasteryClaimedFor, getClaimableCount, claimMasteryMilestone } from '../persistence/rewards.js';
+import { MASTERY_MILESTONES } from '../mastery/milestones.js';
 
 const metas = getAllPowerMetas();
 
@@ -40,6 +42,7 @@ export function buildGrid(player, confirmBtnId) {
     cell.innerHTML = `
       <div class="grid-peek">
         <div class="grid-circle" style="background:${meta.color}">${meta.icon}</div>
+        <span class="mastery-badge hidden" data-char="${meta.id}"></span>
       </div>
       <div class="grid-name">${meta.name}</div>
     `;
@@ -168,11 +171,22 @@ export function buildGrid(player, confirmBtnId) {
   return { getSelected: () => metas.find(m => m.id === selectedId) ?? metas[0], reset };
 }
 
+export function refreshMasteryBadges() {
+  const stats = getStats();
+  document.querySelectorAll('.mastery-badge[data-char]').forEach(badge => {
+    const charId = badge.dataset.char;
+    const games  = stats.charUses[charId] ?? 0;
+    const count  = getClaimableCount(charId, games);
+    badge.classList.toggle('hidden', count === 0);
+  });
+}
+
 // ── Character info modal ──────────────────────────────────────────────────────
 let _modalSelectCb = null;
 let _modalMeta     = null;
 let _modalSkinIdx  = 0;
 let _previewAnimId = null;
+let _modalTab      = 'info';
 
 function _stopPreviewAnim() {
   if (_previewAnimId !== null) {
@@ -236,11 +250,84 @@ function _syncModalSkin() {
   selectBtn.disabled = locked;
 }
 
+function _switchModalTab(tab) {
+  _modalTab = tab;
+  document.querySelectorAll('.char-modal-tab').forEach(btn => {
+    btn.classList.toggle('char-modal-tab--active', btn.dataset.tab === tab);
+  });
+  document.getElementById('char-modal-panel-info').classList.toggle('hidden', tab !== 'info');
+  document.getElementById('char-modal-panel-mastery').classList.toggle('hidden', tab !== 'mastery');
+  if (tab === 'mastery' && _modalMeta) _renderMasteryContent(_modalMeta);
+}
+
+function _updateMasteryDot(meta) {
+  const dot   = document.getElementById('char-modal-mastery-dot');
+  if (!dot) return;
+  const stats = getStats();
+  const games = stats.charUses[meta.id] ?? 0;
+  const count = getClaimableCount(meta.id, games);
+  dot.classList.toggle('hidden', count === 0);
+}
+
+function _renderMasteryContent(meta) {
+  const content = document.getElementById('char-modal-mastery-content');
+  if (!content) return;
+  const stats   = getStats();
+  const games   = stats.charUses[meta.id] ?? 0;
+  const claimed = getMasteryClaimedFor(meta.id);
+
+  const milestonesHtml = MASTERY_MILESTONES.map(m => {
+    const isClaimed = claimed.has(m.games);
+    const isReady   = !isClaimed && games >= m.games;
+    const pct       = Math.min(100, Math.round((games / m.games) * 100));
+    const rewardTxt = `${m.xp} XP${m.chests ? ` · ${m.chests} cofre${m.chests > 1 ? 's' : ''}` : ''}`;
+    let stateClass  = isClaimed ? 'mastery-ms--claimed' : isReady ? 'mastery-ms--ready' : 'mastery-ms--locked';
+    let iconHtml    = isClaimed ? '<span class="mastery-ms-check">✓</span>' : isReady ? '🎁' : `${m.games}`;
+    let actionHtml  = isClaimed
+      ? `<span class="mastery-ms-done">Reclamado</span>`
+      : isReady
+        ? `<button class="mastery-claim-btn" data-games="${m.games}">Reclamar</button>`
+        : `<span class="mastery-ms-frac">${games}/${m.games}</span>`;
+
+    return `<div class="mastery-ms ${stateClass}">
+      <div class="mastery-ms-icon">${iconHtml}</div>
+      <div class="mastery-ms-body">
+        <div class="mastery-ms-title">${m.games} partidas</div>
+        <div class="mastery-ms-reward">${rewardTxt}</div>
+        ${!isClaimed && !isReady ? `<div class="mastery-ms-bar"><div class="mastery-ms-bar-fill" style="width:${pct}%"></div></div>` : ''}
+      </div>
+      <div class="mastery-ms-action">${actionHtml}</div>
+    </div>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="mastery-header">
+      <span class="mastery-games-val">${games}</span>
+      <span class="mastery-games-lbl">partidas</span>
+    </div>
+    <div class="mastery-path">${milestonesHtml}</div>
+  `;
+
+  content.querySelectorAll('.mastery-claim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = parseInt(btn.dataset.games);
+      const result = claimMasteryMilestone(meta.id, g);
+      if (!result) return;
+      document.dispatchEvent(new CustomEvent('mastery:claimed', { detail: result }));
+      _renderMasteryContent(meta);
+      _updateMasteryDot(meta);
+      refreshMasteryBadges();
+    });
+  });
+}
+
 export function openCharModal(meta, onSelect) {
   _modalMeta     = meta;
   _modalSelectCb = onSelect;
   const overlay = document.getElementById("char-modal");
   overlay.classList.remove("modal-closing", "hidden");
+
+  _switchModalTab('info');
 
   const skins = getSkinsFor(meta.id);
   _modalSkinIdx = getSelectedSkinIdx(meta.id);
@@ -253,6 +340,7 @@ export function openCharModal(meta, onSelect) {
   _renderModalCircle();
   if (skins) _syncModalSkin();
   _syncModalFavBtn();
+  _updateMasteryDot(meta);
 }
 
 export function closeCharModal() {
@@ -277,6 +365,10 @@ export function syncModalSkinIfOpen(charId) {
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────────
+document.querySelectorAll('.char-modal-tab').forEach(btn => {
+  btn.addEventListener('click', () => _switchModalTab(btn.dataset.tab));
+});
+
 document.getElementById("char-modal-fav")?.addEventListener("click", () => {
   if (!_modalMeta) return;
   toggleFavorite(_modalMeta.id);

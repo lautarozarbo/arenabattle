@@ -3766,3 +3766,184 @@ td.rank {
 }
 .fr-code-feedback--ok    { background: rgba(62,207,106,.12); color: #3ecf6a; }
 .fr-code-feedback--error { background: rgba(239,68,68,.12);  color: #f87171; }
+
+/* ── Mastery badge on grid cell ──────────────────────────────────────────── */
+.grid-peek { position: relative; }
+.mastery-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #ff4757;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  animation: mastery-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mastery-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.25); opacity: 0.75; }
+}
+
+/* ── Character modal tabs ─────────────────────────────────────────────────── */
+.char-modal-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 0;
+  margin-bottom: 2px;
+}
+.char-modal-tab {
+  flex: 1;
+  padding: 7px 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  position: relative;
+  margin-bottom: -1px;
+}
+.char-modal-tab--active {
+  color: var(--text);
+  border-bottom-color: var(--accent, #7c6be0);
+}
+.char-modal-mastery-dot {
+  position: absolute;
+  top: 4px;
+  right: 18px;
+  width: 7px;
+  height: 7px;
+  background: #ff4757;
+  border-radius: 50%;
+}
+
+/* ── Modal panels ─────────────────────────────────────────────────────────── */
+.char-modal-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.char-modal-panel::-webkit-scrollbar { width: 3px; }
+.char-modal-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* ── Mastery tab content ──────────────────────────────────────────────────── */
+.mastery-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 4px;
+  gap: 2px;
+}
+.mastery-games-val {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text);
+}
+.mastery-games-lbl {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.mastery-path {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+.mastery-ms {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.mastery-ms--ready {
+  background: rgba(255,71,87,0.1);
+  border-color: rgba(255,71,87,0.35);
+}
+.mastery-ms--claimed {
+  opacity: 0.55;
+}
+
+.mastery-ms-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.mastery-ms--ready .mastery-ms-icon {
+  background: rgba(255,71,87,0.2);
+  font-size: 1rem;
+}
+.mastery-ms--claimed .mastery-ms-icon {
+  background: rgba(100,220,100,0.15);
+}
+.mastery-ms-check { color: #64dc64; font-size: 0.9rem; }
+
+.mastery-ms-body {
+  flex: 1;
+  min-width: 0;
+}
+.mastery-ms-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.mastery-ms-reward {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+.mastery-ms-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.mastery-ms-bar-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  transition: width .3s;
+}
+
+.mastery-ms-action { flex-shrink: 0; }
+.mastery-claim-btn {
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: none;
+  background: #ff4757;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.mastery-claim-btn:hover { background: #ff6575; }
+.mastery-ms-done {
+  font-size: 0.7rem;
+  color: rgba(100,220,100,0.8);
+}
+.mastery-ms-frac {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}

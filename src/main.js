@@ -33,7 +33,7 @@ import {
 } from "./ui/arenaConfig.js";
 import { bgBattleResume, bgBattlePause } from "./ui/menuAnimation.js";
 import { showScreen, showConfirm, currentScreen, initScreens } from "./ui/screens.js";
-import { buildGrid, notifySkinChange, syncModalSkinIfOpen } from "./ui/characterSelect.js";
+import { buildGrid, notifySkinChange, syncModalSkinIfOpen, refreshMasteryBadges } from "./ui/characterSelect.js";
 import {
   initLeagueUI, startLeague, showLeagueStandings, updateLeagueInfo,
   loadLeague, isLeagueFinished, isLeagueRandomMode,
@@ -111,6 +111,8 @@ function _updateXpBar() {
   document.getElementById('xp-chest-count').textContent = chests;
   document.getElementById('xp-chest-btn').classList.toggle('hidden', chests <= 0);
 }
+
+document.addEventListener('mastery:claimed', () => _updateXpBar());
 
 function _showGameoverPoints(lines) {
   const el = document.getElementById('gameover-points');
@@ -221,6 +223,7 @@ onLogin((username) => {
   }
   _updateXpBar();
   refreshFriendsBadge();
+  refreshMasteryBadges();
   if (!_profilePanel.classList.contains('hidden')) _refreshProfilePanel();
 });
 onLogout(() => {
@@ -1070,6 +1073,7 @@ function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
     document.getElementById("btn-restart").textContent = t('btn.pick.again');
   }
   recordCharUse(p1meta.id);
+  refreshMasteryBadges();
   const sp1 = applySkinnedMeta(p1meta);
   const sp2 = applySkinnedMeta(p2meta);
   _startFightWithCfgs([
@@ -1097,6 +1101,7 @@ function _startFightWithCfgs(cfgs, onResult, arenaOpts = {}) {
 function startTagTeamFight() {
   const { my, partner, e1, e2 } = _ttCfg;
   recordCharUse(my?.meta?.id);
+  refreshMasteryBadges();
   _ttMatch = new TagTeamMatch([my, partner], [e1, e2]);
   _ttArenaOpts = getQuickArenaOpts();
   canvas.width = canvas.height = _ttArenaOpts.canvasSize;

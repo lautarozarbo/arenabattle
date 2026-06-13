@@ -1,6 +1,7 @@
 import { CHAR_SKINS } from '../skins/index.js';
 import { ARENA_SKINS } from '../skins/arenaSkins.js';
 import { supabase } from '../supabase.js';
+import { MASTERY_MILESTONES } from '../mastery/milestones.js';
 
 export const POINTS = {
   MATCH_COMPLETE:        5,
@@ -9,7 +10,7 @@ export const POINTS = {
   EVENT_WIN:            20,
 };
 
-let _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
+let _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
 
 async function _getUID() {
   const { data } = await supabase.auth.getSession();
@@ -21,19 +22,20 @@ async function _persist(d) {
   const uid = await _getUID();
   if (!uid) return;
   supabase.from('user_rewards').upsert({
-    user_id:        uid,
-    xp:             d.xp             ?? 0,
-    chests:         d.chests         ?? 0,
-    unlocked:       d.unlocked       ?? {},
-    unlocked_arena: d.unlockedArena  ?? {},
-    updated_at:     new Date().toISOString(),
+    user_id:         uid,
+    xp:              d.xp               ?? 0,
+    chests:          d.chests           ?? 0,
+    unlocked:        d.unlocked         ?? {},
+    unlocked_arena:  d.unlockedArena    ?? {},
+    mastery_claimed: d.masteryClaimedFor ?? {},
+    updated_at:      new Date().toISOString(),
   }).then(() => {});
 }
 
 export async function syncRewardsFromCloud() {
   const uid = await _getUID();
   if (!uid) {
-    _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
+    _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
     return;
   }
   const { data } = await supabase
@@ -42,11 +44,12 @@ export async function syncRewardsFromCloud() {
     .eq('user_id', uid)
     .single();
   _cache = data ? {
-    xp:            data.xp             ?? 0,
-    chests:        data.chests         ?? 0,
-    unlocked:      data.unlocked       ?? {},
-    unlockedArena: data.unlocked_arena ?? {},
-  } : { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
+    xp:               data.xp              ?? 0,
+    chests:           data.chests          ?? 0,
+    unlocked:         data.unlocked        ?? {},
+    unlockedArena:    data.unlocked_arena  ?? {},
+    masteryClaimedFor: data.mastery_claimed ?? {},
+  } : { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
 }
 
 export function getXP()     { return _cache.xp     ?? 0; }
@@ -70,6 +73,31 @@ export function addPoints(amount) {
   while (d.xp >= 100) { d.xp -= 100; d.chests++; }
   _persist(d);
   return { xp: d.xp, chests: d.chests, gained: amount };
+}
+
+export function getMasteryClaimedFor(charId) {
+  return new Set(_cache.masteryClaimedFor?.[charId] ?? []);
+}
+
+export function getClaimableCount(charId, gamesPlayed) {
+  const claimed = getMasteryClaimedFor(charId);
+  return MASTERY_MILESTONES.filter(m => gamesPlayed >= m.games && !claimed.has(m.games)).length;
+}
+
+export function claimMasteryMilestone(charId, games) {
+  const milestone = MASTERY_MILESTONES.find(m => m.games === games);
+  if (!milestone) return null;
+  const claimed = _cache.masteryClaimedFor?.[charId] ?? [];
+  if (claimed.includes(games)) return null;
+
+  const d = { ..._cache };
+  d.masteryClaimedFor = { ...(d.masteryClaimedFor ?? {}) };
+  d.masteryClaimedFor[charId] = [...claimed, games];
+  d.xp     = (d.xp     ?? 0) + milestone.xp;
+  d.chests = (d.chests ?? 0) + milestone.chests;
+  while (d.xp >= 100) { d.xp -= 100; d.chests++; }
+  _persist(d);
+  return { xp: milestone.xp, chests: milestone.chests };
 }
 
 export function openChest() {
