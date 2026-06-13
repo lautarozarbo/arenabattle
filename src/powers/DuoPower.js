@@ -1,5 +1,6 @@
 ﻿import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
+import { getHpVisible } from "../game/circle.js";
 
 function drawBeam(ctx, x1, y1, x2, y2, alpha) {
   ctx.save();
@@ -307,23 +308,17 @@ export class DuoPower extends BasePower {
       ctx.stroke();
 
       // HP inside companion
-      const r = this._comp.radius;
-      ctx.font = `bold ${r * 0.75}px system-ui, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "rgba(0,0,0,0.9)";
-      ctx.strokeText(
-        String(Math.ceil(this._comp.hp)),
-        this._comp.x,
-        this._comp.y,
-      );
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(
-        String(Math.ceil(this._comp.hp)),
-        this._comp.x,
-        this._comp.y,
-      );
+      if (getHpVisible()) {
+        const r = this._comp.radius;
+        ctx.font = `bold ${r * 0.75}px system-ui, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(0,0,0,0.9)";
+        ctx.strokeText(String(Math.ceil(this._comp.hp)), this._comp.x, this._comp.y);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(String(Math.ceil(this._comp.hp)), this._comp.x, this._comp.y);
+      }
       ctx.restore();
 
       // Companion beam indicator
