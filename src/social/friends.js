@@ -14,19 +14,20 @@ export function initFriends() {
     });
   });
 
-  document.getElementById('btn-friends-close').addEventListener('click', _closePanel);
-  document.getElementById('friends-panel').addEventListener('click', e => {
-    if (e.target === document.getElementById('friends-panel')) _closePanel();
-  });
-
+  const closeBtn = document.getElementById('btn-friends-close');
+  const panel    = document.getElementById('friends-panel');
   const codeInput  = document.getElementById('fr-code-input');
   const codeSubmit = document.getElementById('fr-code-submit');
 
-  codeSubmit.addEventListener('click', () => _submitCode());
-  codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') _submitCode(); });
-  codeInput.addEventListener('input', () => {
-    codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  });
+  if (closeBtn) closeBtn.addEventListener('click', _closePanel);
+  if (panel)    panel.addEventListener('click', e => { if (e.target === panel) _closePanel(); });
+  if (codeSubmit) codeSubmit.addEventListener('click', () => _submitCode());
+  if (codeInput) {
+    codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') _submitCode(); });
+    codeInput.addEventListener('input', () => {
+      codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+  }
 }
 
 async function _submitCode() {

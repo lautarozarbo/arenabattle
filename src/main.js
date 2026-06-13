@@ -211,7 +211,7 @@ _updateXpBar();
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 initAuth();
-initFriends();
+try { initFriends(); } catch (e) { console.error('[friends] init failed:', e); }
 onLogin((username) => {
   const localName = localStorage.getItem('playerName');
   if (localName && localName !== 'Invitado') {
