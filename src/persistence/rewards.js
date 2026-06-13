@@ -79,6 +79,25 @@ export function getMasteryClaimedFor(charId) {
   return new Set(_cache.masteryClaimedFor?.[charId] ?? []);
 }
 
+export function isEffectUnlocked(charId) {
+  return getMasteryClaimedFor(charId).has(100);
+}
+
+function _loadEffectsActive() {
+  try { return JSON.parse(localStorage.getItem('mastery_effects') ?? '{}'); } catch { return {}; }
+}
+
+export function getEffectActive(charId) {
+  if (!isEffectUnlocked(charId)) return false;
+  return _loadEffectsActive()[charId] ?? false;
+}
+
+export function setEffectActive(charId, active) {
+  const d = _loadEffectsActive();
+  d[charId] = active;
+  localStorage.setItem('mastery_effects', JSON.stringify(d));
+}
+
 export function getClaimableCount(charId, gamesPlayed) {
   const claimed = getMasteryClaimedFor(charId);
   return MASTERY_MILESTONES.filter(m => gamesPlayed >= m.games && !claimed.has(m.games)).length;
@@ -97,7 +116,8 @@ export function claimMasteryMilestone(charId, games) {
   d.chests = (d.chests ?? 0) + milestone.chests;
   while (d.xp >= 100) { d.xp -= 100; d.chests++; }
   _persist(d);
-  return { xp: milestone.xp, chests: milestone.chests };
+  if (milestone.effect) setEffectActive(charId, true);
+  return { xp: milestone.xp, chests: milestone.chests, effect: milestone.effect };
 }
 
 export function openChest() {

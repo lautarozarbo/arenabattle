@@ -36,6 +36,7 @@ export class Circle {
     this._silenced        = false;
     this._hitCooldown     = 0; // prevents rapid collision damage when circles graze
     this.teamId           = cfg.teamId ?? null;
+    this.activeEffect     = cfg.activeEffect ?? null;
   }
 
   clampToBaseSpeed() {
@@ -176,6 +177,7 @@ export class Circle {
 
     this.power.renderAbove(ctx);
     drawSkinDecorationAbove(ctx, this.x, this.y, this.radius, this.charId, this.skinId, this._facingAngle);
+    if (this.activeEffect === 'golden_sparkles') _drawGoldenSparkles(ctx, this.x, this.y, this.radius);
 
     this._drawHpInside(ctx);
     this._renderDmgNums(ctx);
@@ -222,4 +224,42 @@ export class Circle {
       ctx.restore();
     }
   }
+}
+
+function _drawGoldenSparkles(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save();
+
+  // Inner ring: 8 particles orbiting clockwise
+  for (let i = 0; i < 8; i++) {
+    const phase = (i / 8) * Math.PI * 2;
+    const angle = phase + t * 1.6;
+    const dist  = r + 10 + 4 * Math.sin(t * 2.5 + phase * 2);
+    const alpha = 0.55 + 0.45 * Math.sin(t * 4 + phase);
+    const size  = Math.max(0.5, 2 + Math.sin(t * 3 + i * 0.9));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle   = '#FFD700';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur  = 10;
+    ctx.beginPath();
+    ctx.arc(x + Math.cos(angle) * dist, y + Math.sin(angle) * dist, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Outer ring: 5 particles counter-clockwise, lighter
+  for (let i = 0; i < 5; i++) {
+    const phase = (i / 5) * Math.PI * 2;
+    const angle = phase - t * 0.9;
+    const dist  = r + 19 + 5 * Math.sin(t * 1.7 + phase);
+    const alpha = 0.25 + 0.3 * Math.sin(t * 2.2 + phase * 1.5);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle   = '#FFF59D';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur  = 6;
+    ctx.beginPath();
+    ctx.arc(x + Math.cos(angle) * dist, y + Math.sin(angle) * dist, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
 }

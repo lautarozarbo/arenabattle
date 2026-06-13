@@ -16,7 +16,7 @@ import {
 } from "./skins/index.js";
 import {
   POINTS, getXP, getChests, isArenaSkinUnlocked, addPoints, openChest,
-  syncRewardsFromCloud,
+  syncRewardsFromCloud, getEffectActive,
 } from "./persistence/rewards.js";
 import {
   ARENA_SKINS, setSelectedArenaSkinId, drawArenaBg,
@@ -1077,7 +1077,7 @@ function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
   const sp1 = applySkinnedMeta(p1meta);
   const sp2 = applySkinnedMeta(p2meta);
   _startFightWithCfgs([
-    { color: sp1.color, label: p1meta.name, powerId: p1meta.id, hp: 100, skinId: sp1.skinId },
+    { color: sp1.color, label: p1meta.name, powerId: p1meta.id, hp: 100, skinId: sp1.skinId, activeEffect: getEffectActive(p1meta.id) ? 'golden_sparkles' : null },
     { color: sp2.color, label: p2meta.name, powerId: p2meta.id, hp: 100, skinId: sp2.skinId },
   ], onResult, arenaOpts);
 }
@@ -1117,7 +1117,7 @@ function _ttRunRound() {
   const sm0 = applySkinnedMeta(a0.meta);
   const sm1 = applySkinnedMeta(a1.meta);
   const cfgs = [
-    { color: sm0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sm0.skinId },
+    { color: sm0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sm0.skinId, activeEffect: getEffectActive(a0.meta.id) ? 'golden_sparkles' : null },
     { color: sm1.color, label: a1.meta.name, powerId: a1.meta.id, hp: a1.hp, skinId: sm1.skinId },
   ];
   _ttPrevHp = [a0.hp, a1.hp];

@@ -4,7 +4,7 @@ import {
 } from '../skins/index.js';
 import { isSkinUnlocked } from '../persistence/rewards.js';
 import { getFavorites, isFavorite, toggleFavorite, getStats } from '../persistence/stats.js';
-import { getMasteryClaimedFor, getClaimableCount, claimMasteryMilestone } from '../persistence/rewards.js';
+import { getMasteryClaimedFor, getClaimableCount, claimMasteryMilestone, isEffectUnlocked, getEffectActive, setEffectActive } from '../persistence/rewards.js';
 import { MASTERY_MILESTONES } from '../mastery/milestones.js';
 
 const metas = getAllPowerMetas();
@@ -280,10 +280,12 @@ function _renderMasteryContent(meta) {
     const isClaimed = claimed.has(m.games);
     const isReady   = !isClaimed && games >= m.games;
     const pct       = Math.min(100, Math.round((games / m.games) * 100));
-    const rewardTxt = `${m.xp} XP${m.chests ? ` · ${m.chests} cofre${m.chests > 1 ? 's' : ''}` : ''}`;
-    let stateClass  = isClaimed ? 'mastery-ms--claimed' : isReady ? 'mastery-ms--ready' : 'mastery-ms--locked';
-    let iconHtml    = isClaimed ? '<span class="mastery-ms-check">✓</span>' : isReady ? '🎁' : `${m.games}`;
-    let actionHtml  = isClaimed
+    const rewardTxt = m.effect
+      ? '✨ Efecto: Destellos dorados'
+      : `${m.xp} XP${m.chests ? ` · ${m.chests} cofre${m.chests > 1 ? 's' : ''}` : ''}`;
+    const stateClass = isClaimed ? 'mastery-ms--claimed' : isReady ? 'mastery-ms--ready' : 'mastery-ms--locked';
+    const iconHtml   = isClaimed ? '<span class="mastery-ms-check">✓</span>' : isReady ? '🎁' : `${m.games}`;
+    const actionHtml = isClaimed
       ? `<span class="mastery-ms-done">Reclamado</span>`
       : isReady
         ? `<button class="mastery-claim-btn" data-games="${m.games}">Reclamar</button>`
@@ -300,12 +302,28 @@ function _renderMasteryContent(meta) {
     </div>`;
   }).join('');
 
+  const effectActive   = getEffectActive(meta.id);
+  const effectUnlocked = isEffectUnlocked(meta.id);
+  const effectSectionHtml = effectUnlocked ? `
+    <div class="mastery-effect-row">
+      <span class="mastery-effect-icon">✨</span>
+      <div class="mastery-effect-info">
+        <div class="mastery-effect-name">Destellos dorados</div>
+        <div class="mastery-effect-desc">Brilla en combate</div>
+      </div>
+      <button class="mastery-effect-toggle ${effectActive ? 'mastery-effect-toggle--on' : ''}" id="mastery-effect-btn">
+        ${effectActive ? 'ON' : 'OFF'}
+      </button>
+    </div>
+  ` : '';
+
   content.innerHTML = `
     <div class="mastery-header">
       <span class="mastery-games-val">${games}</span>
       <span class="mastery-games-lbl">partidas</span>
     </div>
     <div class="mastery-path">${milestonesHtml}</div>
+    ${effectSectionHtml}
   `;
 
   content.querySelectorAll('.mastery-claim-btn').forEach(btn => {
@@ -319,6 +337,15 @@ function _renderMasteryContent(meta) {
       refreshMasteryBadges();
     });
   });
+
+  const effectBtn = content.querySelector('#mastery-effect-btn');
+  if (effectBtn) {
+    effectBtn.addEventListener('click', () => {
+      const current = getEffectActive(meta.id);
+      setEffectActive(meta.id, !current);
+      _renderMasteryContent(meta);
+    });
+  }
 }
 
 export function openCharModal(meta, onSelect) {
