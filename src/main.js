@@ -210,7 +210,12 @@ _updateXpBar();
 // ── Auth ──────────────────────────────────────────────────────────────────────
 initAuth();
 onLogin((username) => {
-  if (username) _savePlayerName(username);
+  const localName = localStorage.getItem('playerName');
+  if (localName && localName !== 'Invitado') {
+    _savePlayerName(localName);
+  } else if (username) {
+    _savePlayerName(username);
+  }
   _updateXpBar();
 });
 onLogout(() => { _savePlayerName('Invitado'); });
