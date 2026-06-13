@@ -1,22 +1,22 @@
 import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
 
-const ARROW_SPEED    = 430;
-const ARROW_DMG      = 5;
-const ARROW_LIFE     = 2.0;
-const MAX_INTERVAL   = 2.2;  // seconds between shots at base speed
-const MIN_INTERVAL   = 0.28; // seconds between shots at max fury
-const RAMP_TIME      = 9;    // seconds without collision to reach full fury
+const ARROW_SPEED = 430;
+const ARROW_DMG = 5;
+const ARROW_LIFE = 2.0;
+const MAX_INTERVAL = 1.5; // seconds between shots at base speed
+const MIN_INTERVAL = 0.25; // seconds between shots at max fury
+const RAMP_TIME = 6; // seconds without collision to reach full fury
 
 export class ArcherPower extends BasePower {
   constructor(owner) {
     super(owner);
-    this._arrows        = []; // { x, y, vx, vy, life, angle }
-    this._shotTimer     = 1.5;
-    this._timeSinceHit  = 0;  // time without circle-to-circle collision
-    this._lastEnemyX    = 0;
-    this._lastEnemyY    = 0;
-    this._hasEnemy      = false;
+    this._arrows = []; // { x, y, vx, vy, life, angle }
+    this._shotTimer = 1.5;
+    this._timeSinceHit = 0; // time without circle-to-circle collision
+    this._lastEnemyX = 0;
+    this._lastEnemyY = 0;
+    this._hasEnemy = false;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -45,18 +45,25 @@ export class ArcherPower extends BasePower {
 
     // Move arrows
     const a = this.arena;
-    this._arrows = this._arrows.filter(arr => {
-      arr.x    += arr.vx * dt;
-      arr.y    += arr.vy * dt;
+    this._arrows = this._arrows.filter((arr) => {
+      arr.x += arr.vx * dt;
+      arr.y += arr.vy * dt;
       arr.life -= dt;
 
       // Out of bounds or expired
-      if (arr.life <= 0 || arr.x < a.left || arr.x > a.right ||
-          arr.y < a.top  || arr.y > a.bottom) return false;
+      if (
+        arr.life <= 0 ||
+        arr.x < a.left ||
+        arr.x > a.right ||
+        arr.y < a.top ||
+        arr.y > a.bottom
+      )
+        return false;
 
       // Hit obstacle → remove (no rate effect)
       for (const obs of a.obstacles) {
-        const dx = arr.x - obs.cx, dy = arr.y - obs.cy;
+        const dx = arr.x - obs.cx,
+          dy = arr.y - obs.cy;
         if (dx * dx + dy * dy < obs.r * obs.r) return false;
       }
 
@@ -91,9 +98,9 @@ export class ArcherPower extends BasePower {
 
   onEnemyFrame(enemy) {
     if (!enemy.isAlive) return;
-    this._hasEnemy    = true;
-    this._lastEnemyX  = enemy.x;
-    this._lastEnemyY  = enemy.y;
+    this._hasEnemy = true;
+    this._lastEnemyX = enemy.x;
+    this._lastEnemyY = enemy.y;
 
     // Check arrow → enemy hits (duo companion too)
     this._checkArrowHits(enemy, false);
@@ -103,8 +110,9 @@ export class ArcherPower extends BasePower {
 
   _checkArrowHits(target, isComp) {
     const r2 = (target.radius + 3) ** 2;
-    this._arrows = this._arrows.filter(arr => {
-      const dx = target.x - arr.x, dy = target.y - arr.y;
+    this._arrows = this._arrows.filter((arr) => {
+      const dx = target.x - arr.x,
+        dy = target.y - arr.y;
       if (dx * dx + dy * dy < r2) {
         target.takeDamage(ARROW_DMG);
         sfx.archerHit();
@@ -115,10 +123,10 @@ export class ArcherPower extends BasePower {
   }
 
   clearState() {
-    this._arrows       = [];
-    this._shotTimer    = MAX_INTERVAL;
+    this._arrows = [];
+    this._shotTimer = MAX_INTERVAL;
     this._timeSinceHit = 0;
-    this._hasEnemy     = false;
+    this._hasEnemy = false;
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -137,7 +145,7 @@ export class ArcherPower extends BasePower {
     const r = radius + 8;
     // Background ring
     ctx.save();
-    ctx.strokeStyle = 'rgba(107,142,35,0.25)';
+    ctx.strokeStyle = "rgba(107,142,35,0.25)";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -145,15 +153,20 @@ export class ArcherPower extends BasePower {
     ctx.restore();
 
     // Fury fill arc
-    const pulse = fury >= 1 ? 0.7 + 0.3 * Math.abs(Math.sin(Date.now() / 120)) : 1;
+    const pulse =
+      fury >= 1 ? 0.7 + 0.3 * Math.abs(Math.sin(Date.now() / 120)) : 1;
     const alpha = 0.4 + 0.55 * fury;
     ctx.save();
-    ctx.strokeStyle = fury >= 1
-      ? `rgba(200,230,60,${alpha * pulse})`
-      : `rgba(140,200,50,${alpha})`;
+    ctx.strokeStyle =
+      fury >= 1
+        ? `rgba(200,230,60,${alpha * pulse})`
+        : `rgba(140,200,50,${alpha})`;
     ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    if (fury >= 1) { ctx.shadowBlur = 8; ctx.shadowColor = '#aaff44'; }
+    ctx.lineCap = "round";
+    if (fury >= 1) {
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = "#aaff44";
+    }
     ctx.beginPath();
     ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * fury);
     ctx.stroke();
@@ -161,7 +174,7 @@ export class ArcherPower extends BasePower {
   }
 
   _drawArrow(ctx, arr) {
-    const len   = 18;
+    const len = 18;
     const headL = 7;
     const headW = 4;
 
@@ -170,16 +183,16 @@ export class ArcherPower extends BasePower {
     ctx.rotate(arr.angle);
 
     // Shaft
-    ctx.strokeStyle = '#8B5E1A';
-    ctx.lineWidth   = 2;
-    ctx.lineCap     = 'round';
+    ctx.strokeStyle = "#8B5E1A";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(-len / 2, 0);
     ctx.lineTo(len / 2 - headL, 0);
     ctx.stroke();
 
     // Arrowhead
-    ctx.fillStyle = '#c8a040';
+    ctx.fillStyle = "#c8a040";
     ctx.beginPath();
     ctx.moveTo(len / 2, 0);
     ctx.lineTo(len / 2 - headL, -headW / 2);
@@ -188,24 +201,25 @@ export class ArcherPower extends BasePower {
     ctx.fill();
 
     // Tail fletching (two short lines)
-    ctx.strokeStyle = '#6B8E23';
+    ctx.strokeStyle = "#6B8E23";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(-len / 2 + 1, 0);
     ctx.lineTo(-len / 2 + 1 - 4, -3);
     ctx.moveTo(-len / 2 + 1, 0);
-    ctx.lineTo(-len / 2 + 1 - 4,  3);
+    ctx.lineTo(-len / 2 + 1 - 4, 3);
     ctx.stroke();
 
     ctx.restore();
   }
 
   static meta = {
-    id:          'archer',
-    name:        'Arquero',
-    description: 'Dispara flechas al enemigo. Mientras más tiempo pase sin colisionar con él, más rápido dispara. Al chocar, la cadencia se reinicia.',
-    color:       '#6B8E23',
-    icon:        '🏹',
-    dmgRating:   2,
+    id: "archer",
+    name: "Arquero",
+    description:
+      "Dispara flechas al enemigo. Mientras más tiempo pase sin colisionar con él, más rápido dispara. Al chocar, la cadencia se reinicia.",
+    color: "#6B8E23",
+    icon: "▷",
+    dmgRating: 2,
   };
 }
