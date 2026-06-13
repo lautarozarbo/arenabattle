@@ -78,7 +78,12 @@ export async function syncRewardsFromCloud(migrateLocal = false) {
         unlocked_arena: local.unlockedArena  ?? {},
         updated_at:     new Date().toISOString(),
       });
+    } else {
+      _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
     }
+  } else {
+    _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {} };
+    _saveLocal(_cache);
   }
 }
 

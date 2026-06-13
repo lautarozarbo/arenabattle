@@ -97,7 +97,12 @@ export async function syncStatsFromCloud(migrateLocal = false) {
         favorites:     local.favorites,
         updated_at:    new Date().toISOString(),
       });
+    } else {
+      _cache = _defaults();
     }
+  } else {
+    _cache = _defaults();
+    try { localStorage.setItem(LS_STATS, JSON.stringify(_cache)); } catch {}
   }
 }
 
