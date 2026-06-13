@@ -11,7 +11,7 @@ export const CHAR_SKINS = {
   ],
   ninja: [
     { id: "default", name: "Default", color: null },
-    { id: "mask", name: "Máscara Ninja", color: "#444444" },
+    { id: "mask", name: "Máscara Ninja", color: "#111111" },
   ],
   vampire: [
     { id: "default", name: "Default", color: null },

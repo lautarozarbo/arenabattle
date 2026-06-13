@@ -152,12 +152,12 @@ function _ninjaMask(ctx, x, y, r) {
   ctx.clip();
   ctx.beginPath();
   ctx.rect(x - r, slitY - r * 0.09, r * 2, r * 0.18);
-  ctx.fillStyle = "rgba(130, 105, 70, 0.5)";
+  ctx.fillStyle = "rgba(10, 10, 10, 0.7)";
   ctx.fill();
   // Narrow bright opening in the center
   ctx.beginPath();
   ctx.rect(x - r * 0.6, slitY - r * 0.045, r * 1.2, r * 0.09);
-  ctx.fillStyle = "rgba(180, 150, 100, 0.35)";
+  ctx.fillStyle = "rgba(80, 80, 80, 0.3)";
   ctx.fill();
   ctx.restore();
 
@@ -165,7 +165,7 @@ function _ninjaMask(ctx, x, y, r) {
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineWidth = r * 0.15;
-  ctx.strokeStyle = "#444444";
+  ctx.strokeStyle = "#111111";
   ctx.beginPath();
   ctx.moveTo(x + r * 0.92, slitY - r * 0.09);
   ctx.bezierCurveTo(

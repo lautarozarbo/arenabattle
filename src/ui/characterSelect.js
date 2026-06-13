@@ -353,6 +353,7 @@ function _renderMasteryContent(meta) {
       document.dispatchEvent(new CustomEvent('mastery:claimed', { detail: result }));
       _renderMasteryContent(meta);
       _updateMasteryDot(meta);
+      _updateEffectRow(meta);
       refreshMasteryBadges();
     });
   });
