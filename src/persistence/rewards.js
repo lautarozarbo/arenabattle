@@ -47,7 +47,7 @@ async function _persist(d) {
   }).then(() => {});
 }
 
-export async function syncRewardsFromCloud() {
+export async function syncRewardsFromCloud(migrateLocal = false) {
   const uid = await _getUID();
   if (!uid) return;
   const { data } = await supabase
@@ -63,7 +63,7 @@ export async function syncRewardsFromCloud() {
       unlockedArena: data.unlocked_arena ?? {},
     };
     _saveLocal(_cache);
-  } else {
+  } else if (migrateLocal) {
     const local = _loadLocal();
     const hasLocal = (local.xp ?? 0) > 0 || (local.chests ?? 0) > 0
       || Object.keys(local.unlocked ?? {}).length > 0

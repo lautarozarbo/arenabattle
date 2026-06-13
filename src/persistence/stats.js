@@ -61,7 +61,7 @@ async function _persist(s) {
   }).then(() => {});
 }
 
-export async function syncStatsFromCloud() {
+export async function syncStatsFromCloud(migrateLocal = false) {
   const uid = await _getUID();
   if (!uid) return;
   const { data } = await supabase
@@ -80,9 +80,8 @@ export async function syncStatsFromCloud() {
       favorites:     Array.isArray(data.favorites) ? data.favorites : [],
     };
     try { localStorage.setItem(LS_STATS, JSON.stringify(_cache)); } catch {}
-  } else {
+  } else if (migrateLocal) {
     const local = _loadLocal();
-    const def   = _defaults();
     const hasLocal = Object.values(local.wins).some(v => v > 0)
       || Object.values(local.losses).some(v => v > 0)
       || Object.keys(local.charUses).length > 0;
