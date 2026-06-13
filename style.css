@@ -3110,6 +3110,12 @@ td.rank {
 .profile-auth-section {
   margin-bottom: 14px;
 }
+.pstat-loading {
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.82rem;
+  padding: 24px 0;
+}
 .auth-guest-msg {
   font-size: 0.78rem;
   color: rgba(255,255,255,0.4);

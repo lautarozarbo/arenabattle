@@ -8,13 +8,14 @@ import { t, getLang, setLang } from "./i18n.js";
 import { NEWS } from "./news.js";
 import {
   getStats, recordWin, recordLoss, recordDraw,
-  recordCharUse, getMostUsedChar,
+  recordCharUse, getMostUsedChar, syncStatsFromCloud,
 } from "./persistence/stats.js";
 import {
   ANIMATED_SKIN_IDS, applySkinnedMeta, drawCharPreview,
 } from "./skins/index.js";
 import {
   POINTS, getXP, getChests, isArenaSkinUnlocked, addPoints, openChest,
+  syncRewardsFromCloud,
 } from "./persistence/rewards.js";
 import {
   ARENA_SKINS, setSelectedArenaSkinId, drawArenaBg,
@@ -410,10 +411,13 @@ function _closeProfile() {
   }, { once: true });
 }
 
-document.getElementById("btn-open-profile").addEventListener("click", () => {
+document.getElementById("btn-open-profile").addEventListener("click", async () => {
   sfx.uiClick();
-  _buildProfileStats();
   _profilePanel.classList.remove("hidden");
+  _profileStatsEl.innerHTML = '<div class="pstat-loading">Cargando...</div>';
+  await Promise.all([syncStatsFromCloud(), syncRewardsFromCloud()]);
+  _buildProfileStats();
+  _updateXpBar();
 });
 
 document.getElementById("btn-profile-close").addEventListener("click", () => {
