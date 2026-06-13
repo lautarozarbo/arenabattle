@@ -221,11 +221,13 @@ onLogin((username) => {
   }
   _updateXpBar();
   refreshFriendsBadge();
+  if (!_profilePanel.classList.contains('hidden')) _refreshProfilePanel();
 });
 onLogout(() => {
   localStorage.removeItem('playerName');
   _savePlayerName('Invitado');
   refreshFriendsBadge();
+  if (!_profilePanel.classList.contains('hidden')) _refreshProfilePanel();
 });
 
 document.getElementById('btn-open-friends').addEventListener('click', () => {
@@ -431,9 +433,7 @@ function _closeProfile() {
   }, { once: true });
 }
 
-document.getElementById("btn-open-profile").addEventListener("click", async () => {
-  sfx.uiClick();
-  _profilePanel.classList.remove("hidden");
+async function _refreshProfilePanel() {
   _profileStatsEl.innerHTML = '<div class="pstat-loading">Cargando...</div>';
   let friendCode = null;
   try {
@@ -457,6 +457,12 @@ document.getElementById("btn-open-profile").addEventListener("click", async () =
       fcEl.classList.add('hidden');
     }
   }
+}
+
+document.getElementById("btn-open-profile").addEventListener("click", async () => {
+  sfx.uiClick();
+  _profilePanel.classList.remove("hidden");
+  await _refreshProfilePanel();
 });
 
 document.getElementById('profile-friend-code').addEventListener('click', async function () {

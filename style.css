@@ -3530,6 +3530,8 @@ td.rank {
   font-size: 0.68rem;
   color: rgba(255,255,255,0.25);
   flex-shrink: 0;
+  min-width: 7rem;
+  text-align: right;
 }
 
 /* ── Friends badge on menu button ────────────────────────────────────────── */
