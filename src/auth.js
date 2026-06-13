@@ -29,6 +29,7 @@ export async function updateUsername(name) {
 }
 
 let _heartbeatId = null;
+let _syncGen     = 0;  // increments on every auth event; lets in-flight syncs detect they're stale
 
 async function _updateLastSeen() {
   const { data } = await supabase.auth.getSession();
@@ -45,15 +46,18 @@ function _startHeartbeat() {
 }
 
 async function _syncAndNotify() {
+  const gen = ++_syncGen;
   let username = null;
   try {
     await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
+    if (gen !== _syncGen) return;  // a newer auth event arrived; discard this sync
     username = await getUsername();
     _updateLastSeen();
     _startHeartbeat();
   } catch (err) {
     console.warn('[auth] sync error:', err);
   }
+  if (gen !== _syncGen) return;
   if (_onLoginCallback) _onLoginCallback(username);
 }
 
@@ -140,21 +144,22 @@ export function initAuth() {
   });
 
   // Single source of truth for auth state.
-  // INITIAL_SESSION: fires on page load after SDK resolves/refreshes the stored token.
-  // SIGNED_IN: fires on explicit login (form submit).
-  // SIGNED_OUT: fires on explicit logout.
-  // TOKEN_REFRESHED: fires every hour automatically — no action needed.
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  // Callback is intentionally NOT async: Supabase queues auth events and only dispatches
+  // the next one after the current callback resolves. If we await _syncAndNotify() here,
+  // a SIGNED_OUT that arrives while syncing would be blocked forever (stuck loading bug).
+  // Instead we fire _syncAndNotify() without awaiting and use _syncGen to discard stale results.
+  supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'INITIAL_SESSION') {
       if (session?.user) {
         _setLoggedIn(session.user);
-        await _syncAndNotify();
+        _syncAndNotify();
       }
     } else if (event === 'SIGNED_IN') {
       _closeModal();
       _setLoggedIn(session.user);
-      await _syncAndNotify();
+      _syncAndNotify();
     } else if (event === 'SIGNED_OUT') {
+      _syncGen++;  // invalidate any in-flight sync so its callback never fires
       _setLoggedOut();
       if (_onLogoutCallback) _onLogoutCallback();
     }
