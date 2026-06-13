@@ -40,9 +40,9 @@ export function buildGrid(player, confirmBtnId) {
     if (isFavorite(meta.id)) cell.classList.add("fav");
     if (meta.id === selectedId) cell.classList.add("active");
     cell.innerHTML = `
+      <span class="mastery-badge hidden" data-char="${meta.id}"></span>
       <div class="grid-peek">
         <div class="grid-circle" style="background:${meta.color}">${meta.icon}</div>
-        <span class="mastery-badge hidden" data-char="${meta.id}"></span>
       </div>
       <div class="grid-name">${meta.name}</div>
     `;

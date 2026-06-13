@@ -3768,11 +3768,10 @@ td.rank {
 .fr-code-feedback--error { background: rgba(239,68,68,.12);  color: #f87171; }
 
 /* ── Mastery badge on grid cell ──────────────────────────────────────────── */
-.grid-peek { position: relative; }
 .mastery-badge {
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 6px;
+  left: 6px;
   width: 10px;
   height: 10px;
   background: #ff4757;
