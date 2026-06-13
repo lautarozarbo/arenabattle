@@ -1364,4 +1364,57 @@ export const sfx = {
       o.stop(t + 0.07);
     });
   },
+
+  // ── Archer ───────────────────────────────────────────────────────────────────
+
+  archerShot() {
+    if (!sfx.enabled) return;
+    throttled("archerShot", 60, () => {
+      const c = ac(),
+        t = c.currentTime;
+      // Bowstring twang: sharp high pluck that decays fast
+      const o = mkOsc("triangle", 1800),
+        g = mkGain(0);
+      o.frequency.exponentialRampToValueAtTime(320, t + 0.08);
+      g.gain.linearRampToValueAtTime(0.15, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+      pipe(o, g);
+      o.start(t);
+      o.stop(t + 0.1);
+      // Short noise burst (air displacement)
+      const n = mkNoise(0.06),
+        f = mkFilter("highpass", 2200, 1.5),
+        ng = mkGain(0);
+      ng.gain.linearRampToValueAtTime(0.1, t + 0.002);
+      ng.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+      pipe(n, f, ng);
+      n.start(t);
+      n.stop(t + 0.055);
+    });
+  },
+
+  archerHit() {
+    if (!sfx.enabled) return;
+    throttled("archerHit", 100, () => {
+      const c = ac(),
+        t = c.currentTime;
+      // Dull thud — like an arrow embedding into something
+      const o = mkOsc("sine", 180),
+        g = mkGain(0);
+      o.frequency.exponentialRampToValueAtTime(55, t + 0.1);
+      g.gain.linearRampToValueAtTime(0.3, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      pipe(o, g);
+      o.start(t);
+      o.stop(t + 0.12);
+      const n = mkNoise(0.06),
+        f = mkFilter("bandpass", 600, 2),
+        ng = mkGain(0);
+      ng.gain.linearRampToValueAtTime(0.18, t + 0.003);
+      ng.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      pipe(n, f, ng);
+      n.start(t);
+      n.stop(t + 0.07);
+    });
+  },
 };

@@ -88,6 +88,9 @@ export const CHAR_SKINS = {
     { id: "default", name: "Default", color: null },
     { id: "ladrillos", name: "Ladrillos", color: "#8B4513" },
   ],
+  archer: [
+    { id: "default", name: "Default", color: null },
+  ],
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
