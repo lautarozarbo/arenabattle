@@ -3148,6 +3148,7 @@ td.rank {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
 }
 .btn-auth-logout {
   flex-shrink: 0;
@@ -3165,6 +3166,7 @@ td.rank {
 #auth-logged-in {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
