@@ -3353,3 +3353,115 @@ td.rank {
   padding: 40px;
   font-size: 0.85rem;
 }
+.lb-name--link { cursor: pointer; }
+.lb-row { cursor: pointer; }
+
+/* ── User Profile Modal ──────────────────────────────── */
+.user-profile-modal {
+  background: #12182b;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  padding: 0 0 24px;
+  width: min(420px, 95vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.user-profile-modal .auth-modal-header { padding: 16px 20px 18px; }
+.user-profile-scroll {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 20px;
+}
+.up-loading {
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.85rem;
+  padding: 40px 0;
+}
+.up-username {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.up-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255,255,255,0.35);
+  margin: 16px 0 8px;
+}
+.up-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.up-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.up-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+.up-val--win  { color: #6ee87a; }
+.up-val--loss { color: #ff7070; }
+.up-lbl {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+}
+.up-champ-row {
+  display: flex;
+  gap: 8px;
+}
+.up-champ-card {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.up-champ-trophy { font-size: 1.2rem; }
+.up-champ-info { display: flex; flex-direction: column; }
+.up-champ-val { font-size: 1rem; font-weight: 700; color: #fff; }
+.up-champ-lbl { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+.up-fav-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 12px;
+}
+.up-fav-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.up-fav-info { display: flex; flex-direction: column; gap: 2px; }
+.up-fav-name { font-size: 0.9rem; font-weight: 600; }
+.up-fav-sub  { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+.up-fav-empty {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 12px;
+}

@@ -235,6 +235,15 @@ document.getElementById('leaderboard-modal').addEventListener('click', e => {
   }
 });
 
+document.getElementById('btn-user-profile-close').addEventListener('click', () => {
+  document.getElementById('user-profile-modal').classList.add('hidden');
+});
+document.getElementById('user-profile-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('user-profile-modal')) {
+    document.getElementById('user-profile-modal').classList.add('hidden');
+  }
+});
+
 // ── Screen management → ui/screens.js ────────────────────────────────────────
 
 // ── Toggle pill (sliding indicator for segmented controls) ───────────────────
