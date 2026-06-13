@@ -208,7 +208,7 @@ function _formatLastSeen(lastSeenStr) {
   if (!lastSeenStr) return '';
   const diff = Date.now() - new Date(lastSeenStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 5)  return '🟢 En línea';
+  if (mins < 10) return '🟢 En línea';
   if (mins < 60) return `Hace ${mins} min`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24)  return `Hace ${hrs}h`;

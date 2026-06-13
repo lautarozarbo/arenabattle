@@ -1,6 +1,8 @@
 import { supabase } from '../supabase.js';
 
-let _currentTab = 'friends';
+let _currentTab  = 'friends';
+let _friendCode  = null;
+let _friendCodeUid = null;
 
 export function initFriends() {
   document.querySelectorAll('.friends-tab').forEach(tab => {
@@ -51,13 +53,16 @@ export async function refreshFriendsBadge() {
 
 export async function getMyFriendCode() {
   const { data: me } = await supabase.auth.getUser();
-  if (!me.user) return null;
+  if (!me.user) { _friendCode = null; _friendCodeUid = null; return null; }
+  if (_friendCode && _friendCodeUid === me.user.id) return _friendCode;
   const { data } = await supabase
     .from('profiles')
     .select('friend_code')
     .eq('user_id', me.user.id)
     .single();
-  return data?.friend_code ?? null;
+  _friendCode    = data?.friend_code ?? null;
+  _friendCodeUid = me.user.id;
+  return _friendCode;
 }
 
 function _setBadge(n) {
@@ -261,7 +266,7 @@ function _formatLastSeen(lastSeenStr) {
   if (!lastSeenStr) return '';
   const diff = Date.now() - new Date(lastSeenStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 5)  return '🟢 En línea';
+  if (mins < 10) return '🟢 En línea';
   if (mins < 60) return `Hace ${mins} min`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24)  return `Hace ${hrs}h`;

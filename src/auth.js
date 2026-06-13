@@ -38,7 +38,7 @@ async function _updateLastSeen() {
 
 function _startHeartbeat() {
   if (_heartbeatId) clearInterval(_heartbeatId);
-  _heartbeatId = setInterval(_updateLastSeen, 3 * 60 * 1000);
+  _heartbeatId = setInterval(_updateLastSeen, 6 * 60 * 1000);
 }
 
 async function _syncAndNotify() {
