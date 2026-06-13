@@ -18,6 +18,104 @@ export function initFriends() {
   document.getElementById('friends-panel').addEventListener('click', e => {
     if (e.target === document.getElementById('friends-panel')) _closePanel();
   });
+
+  const codeInput  = document.getElementById('fr-code-input');
+  const codeSubmit = document.getElementById('fr-code-submit');
+
+  codeSubmit.addEventListener('click', () => _submitCode());
+  codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') _submitCode(); });
+  codeInput.addEventListener('input', () => {
+    codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  });
+}
+
+async function _submitCode() {
+  const input    = document.getElementById('fr-code-input');
+  const btn      = document.getElementById('fr-code-submit');
+  const feedback = document.getElementById('fr-code-feedback');
+  const code     = input.value.trim().toUpperCase();
+
+  if (code.length !== 8) {
+    _showFeedback(feedback, 'El código debe tener 8 caracteres.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  feedback.classList.add('hidden');
+
+  const { data: me } = await supabase.auth.getUser();
+  if (!me.user) {
+    _showFeedback(feedback, 'Tenés que iniciar sesión.', 'error');
+    btn.disabled = false; btn.textContent = 'Enviar';
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('user_id, username')
+    .eq('friend_code', code)
+    .single();
+
+  if (!profile) {
+    _showFeedback(feedback, 'Código no encontrado.', 'error');
+    btn.disabled = false; btn.textContent = 'Enviar';
+    return;
+  }
+
+  if (profile.user_id === me.user.id) {
+    _showFeedback(feedback, 'Ese es tu propio código.', 'error');
+    btn.disabled = false; btn.textContent = 'Enviar';
+    return;
+  }
+
+  const { data: existing } = await supabase
+    .from('friendships')
+    .select('*')
+    .or(`and(requester_id.eq.${me.user.id},addressee_id.eq.${profile.user_id}),and(requester_id.eq.${profile.user_id},addressee_id.eq.${me.user.id})`)
+    .maybeSingle();
+
+  if (existing?.status === 'accepted') {
+    _showFeedback(feedback, `Ya sos amigo de ${profile.username}.`, 'error');
+    btn.disabled = false; btn.textContent = 'Enviar';
+    return;
+  }
+  if (existing?.status === 'pending' && existing.requester_id === me.user.id) {
+    _showFeedback(feedback, 'Ya enviaste una solicitud a ese usuario.', 'error');
+    btn.disabled = false; btn.textContent = 'Enviar';
+    return;
+  }
+  if (existing?.status === 'pending' && existing.addressee_id === me.user.id) {
+    await supabase.from('friendships').update({ status: 'accepted' }).eq('id', existing.id);
+    _showFeedback(feedback, `¡Ahora sos amigo de ${profile.username}!`, 'ok');
+    input.value = '';
+    btn.disabled = false; btn.textContent = 'Enviar';
+    await _loadTab();
+    await refreshFriendsBadge();
+    return;
+  }
+
+  const { error } = await supabase.from('friendships').insert({
+    requester_id: me.user.id,
+    addressee_id: profile.user_id,
+    status: 'pending',
+  });
+
+  if (error) {
+    _showFeedback(feedback, 'Error al enviar la solicitud.', 'error');
+  } else {
+    _showFeedback(feedback, `Solicitud enviada a ${profile.username}.`, 'ok');
+    input.value = '';
+  }
+  btn.disabled = false; btn.textContent = 'Enviar';
+}
+
+function _showFeedback(el, msg, type) {
+  el.textContent = msg;
+  el.className = `fr-code-feedback fr-code-feedback--${type}`;
+  el.classList.remove('hidden');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.add('hidden'), 4000);
 }
 
 function _closePanel() {

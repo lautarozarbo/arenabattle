@@ -445,12 +445,28 @@ document.getElementById("btn-open-profile").addEventListener("click", async () =
   const fcEl = document.getElementById('profile-friend-code');
   if (fcEl) {
     if (friendCode) {
-      fcEl.textContent = `Código: ${friendCode}`;
+      fcEl.dataset.code = friendCode;
+      fcEl.innerHTML = `<span class="pfc-label">Tu código</span><span class="pfc-code">${friendCode}</span><span class="pfc-hint">Toca para copiar</span>`;
       fcEl.classList.remove('hidden');
     } else {
       fcEl.classList.add('hidden');
     }
   }
+});
+
+document.getElementById('profile-friend-code').addEventListener('click', async function () {
+  const code = this.dataset.code;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const hint = this.querySelector('.pfc-hint');
+  if (hint) { hint.textContent = '¡Copiado!'; setTimeout(() => { hint.textContent = 'Toca para copiar'; }, 2000); }
 });
 
 document.getElementById("btn-profile-close").addEventListener("click", () => {

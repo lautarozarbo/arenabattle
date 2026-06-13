@@ -3499,16 +3499,37 @@ td.rank {
 /* ── Profile panel: friend code ──────────────────────────────────────────── */
 .profile-friend-code {
   margin: 10px 20px 0;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.4);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+}
+.profile-friend-code:hover { background: rgba(255,255,255,0.09); }
+.pfc-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  flex-shrink: 0;
+}
+.pfc-code {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .12em;
+  flex: 1;
   text-align: center;
-  letter-spacing: 0.05em;
-  cursor: default;
-  user-select: text;
+}
+.pfc-hint {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.25);
+  flex-shrink: 0;
 }
 
 /* ── Friends badge on menu button ────────────────────────────────────────── */
@@ -3565,14 +3586,9 @@ td.rank {
 .friends-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px 10px;
+  justify-content: flex-end;
+  padding: 6px 12px 0;
   flex-shrink: 0;
-}
-.friends-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
 }
 .friends-close-btn {
   background: none;
@@ -3703,3 +3719,51 @@ td.rank {
   font-size: 0.85rem;
   padding: 32px 20px;
 }
+
+/* ── Add by code ──────────────────────────────────────────────────────────── */
+.fr-add-by-code {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 8px;
+  flex-shrink: 0;
+}
+.fr-code-input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color .15s;
+}
+.fr-code-input::placeholder { color: rgba(255,255,255,0.2); font-weight: 400; letter-spacing: 0; text-transform: none; }
+.fr-code-input:focus { border-color: #3b82f6; }
+.fr-code-btn {
+  padding: 8px 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.fr-code-btn:hover:not(:disabled) { background: #2563eb; }
+.fr-code-btn:disabled { opacity: .5; cursor: default; }
+.fr-code-feedback {
+  margin: 0 16px 6px;
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.fr-code-feedback--ok    { background: rgba(62,207,106,.12); color: #3ecf6a; }
+.fr-code-feedback--error { background: rgba(239,68,68,.12);  color: #f87171; }

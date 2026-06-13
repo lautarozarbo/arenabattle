@@ -1049,11 +1049,15 @@
       <div class="friends-sheet">
         <div class="friends-drag-handle"></div>
         <div class="friends-header">
-          <span class="friends-title">Amigos</span>
           <button id="btn-friends-close" class="friends-close-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
+        <div class="fr-add-by-code">
+          <input class="fr-code-input" id="fr-code-input" placeholder="Código de amigo (ej: AB12CD34)" maxlength="8" autocomplete="off" />
+          <button class="fr-code-btn" id="fr-code-submit">Enviar</button>
+        </div>
+        <div id="fr-code-feedback" class="fr-code-feedback hidden"></div>
         <div class="friends-tabs">
           <button class="friends-tab friends-tab--active" data-tab="friends">Amigos</button>
           <button class="friends-tab" data-tab="received">
