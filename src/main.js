@@ -1,5 +1,5 @@
 import { initAuth, onLogin, onLogout, updateUsername } from "./auth.js";
-import { openLeaderboard } from "./leaderboard.js";
+import { openLeaderboard } from "./social/leaderboard.js";
 import { Game     } from "./game/game.js";
 import { getAllPowerMetas } from "./powers/registry.js";
 import { TagTeamMatch  } from "./modes/TagTeam.js";

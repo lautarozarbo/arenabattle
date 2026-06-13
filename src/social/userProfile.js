@@ -1,5 +1,5 @@
-import { supabase } from './supabase.js';
-import { getAllPowerMetas } from './powers/registry.js';
+import { supabase } from '../supabase.js';
+import { getAllPowerMetas } from '../powers/registry.js';
 
 export async function openUserProfile(userId) {
   const modal = document.getElementById('user-profile-modal');
