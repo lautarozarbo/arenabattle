@@ -1,4 +1,5 @@
-import { initAuth, onLogin } from "./auth.js";
+import { initAuth, onLogin, onLogout, updateUsername } from "./auth.js";
+import { openLeaderboard } from "./leaderboard.js";
 import { Game     } from "./game/game.js";
 import { getAllPowerMetas } from "./powers/registry.js";
 import { TagTeamMatch  } from "./modes/TagTeam.js";
@@ -208,7 +209,25 @@ _updateXpBar();
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 initAuth();
-onLogin(() => { _updateXpBar(); });
+onLogin((username) => {
+  if (username) _savePlayerName(username);
+  _updateXpBar();
+});
+onLogout(() => { _savePlayerName('Invitado'); });
+
+document.getElementById('btn-open-leaderboard').addEventListener('click', () => {
+  sfx.uiClick();
+  openLeaderboard();
+});
+document.getElementById('btn-leaderboard-close').addEventListener('click', () => {
+  sfx.uiClick();
+  document.getElementById('leaderboard-modal').classList.add('hidden');
+});
+document.getElementById('leaderboard-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('leaderboard-modal')) {
+    document.getElementById('leaderboard-modal').classList.add('hidden');
+  }
+});
 
 // ── Screen management → ui/screens.js ────────────────────────────────────────
 
@@ -270,6 +289,7 @@ function _savePlayerName(val) {
   _chipName.textContent    = val;
   _profileName.textContent = val;
   _profileInput.value      = val;
+  updateUsername(val);
 }
 
 function _confirmProfileName() {

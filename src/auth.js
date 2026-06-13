@@ -2,19 +2,39 @@ import { supabase } from './supabase.js';
 import { syncRewardsFromCloud } from './persistence/rewards.js';
 import { syncStatsFromCloud } from './persistence/stats.js';
 
-let _onLoginCallback = null;
+let _onLoginCallback  = null;
+let _onLogoutCallback = null;
 
-export function onLogin(cb) { _onLoginCallback = cb; }
+export function onLogin(cb)  { _onLoginCallback  = cb; }
+export function onLogout(cb) { _onLogoutCallback = cb; }
+
+export async function getUsername() {
+  const { data: me } = await supabase.auth.getUser();
+  if (!me.user) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('user_id', me.user.id)
+    .single();
+  return data?.username ?? null;
+}
+
+export async function updateUsername(name) {
+  const { data: me } = await supabase.auth.getUser();
+  if (!me.user) return;
+  await supabase.from('profiles').update({ username: name, updated_at: new Date().toISOString() })
+    .eq('user_id', me.user.id);
+}
 
 async function _syncAndNotify() {
   await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
-  if (_onLoginCallback) _onLoginCallback();
+  const username = await getUsername();
+  if (_onLoginCallback) _onLoginCallback(username);
 }
 
 function _setLoggedIn(user) {
   document.getElementById('auth-logged-out').classList.add('hidden');
-  const loggedIn = document.getElementById('auth-logged-in');
-  loggedIn.classList.remove('hidden');
+  document.getElementById('auth-logged-in').classList.remove('hidden');
   document.getElementById('auth-user-email').textContent = user.email;
 }
 
@@ -97,6 +117,7 @@ export function initAuth() {
   document.getElementById('btn-logout').addEventListener('click', async () => {
     await supabase.auth.signOut();
     _setLoggedOut();
+    if (_onLogoutCallback) _onLogoutCallback();
   });
 
   supabase.auth.getSession().then(({ data }) => {

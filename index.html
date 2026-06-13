@@ -94,6 +94,11 @@
               <polyline points="12,7 3,18 21,18 12,7"/>
             </svg>
           </button>
+          <button class="menu-top-left-icon" id="btn-open-leaderboard" title="Ranking">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Center overlay: logo + XP bar -->
@@ -1053,6 +1058,34 @@
           <p class="auth-error hidden" id="auth-error"></p>
           <button class="btn-auth-submit" id="btn-auth-submit" type="submit">Iniciar sesión</button>
         </form>
+      </div>
+    </div>
+
+    <!-- ── Leaderboard Modal ──────────────────────────── -->
+    <div id="leaderboard-modal" class="auth-modal-overlay hidden">
+      <div class="leaderboard-modal">
+        <div class="auth-modal-header">
+          <span class="auth-modal-title">Ranking Global</span>
+          <button class="auth-modal-close" id="btn-leaderboard-close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="leaderboard-wrap">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jugador</th>
+                <th>Victorias</th>
+                <th>Win %</th>
+                <th>Campeonatos</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr><td colspan="5" class="lb-loading">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 

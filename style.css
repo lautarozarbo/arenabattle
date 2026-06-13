@@ -3255,3 +3255,51 @@ td.rank {
 }
 .btn-auth-submit:hover:not(:disabled) { background: rgba(255,255,255,0.25); }
 .btn-auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Leaderboard ─────────────────────────────────────── */
+.leaderboard-modal {
+  background: #12182b;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  padding: 0 24px 24px;
+  width: min(520px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.leaderboard-wrap {
+  overflow-y: auto;
+  flex: 1;
+}
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.leaderboard-table thead th {
+  text-align: left;
+  padding: 8px 10px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: sticky;
+  top: 0;
+  background: #12182b;
+}
+.leaderboard-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.1s;
+}
+.leaderboard-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+.lb-row--me { background: rgba(255,255,255,0.07) !important; }
+.leaderboard-table td {
+  padding: 10px 10px;
+  color: rgba(255,255,255,0.85);
+}
+.lb-rank { width: 40px; color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+.lb-name { font-weight: 500; }
+.lb-wins { color: #6ee87a; font-weight: 600; }
+.lb-rate { color: rgba(255,255,255,0.5); }
+.lb-champ { font-size: 0.85rem; }
+.lb-loading { text-align: center; color: rgba(255,255,255,0.35); padding: 32px; }
