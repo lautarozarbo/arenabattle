@@ -269,17 +269,17 @@ function _updateCharStats(meta) {
   const next    = MASTERY_MILESTONES.find(m => !claimed.has(m.games));
   const pct     = next ? Math.min(100, Math.round((games / next.games) * 100)) : 100;
 
-  el.innerHTML = `
-    <div class="cmc-row">
-      <span class="cmc-label">Partidas con ${meta.name}</span>
-      <span class="cmc-val">${games}</span>
-    </div>
-    ${next
-      ? `<div class="cmc-bar"><div class="cmc-bar-fill" style="width:${pct}%"></div></div>
-         <div class="cmc-next">Próxima recompensa: <b>${next.games}</b> partidas</div>`
-      : `<div class="cmc-next cmc-next--done">Maestría completada</div>`
-    }
-  `;
+  el.innerHTML = next
+    ? `<div class="cmc-row">
+         <span class="cmc-label">Partidas con ${meta.name}</span>
+         <span class="cmc-val">${games}</span>
+       </div>
+       <div class="cmc-bar"><div class="cmc-bar-fill" style="width:${pct}%"></div></div>
+       <div class="cmc-next">Próxima recompensa: <b>${next.games}</b> partidas</div>`
+    : `<div class="cmc-done-block">
+         <div class="cmc-next cmc-next--done">Maestría completada</div>
+         <div class="cmc-label">${games} partidas con ${meta.name}</div>
+       </div>`;
 }
 
 function _updateEffectRow(meta) {

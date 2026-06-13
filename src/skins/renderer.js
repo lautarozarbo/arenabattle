@@ -159,33 +159,72 @@ function _ninjaMask(ctx, x, y, r) {
   ctx.rect(x - r * 0.6, slitY - r * 0.045, r * 1.2, r * 0.09);
   ctx.fillStyle = "rgba(80, 80, 80, 0.3)";
   ctx.fill();
+
+  // Red glowing eyes
+  ctx.shadowColor = '#ff0000';
+  ctx.shadowBlur = r * 0.45;
+  for (const ex of [x - r * 0.28, x + r * 0.28]) {
+    ctx.beginPath();
+    ctx.arc(ex, slitY, r * 0.085, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(200, 0, 0, 0.95)';
+    ctx.fill();
+    // bright pupil
+    ctx.beginPath();
+    ctx.arc(ex, slitY, r * 0.04, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 120, 120, 1)';
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
   ctx.restore();
 
-  // Two ribbon tails on the right side
+  // Two ribbon tails — wind-like irregular fabric motion
+  const t = Date.now() * 0.001;
+
+  // Layered sines at different frequencies to break regularity
+  function wind(freq, amp, phase) {
+    return (
+      Math.sin(t * freq + phase)               * amp +
+      Math.sin(t * freq * 2.3 + phase + 1.1)  * amp * 0.45 +
+      Math.sin(t * freq * 5.1 + phase + 2.7)  * amp * 0.18
+    );
+  }
+
+  // Upper tail — control points get progressively more displacement
+  const u1y = wind(1.7,  r * 0.07, 0.0);
+  const u1x = wind(1.3,  r * 0.05, 0.8);
+  const u2y = wind(1.7,  r * 0.13, 0.5);
+  const u2x = wind(1.3,  r * 0.09, 1.5);
+  const u3y = wind(1.7,  r * 0.19, 1.1);
+  const u3x = wind(1.3,  r * 0.13, 2.2);
+
+  // Lower tail — different base phase so they move independently
+  const l1y = wind(2.1,  r * 0.07, 3.0);
+  const l1x = wind(1.6,  r * 0.05, 3.7);
+  const l2y = wind(2.1,  r * 0.13, 3.5);
+  const l2x = wind(1.6,  r * 0.09, 4.2);
+  const l3y = wind(2.1,  r * 0.19, 4.1);
+  const l3x = wind(1.6,  r * 0.13, 5.0);
+
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineWidth = r * 0.15;
   ctx.strokeStyle = "#111111";
+
   ctx.beginPath();
   ctx.moveTo(x + r * 0.92, slitY - r * 0.09);
   ctx.bezierCurveTo(
-    x + r * 1.3,
-    slitY - r * 0.12,
-    x + r * 1.45,
-    slitY - r * 0.32,
-    x + r * 1.22,
-    slitY - r * 0.56,
+    x + r * 1.3  + u1x, slitY - r * 0.12 + u1y,
+    x + r * 1.45 + u2x, slitY - r * 0.32 + u2y,
+    x + r * 1.22 + u3x, slitY - r * 0.56 + u3y,
   );
   ctx.stroke();
+
   ctx.beginPath();
   ctx.moveTo(x + r * 0.92, slitY + r * 0.09);
   ctx.bezierCurveTo(
-    x + r * 1.3,
-    slitY + r * 0.14,
-    x + r * 1.42,
-    slitY + r * 0.42,
-    x + r * 1.18,
-    slitY + r * 0.64,
+    x + r * 1.3  + l1x, slitY + r * 0.14 + l1y,
+    x + r * 1.42 + l2x, slitY + r * 0.42 + l2y,
+    x + r * 1.18 + l3x, slitY + r * 0.64 + l3y,
   );
   ctx.stroke();
   ctx.restore();

@@ -12,13 +12,13 @@ export function buildHud(cfgs) {
   if (N === 2) {
     hud.innerHTML = `
       <div class="fighter-hud">
-        <span class="hud-name" style="color:${cfgs[0].color}">${PLAYER_ICON}${cfgs[0].label}</span>
+        <span class="hud-name" style="color:${cfgs[0].labelColor ?? cfgs[0].color}">${PLAYER_ICON}${cfgs[0].label}</span>
         <div class="hp-track"><div class="hp-fill" id="hf-0-hp"></div></div>
         <span class="hp-text" id="hf-0-text">${cfgs[0].hp ?? 100}</span>
       </div>
       <span class="hud-vs">VS</span>
       <div class="fighter-hud right">
-        <span class="hud-name" style="color:${cfgs[1].color}">${cfgs[1].label}</span>
+        <span class="hud-name" style="color:${cfgs[1].labelColor ?? cfgs[1].color}">${cfgs[1].label}</span>
         <div class="hp-track"><div class="hp-fill" id="hf-1-hp"></div></div>
         <span class="hp-text" id="hf-1-text">${cfgs[1].hp ?? 100}</span>
       </div>

@@ -2,6 +2,10 @@
 import { sfx } from '../audio/index.js';
 import { drawSkinDecorationBelow, drawSkinDecorationAbove } from '../skins/index.js';
 
+let _showHp = localStorage.getItem('showHp') !== 'false';
+export function setHpVisible(v) { _showHp = v; localStorage.setItem('showHp', v); }
+export function getHpVisible()  { return _showHp; }
+
 export class Circle {
   constructor(cfg) {
     this.x      = cfg.x;
@@ -194,6 +198,7 @@ export class Circle {
   }
 
   _drawHpInside(ctx) {
+    if (!_showHp) return;
     const text = String(Math.ceil(this.hp));
     ctx.save();
     ctx.font = `bold ${this.radius * 0.75}px system-ui, sans-serif`;

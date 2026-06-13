@@ -11,7 +11,7 @@ export const CHAR_SKINS = {
   ],
   ninja: [
     { id: "default", name: "Default", color: null },
-    { id: "mask", name: "Máscara Ninja", color: "#111111" },
+    { id: "mask", name: "Máscara Ninja", color: "#111111", labelColor: "#cc3333" },
   ],
   vampire: [
     { id: "default", name: "Default", color: null },
@@ -91,7 +91,7 @@ export const CHAR_SKINS = {
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
-export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon']);
+export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask']);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 
@@ -137,5 +137,5 @@ export function applySkinnedMeta(meta) {
   const skins = getSkinsFor(meta.id);
   if (!skins) return meta;
   const skin = skins[getSelectedSkinIdx(meta.id)];
-  return { ...meta, color: skin.color ?? meta.color, skinId: skin.id };
+  return { ...meta, color: skin.color ?? meta.color, skinId: skin.id, labelColor: skin.labelColor ?? null };
 }

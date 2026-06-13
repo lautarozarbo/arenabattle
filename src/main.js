@@ -23,6 +23,7 @@ import {
 } from "./skins/arenaSkins.js";
 import { openWardrobe, closeWardrobe, switchWardrobeTab } from "./ui/wardrobe.js";
 import { initHud, buildHud, startHudLoop, stopHudLoop } from "./ui/hud.js";
+import { setHpVisible, getHpVisible } from "./game/circle.js";
 import {
   ARENA_LAYOUTS,
   getQuickArenaSizeIdx, setQuickArenaSizeIdx,
@@ -58,22 +59,28 @@ let _ttArenaOpts = {}; // persists through relay rounds
 
 // ── Battle speed ──────────────────────────────────────────────────────────────
 const SPEED_STEPS = [1, 1.5, 2, 3];
-let _speedIdx = 0;
+let _speedIdx = (() => {
+  const saved = parseFloat(localStorage.getItem('battleSpeed') ?? '1');
+  const idx = SPEED_STEPS.indexOf(saved);
+  return idx >= 0 ? idx : 0;
+})();
+
+function _applyBattleSpeed() {
+  const speed = SPEED_STEPS[_speedIdx];
+  game.timeScale = speed;
+  const btn = document.getElementById("btn-speed");
+  btn.textContent = `${speed}×`;
+  btn.classList.toggle("speed-fast", speed > 1);
+}
 
 function resetBattleSpeed() {
-  _speedIdx = 0;
-  game.timeScale = 1;
-  const btn = document.getElementById("btn-speed");
-  btn.textContent = "1×";
-  btn.classList.remove("speed-fast");
+  _applyBattleSpeed();
 }
 
 document.getElementById("btn-speed").addEventListener("click", () => {
   _speedIdx = (_speedIdx + 1) % SPEED_STEPS.length;
-  const speed = SPEED_STEPS[_speedIdx];
-  game.timeScale = speed;
-  document.getElementById("btn-speed").textContent = `${speed}×`;
-  document.getElementById("btn-speed").classList.toggle("speed-fast", speed > 1);
+  localStorage.setItem('battleSpeed', SPEED_STEPS[_speedIdx]);
+  _applyBattleSpeed();
 });
 
 // ── Mode state ────────────────────────────────────────────────────────────────
@@ -289,6 +296,9 @@ function _initTogglePill(rowEl) {
 document.querySelectorAll(".toggle-row").forEach(row => _initTogglePill(row));
 
 showScreen("screen-main-menu");
+
+document.getElementById("btn-hp-toggle")?.classList.toggle("btn-util--active", getHpVisible());
+_applyBattleSpeed();
 
 {
   const _startMusic = () => { music.start(); document.removeEventListener('pointerdown', _startMusic); document.removeEventListener('keydown', _startMusic); };
@@ -646,10 +656,8 @@ function _syncMuteButtons() {
 }
 function _syncLangButtons() {
   const label = getLang().toUpperCase();
-  ["btn-lang", "btn-lang-fight"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = label;
-  });
+  const el = document.getElementById("btn-lang");
+  if (el) el.textContent = label;
 }
 
 ["btn-mute", "btn-mute-fight"].forEach(id => {
@@ -668,15 +676,21 @@ function _syncLangButtons() {
   });
 });
 
-["btn-lang", "btn-lang-fight"].forEach(id => {
-  document.getElementById(id)?.addEventListener("click", () => {
-    const newLang = getLang() === 'es' ? 'en' : 'es';
-    setLang(newLang);
-    _syncLangButtons();
-    updateLeagueInfo();
-    updateTournamentInfo();
-    sfx.uiClick();
-  });
+document.getElementById("btn-lang")?.addEventListener("click", () => {
+  const newLang = getLang() === 'es' ? 'en' : 'es';
+  setLang(newLang);
+  _syncLangButtons();
+  updateLeagueInfo();
+  updateTournamentInfo();
+  sfx.uiClick();
+});
+
+document.getElementById("btn-hp-toggle")?.addEventListener("click", () => {
+  const next = !getHpVisible();
+  setHpVisible(next);
+  const btn = document.getElementById("btn-hp-toggle");
+  btn.classList.toggle("btn-util--active", next);
+  sfx.uiClick();
 });
 
 // ── Confirm modal → ui/screens.js ────────────────────────────────────────────
@@ -1077,8 +1091,8 @@ function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
   const sp1 = applySkinnedMeta(p1meta);
   const sp2 = applySkinnedMeta(p2meta);
   _startFightWithCfgs([
-    { color: sp1.color, label: p1meta.name, powerId: p1meta.id, hp: 100, skinId: sp1.skinId, activeEffect: getEffectActive(p1meta.id) ? 'golden_sparkles' : null },
-    { color: sp2.color, label: p2meta.name, powerId: p2meta.id, hp: 100, skinId: sp2.skinId },
+    { color: sp1.color, labelColor: sp1.labelColor ?? sp1.color, label: p1meta.name, powerId: p1meta.id, hp: 100, skinId: sp1.skinId, activeEffect: getEffectActive(p1meta.id) ? 'golden_sparkles' : null },
+    { color: sp2.color, labelColor: sp2.labelColor ?? sp2.color, label: p2meta.name, powerId: p2meta.id, hp: 100, skinId: sp2.skinId },
   ], onResult, arenaOpts);
 }
 
@@ -1117,8 +1131,8 @@ function _ttRunRound() {
   const sm0 = applySkinnedMeta(a0.meta);
   const sm1 = applySkinnedMeta(a1.meta);
   const cfgs = [
-    { color: sm0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sm0.skinId, activeEffect: getEffectActive(a0.meta.id) ? 'golden_sparkles' : null },
-    { color: sm1.color, label: a1.meta.name, powerId: a1.meta.id, hp: a1.hp, skinId: sm1.skinId },
+    { color: sm0.color, labelColor: sm0.labelColor ?? sm0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sm0.skinId, activeEffect: getEffectActive(a0.meta.id) ? 'golden_sparkles' : null },
+    { color: sm1.color, labelColor: sm1.labelColor ?? sm1.color, label: a1.meta.name, powerId: a1.meta.id, hp: a1.hp, skinId: sm1.skinId },
   ];
   _ttPrevHp = [a0.hp, a1.hp];
   matchResultCallback = null;
@@ -1197,8 +1211,8 @@ function _ttHandleKnockout(winnerSide) {
     const sk0 = applySkinnedMeta(a0.meta);
     const sk1 = applySkinnedMeta(a1.meta);
     const cfgs = [
-      { color: sk0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sk0.skinId },
-      { color: sk1.color, label: a1.meta.name, powerId: a1.meta.id, hp: a1.hp, skinId: sk1.skinId },
+      { color: sk0.color, labelColor: sk0.labelColor ?? sk0.color, label: a0.meta.name, powerId: a0.meta.id, hp: a0.hp, skinId: sk0.skinId },
+      { color: sk1.color, labelColor: sk1.labelColor ?? sk1.color, label: a1.meta.name, powerId: a1.meta.id, hp: a1.hp, skinId: sk1.skinId },
     ];
     _ttPrevHp = [a0.hp, a1.hp];
     document.getElementById("gameover-bar").classList.add("hidden");
