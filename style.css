@@ -3519,6 +3519,7 @@ td.rank {
   text-transform: uppercase;
   letter-spacing: .06em;
   flex-shrink: 0;
+  min-width: 7rem;
 }
 .pfc-code {
   font-size: 0.88rem;
