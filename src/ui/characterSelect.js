@@ -1,0 +1,311 @@
+import { getAllPowerMetas, POWER_CATEGORIES } from '../powers/registry.js';
+import {
+  ANIMATED_SKIN_IDS, getSkinsFor, getSelectedSkinIdx, setSelectedSkinIdx, drawCharPreview,
+} from '../skins/index.js';
+import { isSkinUnlocked } from '../persistence/rewards.js';
+import { getFavorites, isFavorite, toggleFavorite } from '../persistence/stats.js';
+
+const metas = getAllPowerMetas();
+
+const _favRebuildHooks = [];
+const _skinChangeHooks = [];
+
+// ── Character grid ────────────────────────────────────────────────────────────
+export function buildGrid(player, confirmBtnId) {
+  const gridEl   = document.getElementById(`grid-${player}`);
+  const searchEl = document.getElementById(`search-${player}`);
+  let selectedId = metas[0]?.id ?? null;
+
+  gridEl.innerHTML = "";
+
+  const favHeader = document.createElement("div");
+  favHeader.className = "grid-category grid-category--fav hidden";
+  favHeader.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:-1px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Favoritos`;
+  gridEl.appendChild(favHeader);
+
+  const favSectionEl = document.createElement("div");
+  favSectionEl.className = "grid-section hidden";
+  gridEl.appendChild(favSectionEl);
+
+  const categoryEls = {};
+  const cellMap = {};
+
+  function makeCell(meta) {
+    const cell = document.createElement("div");
+    cell.className = "grid-cell";
+    cell.dataset.id = meta.id;
+    cell.style.setProperty("--char-color", meta.color);
+    if (isFavorite(meta.id)) cell.classList.add("fav");
+    if (meta.id === selectedId) cell.classList.add("active");
+    cell.innerHTML = `
+      <div class="grid-peek">
+        <div class="grid-circle" style="background:${meta.color}">${meta.icon}</div>
+      </div>
+      <div class="grid-name">${meta.name}</div>
+    `;
+    cell.addEventListener("click", () => {
+      selectedId = meta.id;
+      syncGrid();
+      openCharModal(meta, () => {
+        selectedId = meta.id;
+        syncGrid();
+        closeCharModal();
+        document.getElementById(confirmBtnId)?.click();
+      });
+    });
+    return cell;
+  }
+
+  for (const cat of POWER_CATEGORIES) {
+    const catMetas = metas.filter(m => m.category === cat);
+    if (!catMetas.length) continue;
+
+    const header = document.createElement("div");
+    header.className = "grid-category";
+    header.dataset.category = cat;
+    header.textContent = cat;
+    gridEl.appendChild(header);
+    categoryEls[cat] = header;
+
+    const section = document.createElement("div");
+    section.className = "grid-section";
+    section.dataset.category = cat;
+    gridEl.appendChild(section);
+
+    for (const meta of catMetas) {
+      const cell = makeCell(meta);
+      section.appendChild(cell);
+      cellMap[meta.id] = cell;
+    }
+  }
+
+  let favCellMap = {};
+
+  function rebuildFavSection() {
+    const favIds = getFavorites();
+    const hasFavs = favIds.length > 0;
+    favHeader.classList.toggle("hidden", !hasFavs);
+    favSectionEl.classList.toggle("hidden", !hasFavs);
+
+    favSectionEl.innerHTML = "";
+    favCellMap = {};
+    for (const id of favIds) {
+      const meta = metas.find(m => m.id === id);
+      if (!meta) continue;
+      const cell = makeCell(meta);
+      favSectionEl.appendChild(cell);
+      favCellMap[id] = cell;
+    }
+
+    for (const [id, cell] of Object.entries(cellMap)) {
+      cell.classList.toggle("fav", favIds.includes(id));
+    }
+    syncGrid();
+  }
+
+  _favRebuildHooks.push(rebuildFavSection);
+  rebuildFavSection();
+
+  _skinChangeHooks.push(() => rebuildFavSection());
+
+  if (searchEl) {
+    searchEl.addEventListener("input", () => {
+      const q = searchEl.value.toLowerCase().trim();
+
+      let anyFavVisible = false;
+      for (const [id, cell] of Object.entries(favCellMap)) {
+        const meta = metas.find(m => m.id === id);
+        const hit = !q || !meta || meta.name.toLowerCase().includes(q) || meta.description.toLowerCase().includes(q);
+        cell.classList.toggle("hidden", !hit);
+        if (hit) anyFavVisible = true;
+      }
+      const hasFavs = Object.keys(favCellMap).length > 0;
+      favHeader.classList.toggle("hidden", !hasFavs || !anyFavVisible);
+      favSectionEl.classList.toggle("hidden", !hasFavs || !anyFavVisible);
+
+      for (const cat of POWER_CATEGORIES) {
+        const catMetas = metas.filter(m => m.category === cat);
+        let anyVisible = false;
+        for (const meta of catMetas) {
+          const cell = cellMap[meta.id];
+          if (!cell) continue;
+          const hit = !q || meta.name.toLowerCase().includes(q) || meta.description.toLowerCase().includes(q);
+          cell.classList.toggle("hidden", !hit);
+          if (hit) anyVisible = true;
+        }
+        const header = categoryEls[cat];
+        const section = gridEl.querySelector(`.grid-section[data-category="${cat}"]`);
+        if (header) header.classList.toggle("hidden", !anyVisible);
+        if (section) section.classList.toggle("hidden", !anyVisible);
+      }
+    });
+  }
+
+  function syncGrid() {
+    for (const [id, cell] of Object.entries(cellMap)) {
+      cell.classList.toggle("active", id === selectedId);
+    }
+    for (const [id, cell] of Object.entries(favCellMap)) {
+      cell.classList.toggle("active", id === selectedId);
+    }
+  }
+
+  function reset() {
+    selectedId = metas[0]?.id ?? null;
+    syncGrid();
+    if (searchEl) {
+      searchEl.value = "";
+      for (const cell of Object.values(cellMap)) cell.classList.remove("hidden");
+      for (const header of Object.values(categoryEls)) header.classList.remove("hidden");
+      gridEl.querySelectorAll(".grid-section[data-category]").forEach(s => s.classList.remove("hidden"));
+      gridEl.querySelectorAll(".grid-category[data-category]").forEach(s => s.classList.remove("hidden"));
+      rebuildFavSection();
+    }
+    gridEl.scrollTop = 0;
+  }
+
+  syncGrid();
+  return { getSelected: () => metas.find(m => m.id === selectedId) ?? metas[0], reset };
+}
+
+// ── Character info modal ──────────────────────────────────────────────────────
+let _modalSelectCb = null;
+let _modalMeta     = null;
+let _modalSkinIdx  = 0;
+let _previewAnimId = null;
+
+function _stopPreviewAnim() {
+  if (_previewAnimId !== null) {
+    cancelAnimationFrame(_previewAnimId);
+    _previewAnimId = null;
+  }
+}
+
+function _startPreviewAnim(canvas, meta, skinId) {
+  _stopPreviewAnim();
+  function loop() {
+    drawCharPreview(canvas, meta, skinId);
+    _previewAnimId = requestAnimationFrame(loop);
+  }
+  _previewAnimId = requestAnimationFrame(loop);
+}
+
+function _syncModalFavBtn() {
+  if (!_modalMeta) return;
+  const fav = isFavorite(_modalMeta.id);
+  const btn = document.getElementById("char-modal-fav");
+  if (!btn) return;
+  btn.classList.toggle("fav-active", fav);
+  btn.querySelector('svg')?.setAttribute('fill', fav ? 'currentColor' : 'none');
+}
+
+function _renderModalCircle() {
+  if (!_modalMeta) return;
+  const skins      = getSkinsFor(_modalMeta.id);
+  const skin       = skins ? skins[_modalSkinIdx] : null;
+  const skinId     = skin?.id ?? 'default';
+  const color      = skin?.color ?? _modalMeta.color;
+  const labelColor = skin?.labelColor ?? color;
+  const canvas     = document.getElementById("char-modal-circle");
+  _stopPreviewAnim();
+  if (ANIMATED_SKIN_IDS.has(skinId)) {
+    _startPreviewAnim(canvas, _modalMeta, skinId);
+  } else {
+    drawCharPreview(canvas, _modalMeta, skinId);
+  }
+  document.getElementById("char-modal").style.setProperty("--modal-color", labelColor);
+  document.getElementById("char-modal-stats").innerHTML = _modalMeta.category
+    ? `<span class="char-modal-category" style="color:${labelColor}">${_modalMeta.category}</span>`
+    : "";
+}
+
+function _syncModalSkin() {
+  if (!_modalMeta) return;
+  const skins   = getSkinsFor(_modalMeta.id);
+  if (!skins) return;
+  const skin      = skins[_modalSkinIdx];
+  const nameEl    = document.getElementById("char-modal-skin-name");
+  const lockEl    = document.getElementById("char-modal-skin-lock");
+  const selectBtn = document.getElementById("char-modal-select");
+  _renderModalCircle();
+  nameEl.textContent = skin.name;
+  document.getElementById("char-modal-skin-prev").disabled = false;
+  document.getElementById("char-modal-skin-next").disabled = false;
+  const locked = !isSkinUnlocked(_modalMeta.id, skin.id);
+  lockEl.classList.toggle('lock-invisible', !locked);
+  selectBtn.disabled = locked;
+}
+
+export function openCharModal(meta, onSelect) {
+  _modalMeta     = meta;
+  _modalSelectCb = onSelect;
+  const overlay = document.getElementById("char-modal");
+  overlay.classList.remove("modal-closing", "hidden");
+
+  const skins = getSkinsFor(meta.id);
+  _modalSkinIdx = getSelectedSkinIdx(meta.id);
+  document.getElementById("char-modal-skin-selector")
+    .classList.toggle("hidden", !skins || skins.length <= 1);
+
+  document.getElementById("char-modal-name").textContent = meta.name;
+  document.getElementById("char-modal-desc").textContent = meta.description;
+  document.getElementById("char-modal-select").disabled  = false;
+  _renderModalCircle();
+  if (skins) _syncModalSkin();
+  _syncModalFavBtn();
+}
+
+export function closeCharModal() {
+  _stopPreviewAnim();
+  _modalSelectCb = null;
+  _modalMeta     = null;
+  const overlay = document.getElementById("char-modal");
+  const box     = document.getElementById("char-modal-box");
+  overlay.classList.add("modal-closing");
+  box.addEventListener("animationend", () => {
+    overlay.classList.remove("modal-closing");
+    overlay.classList.add("hidden");
+  }, { once: true });
+}
+
+export function notifySkinChange(charId) {
+  _skinChangeHooks.forEach(fn => fn(charId));
+}
+
+export function syncModalSkinIfOpen(charId) {
+  if (_modalMeta?.id === charId) _syncModalSkin();
+}
+
+// ── Event listeners ───────────────────────────────────────────────────────────
+document.getElementById("char-modal-fav")?.addEventListener("click", () => {
+  if (!_modalMeta) return;
+  toggleFavorite(_modalMeta.id);
+  _syncModalFavBtn();
+  _favRebuildHooks.forEach(fn => fn());
+});
+
+document.getElementById("char-modal-close").addEventListener("click", closeCharModal);
+document.getElementById("char-modal").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeCharModal();
+});
+document.getElementById("char-modal-skin-prev").addEventListener("click", () => {
+  if (!_modalMeta) return;
+  const skins = getSkinsFor(_modalMeta.id);
+  if (!skins) return;
+  _modalSkinIdx = (_modalSkinIdx - 1 + skins.length) % skins.length;
+  _syncModalSkin();
+});
+document.getElementById("char-modal-skin-next").addEventListener("click", () => {
+  if (!_modalMeta) return;
+  const skins = getSkinsFor(_modalMeta.id);
+  if (!skins) return;
+  _modalSkinIdx = (_modalSkinIdx + 1) % skins.length;
+  _syncModalSkin();
+});
+document.getElementById("char-modal-select").addEventListener("click", () => {
+  if (_modalMeta && getSkinsFor(_modalMeta.id)) {
+    setSelectedSkinIdx(_modalMeta.id, _modalSkinIdx);
+    _skinChangeHooks.forEach(fn => fn(_modalMeta.id));
+  }
+  if (_modalSelectCb) _modalSelectCb();
+});

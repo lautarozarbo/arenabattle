@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Arena</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- ── Screen: Main Menu ────────────────────────── -->
+      <div id="screen-main-menu" class="screen">
+        <!-- Floating circles animation -->
+        <canvas id="bg-battle-canvas"></canvas>
+
+        <!-- Top utility buttons -->
+        <div class="menu-top-utils">
+          <button
+            class="btn-util btn-util--sm"
+            id="btn-mute"
+            title="Silenciar / Activar sonido"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          </button>
+          <button
+            class="btn-util btn-util--sm btn-util--lang"
+            id="btn-lang"
+            title="Cambiar idioma"
+          >
+            ES
+          </button>
+        </div>
+
+        <!-- Novedades (bottom strip) — contenido inyectado desde src/news.js -->
+        <div class="menu-news" id="menu-news">
+          <div class="menu-news-header">
+            <span class="menu-news-title">Novedades</span>
+            <svg
+              class="menu-news-chevron"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          <ul class="menu-news-list" id="menu-news-list"></ul>
+        </div>
+
+        <!-- Top-left: profile chip + wardrobe icon -->
+        <div class="menu-top-left-group">
+          <button class="menu-top-left-chip" id="btn-open-profile">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span id="player-name-display">Invitado</span>
+          </button>
+          <button class="menu-top-left-icon" id="btn-open-wardrobe" title="Skins">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 3a2 2 0 0 1 4 0"/>
+              <line x1="12" y1="3" x2="12" y2="7"/>
+              <polyline points="12,7 3,18 21,18 12,7"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Center overlay: logo + XP bar -->
+        <div class="menu-overlay">
+          <div class="menu-logo-block">
+            <span class="menu-app-name">ARENA</span>
+            <div class="xp-bar-wrap" id="xp-bar-wrap">
+              <div class="xp-track-group">
+                <div class="xp-bar-track">
+                  <div class="xp-bar-fill" id="xp-bar-fill"></div>
+                </div>
+                <span class="xp-label" id="xp-label">0 / 100 XP</span>
+              </div>
+              <button
+                class="xp-chest-btn hidden"
+                id="xp-chest-btn"
+                title="Abrir cofre"
+              >
+                <span class="xp-chest-emoji">📦</span>
+                <span class="xp-chest-count" id="xp-chest-count">1</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Screen: Quick Setup ──────────────────────── -->
+      <div id="screen-quick-setup" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <button class="btn-back hidden" id="btn-quick-setup-back">‹</button>
+            <h2>Partida rápida</h2>
+          </div>
+        </div>
+        <div class="setup-body">
+          <div class="setup-section">
+            <div class="setup-label">Modo</div>
+            <div class="toggle-row" id="quick-mode-row">
+              <button class="toggle-opt active" id="quick-1v1-btn">
+                1 vs 1
+              </button>
+              <button class="toggle-opt" id="quick-2v2-btn">
+                2 vs 2 Relevos
+              </button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Rivales</div>
+            <div class="toggle-row" id="quick-enemy-row">
+              <button class="toggle-opt active" id="quick-random-btn">
+                Aleatorio
+              </button>
+              <button class="toggle-opt" id="quick-pick-btn">Elegir</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Tamaño</div>
+            <div class="toggle-row" id="quick-size-row">
+              <button class="toggle-opt" id="quick-size-sm">Chica</button>
+              <button class="toggle-opt active" id="quick-size-md">
+                Normal
+              </button>
+              <button class="toggle-opt" id="quick-size-lg">Grande</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Arena</div>
+            <div class="arena-picker">
+              <button class="arena-nav" id="arena-prev" aria-label="Anterior">
+                ‹
+              </button>
+              <div class="arena-preview-wrap">
+                <canvas id="arena-preview" width="110" height="110"></canvas>
+                <div class="arena-layout-name" id="arena-layout-name">
+                  Abierta
+                </div>
+              </div>
+              <button class="arena-nav" id="arena-next" aria-label="Siguiente">
+                ›
+              </button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Skin de arena</div>
+            <div class="arena-skin-picker">
+              <button class="arena-nav" id="arena-skin-prev">‹</button>
+              <div class="arena-skin-info">
+                <span class="arena-skin-name" id="arena-skin-name"
+                  >Clásico</span
+                >
+                <span
+                  class="arena-skin-lock lock-invisible"
+                  id="arena-skin-lock"
+                  >🔒 Bloqueado</span
+                >
+              </div>
+              <button class="arena-nav" id="arena-skin-next">›</button>
+            </div>
+          </div>
+          <div class="setup-info-box" id="quick-setup-info">
+            Elige tu personaje y pelea contra un rival al azar
+          </div>
+        </div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-quick-go">
+            Elegir personaje
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Screen: League Setup ─────────────────────── -->
+      <div id="screen-league-setup" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <h2 data-i18n="league.setup.h2">Liga</h2>
+          </div>
+        </div>
+        <div class="setup-body">
+          <div class="setup-section">
+            <div class="setup-label" data-i18n="label.participants">
+              Participantes
+            </div>
+            <div class="counter-row">
+              <button class="counter-btn" id="league-dec">−</button>
+              <span class="counter-val" id="league-count">6</span>
+              <button class="counter-btn" id="league-inc">+</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label" data-i18n="label.format">Formato</div>
+            <div class="toggle-row">
+              <button
+                class="toggle-opt active"
+                id="league-single"
+                data-i18n="league.single"
+              >
+                Ida
+              </button>
+              <button
+                class="toggle-opt"
+                id="league-double"
+                data-i18n="league.double"
+              >
+                Ida y vuelta
+              </button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Rivales</div>
+            <div class="toggle-row">
+              <button class="toggle-opt active" id="league-random-btn">
+                Aleatorio
+              </button>
+              <button class="toggle-opt" id="league-pick-btn">Elegir</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Arena</div>
+            <div class="toggle-row">
+              <button class="toggle-opt active" id="league-arena-random">Aleatoria</button>
+              <button class="toggle-opt" id="league-arena-fixed">Fija</button>
+            </div>
+          </div>
+          <div class="setup-info-box" id="league-info"></div>
+        </div>
+        <div class="select-footer">
+          <button
+            class="btn-primary"
+            id="btn-league-go"
+            data-i18n="btn.choose.char"
+          >
+            Elegir personaje
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Screen: Tournament Setup ─────────────────── -->
+      <div id="screen-tournament-setup" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <h2 data-i18n="tournament.setup.h2">Torneo</h2>
+          </div>
+        </div>
+        <div class="setup-body">
+          <div class="setup-section">
+            <div class="setup-label" data-i18n="label.participants">
+              Participantes
+            </div>
+            <div class="counter-row">
+              <button class="counter-btn" id="tournament-dec">−</button>
+              <span class="counter-val" id="tournament-count">8</span>
+              <button class="counter-btn" id="tournament-inc">+</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Rivales</div>
+            <div class="toggle-row">
+              <button class="toggle-opt active" id="tournament-random-btn">
+                Aleatorio
+              </button>
+              <button class="toggle-opt" id="tournament-pick-btn">
+                Elegir
+              </button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Arena</div>
+            <div class="toggle-row">
+              <button class="toggle-opt active" id="tournament-arena-random">Aleatoria</button>
+              <button class="toggle-opt" id="tournament-arena-fixed">Fija</button>
+            </div>
+          </div>
+          <div class="setup-info-box" id="tournament-info"></div>
+        </div>
+        <div class="select-footer">
+          <button
+            class="btn-primary"
+            id="btn-tournament-go"
+            data-i18n="btn.choose.char"
+          >
+            Elegir personaje
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Screen: P1 selects ───────────────────────── -->
+      <div id="screen-select-p1" class="screen hidden">
+        <div class="select-header">
+          <div class="select-header-top">
+            <button class="btn-back hidden" id="btn-p1-back">‹</button>
+            <div class="select-title-row">
+              <span
+                class="player-tag player-tag--p1"
+                id="tag-p1"
+                data-i18n="p1.tag"
+                >JUGADOR 1</span
+              >
+              <h2 data-i18n="select.p1.h2">Elige tu personaje</h2>
+            </div>
+          </div>
+          <div class="char-search-wrap">
+            <svg
+              class="char-search-icon"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              class="char-search"
+              id="search-p1"
+              type="search"
+              placeholder="Buscar..."
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="fighter-grid" id="grid-p1"></div>
+        <button
+          class="btn-primary hidden"
+          id="btn-confirm-p1"
+          aria-hidden="true"
+        ></button>
+      </div>
+
+      <!-- ── Screen: P2 selects (IA) ──────────────────── -->
+      <div id="screen-select-p2" class="screen hidden">
+        <div class="select-header">
+          <div class="select-header-top">
+            <button class="btn-back" id="btn-p2-back">‹</button>
+            <div class="select-title-row">
+              <span
+                class="player-tag player-tag--ia"
+                id="tag-p2"
+                data-i18n="p2.tag"
+                >IA</span
+              >
+              <h2 data-i18n="select.p2.h2">Elige el poder del rival</h2>
+            </div>
+          </div>
+          <div class="char-search-wrap">
+            <svg
+              class="char-search-icon"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              class="char-search"
+              id="search-p2"
+              type="search"
+              placeholder="Buscar..."
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="fighter-grid" id="grid-p2"></div>
+        <button
+          class="btn-primary hidden"
+          id="btn-confirm-p2"
+          aria-hidden="true"
+        ></button>
+      </div>
+
+      <!-- ── Screen: Fight ────────────────────────────── -->
+      <div id="screen-fight" class="screen hidden">
+        <div id="fight-topbar">
+          <button
+            class="btn-back btn-back--small"
+            id="btn-fight-back"
+            data-i18n="fight.back"
+          >
+            ‹
+          </button>
+          <span id="fight-context-label"></span>
+          <div class="topbar-actions">
+            <button
+              class="btn-util btn-util--sm"
+              id="btn-mute-fight"
+              title="Silenciar"
+            >
+              🔊
+            </button>
+            <button
+              class="btn-util btn-util--sm btn-util--lang"
+              id="btn-lang-fight"
+              title="Idioma"
+            >
+              ES
+            </button>
+            <button class="btn-speed" id="btn-speed">1×</button>
+          </div>
+        </div>
+        <div id="hud"></div>
+        <div id="arena-container">
+          <div id="fight-tag-area" class="hidden">
+            <button id="btn-tag-switch" class="btn-tag">
+              <span class="tag-icon">⇄</span>
+              <span id="tag-btn-label">RELEVO</span>
+            </button>
+          </div>
+          <div id="tag-flash"></div>
+          <div id="canvas-wrap">
+            <canvas id="game-canvas"></canvas>
+          </div>
+        </div>
+        <div id="gameover-bar" class="hidden">
+          <div id="gameover-result">
+            <span class="gameover-label" data-i18n="gameover.label">FIN</span>
+            <span id="gameover-winner"></span>
+          </div>
+          <div id="gameover-points" class="gameover-points hidden"></div>
+          <button class="btn-primary" id="btn-restart">Volver a elegir</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: League Pre-match ─────────────────── -->
+      <div id="screen-league-prematch" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <button class="btn-back" id="btn-prematch-back">‹</button>
+            <div class="header-title-group">
+              <h2 data-i18n="prematch.h2">Próximo rival</h2>
+              <span class="header-badge" id="prematch-progress"></span>
+            </div>
+          </div>
+        </div>
+        <div class="prematch-body">
+          <div class="prematch-arena-section">
+            <div class="prematch-arena-layout-name" id="prematch-layout-name">Abierta</div>
+            <div class="prematch-arena-center-row">
+              <button class="arena-nav" id="prematch-skin-prev">‹</button>
+              <canvas id="prematch-arena-preview" width="110" height="110"></canvas>
+              <button class="arena-nav" id="prematch-skin-next">›</button>
+            </div>
+            <div class="prematch-skin-label">
+              <div class="arena-skin-name" id="prematch-skin-name">Clásico</div>
+              <div class="arena-skin-lock lock-invisible" id="prematch-skin-lock">🔒</div>
+            </div>
+          </div>
+          <div class="prematch-vs-row">
+            <div class="prematch-fighter">
+              <div class="prematch-circle" id="prematch-you-circle"></div>
+              <div class="prematch-fname" id="prematch-you-name"></div>
+              <div class="prematch-role" data-i18n="prematch.you">Jugador</div>
+            </div>
+            <div class="prematch-vs-badge">VS</div>
+            <div class="prematch-fighter">
+              <div class="prematch-circle" id="prematch-rival-circle"></div>
+              <div class="prematch-fname" id="prematch-rival-name"></div>
+              <div class="prematch-role" data-i18n="prematch.rival">Rival</div>
+            </div>
+          </div>
+        </div>
+        <div class="select-footer">
+          <button
+            class="btn-primary"
+            id="btn-prematch-fight"
+            data-i18n="btn.fight"
+          >
+            Pelear
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Screen: League Champion ───────────────────── -->
+      <div id="screen-league-champion" class="screen hidden">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="lchamp-content">
+          <div class="lchamp-trophy">🏆</div>
+          <div class="lchamp-title" id="lchamp-title">¡Campeón de la Liga!</div>
+          <div class="lchamp-circle-wrap">
+            <div class="lchamp-ring" id="lchamp-ring"></div>
+            <div class="lchamp-circle" id="lchamp-circle"></div>
+          </div>
+          <div class="lchamp-name" id="lchamp-name"></div>
+          <div class="lchamp-subtitle" id="lchamp-subtitle"></div>
+          <div class="lchamp-stats" id="lchamp-stats"></div>
+          <div class="event-points-banner hidden" id="lchamp-points"></div>
+        </div>
+        <div class="lchamp-footer">
+          <button class="btn-primary" id="btn-lchamp-standings">Ver clasificación</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: Tournament Champion ─────────────── -->
+      <div id="screen-tournament-champion" class="screen hidden">
+        <canvas id="tchamp-confetti-canvas"></canvas>
+        <div class="lchamp-content">
+          <div class="lchamp-trophy">🏆</div>
+          <div class="lchamp-title" id="tchamp-title">¡Campeón del Torneo!</div>
+          <div class="lchamp-circle-wrap">
+            <div class="lchamp-ring" id="tchamp-ring"></div>
+            <div class="lchamp-circle" id="tchamp-circle"></div>
+          </div>
+          <div class="lchamp-name" id="tchamp-name"></div>
+          <div class="lchamp-subtitle" id="tchamp-subtitle"></div>
+          <div class="event-points-banner hidden" id="tchamp-points"></div>
+        </div>
+        <div class="lchamp-footer">
+          <button class="btn-primary" id="btn-tchamp-bracket">Ver bracket</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: League Standings ─────────────────── -->
+      <div id="screen-league-standings" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <div class="header-title-group">
+              <h2 data-i18n="standings.h2">Clasificación</h2>
+              <span class="header-badge" id="league-progress-label"></span>
+            </div>
+            <button
+              class="btn-reset-mode btn-reset-mode--danger"
+              id="btn-league-reset"
+              title="Nueva liga"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="screen-tabs" id="league-view-tabs"></div>
+        <div class="standings-scroll" id="standings-wrap"></div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-standings-next">Siguiente pelea</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: Participant Picker ────────────────── -->
+      <div id="screen-participant-pick" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <button class="btn-back" id="btn-pick-back">‹</button>
+            <div class="header-title-group">
+              <h2 id="pick-title">Participantes</h2>
+              <span class="header-badge" id="pick-badge"></span>
+            </div>
+          </div>
+          <p class="hint" id="pick-hint">Elegí los rivales</p>
+        </div>
+        <div class="standings-scroll" id="pick-grid-wrap">
+          <div class="pick-grid" id="pick-grid"></div>
+        </div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-pick-confirm">Confirmar</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: Tournament Bracket ───────────────── -->
+      <div id="screen-tournament-bracket" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <div class="header-title-group">
+              <h2 id="bracket-phase-title">Torneo</h2>
+              <span class="header-badge" id="bracket-badge"></span>
+            </div>
+            <button
+              class="btn-reset-mode btn-reset-mode--danger"
+              id="btn-tournament-reset"
+              title="Nuevo torneo"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="screen-tabs" id="bracket-view-tabs"></div>
+        <div class="standings-scroll" id="bracket-wrap"></div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-bracket-action">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- ── Screen: Custom Battle Setup ───────────────── -->
+      <div id="screen-custom-setup" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <button class="btn-back" id="btn-custom-back">‹</button>
+            <h2>Batalla Personalizada</h2>
+          </div>
+          <p class="hint">Configura tu batalla a medida</p>
+        </div>
+        <div class="setup-body">
+          <div class="setup-section">
+            <div class="setup-label">Arena</div>
+            <div class="toggle-row">
+              <button class="toggle-opt" id="custom-arena-sm">Pequeña</button>
+              <button class="toggle-opt active" id="custom-arena-md">
+                Normal
+              </button>
+              <button class="toggle-opt" id="custom-arena-lg">Grande</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Luchadores</div>
+            <div class="counter-row">
+              <button class="counter-btn" id="custom-fighters-dec">−</button>
+              <span class="counter-val" id="custom-fighters-val">2</span>
+              <button class="counter-btn" id="custom-fighters-inc">+</button>
+            </div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-label">Vida</div>
+            <div class="toggle-row">
+              <button class="toggle-opt custom-hp-btn" id="custom-hp-50">
+                50
+              </button>
+              <button
+                class="toggle-opt custom-hp-btn active"
+                id="custom-hp-100"
+              >
+                100
+              </button>
+              <button class="toggle-opt custom-hp-btn" id="custom-hp-150">
+                150
+              </button>
+              <button class="toggle-opt custom-hp-btn" id="custom-hp-200">
+                200
+              </button>
+            </div>
+          </div>
+          <div class="setup-section hidden" id="custom-teams-section">
+            <div class="setup-label">Equipos</div>
+            <div class="toggle-row" id="custom-teams-row"></div>
+          </div>
+          <div class="setup-info-box" id="custom-info"></div>
+        </div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-custom-go">
+            Elegir personaje
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Floating navigation (persists across screens) ── -->
+      <nav id="main-nav" class="floating-nav hidden">
+        <div class="nav-pill" id="nav-pill"></div>
+        <button class="nav-tab nav-tab--active" id="nav-tab-inicio">
+          <svg
+            class="nav-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span class="nav-label">Inicio</span>
+        </button>
+        <button class="nav-tab" id="nav-tab-play">
+          <svg
+            class="nav-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polygon
+              points="10 8 16 12 10 16 10 8"
+              fill="currentColor"
+              stroke="none"
+            />
+          </svg>
+          <span class="nav-label">Jugar</span>
+        </button>
+        <button class="nav-tab" id="btn-league">
+          <svg
+            class="nav-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+            <path d="M4 22h16" />
+            <path
+              d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+            />
+            <path
+              d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+            />
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+          </svg>
+          <span class="nav-label" data-i18n="league.title">Liga</span>
+        </button>
+        <button class="nav-tab" id="btn-tournament">
+          <svg
+            class="nav-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="3" width="6" height="5" rx="1" />
+            <rect x="2" y="16" width="6" height="5" rx="1" />
+            <rect x="16" y="9" width="6" height="5" rx="1" />
+            <path d="M8 5.5h4v13H8" />
+            <path d="M12 12h4" />
+          </svg>
+          <span class="nav-label" data-i18n="tournament.title">Torneo</span>
+        </button>
+      </nav>
+
+      <!-- ── Character info modal ─────────────────────── -->
+      <div id="char-modal" class="char-modal-overlay hidden">
+        <div class="char-modal-box" id="char-modal-box">
+          <button class="char-modal-fav-btn" id="char-modal-fav" title="Favorito">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+          <button class="char-modal-close" id="char-modal-close">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <div class="char-modal-preview">
+            <canvas
+              class="char-modal-circle"
+              id="char-modal-circle"
+              width="220"
+              height="130"
+            ></canvas>
+          </div>
+          <div class="skin-selector hidden" id="char-modal-skin-selector">
+            <button
+              class="skin-arrow"
+              id="char-modal-skin-prev"
+              aria-label="Skin anterior"
+            >
+              &#8249;
+            </button>
+            <div class="skin-label-group">
+              <span class="skin-label-heading">SKIN</span>
+              <span class="skin-name" id="char-modal-skin-name">Default</span>
+              <span
+                class="skin-lock-icon lock-invisible"
+                id="char-modal-skin-lock"
+                >🔒</span
+              >
+            </div>
+            <button
+              class="skin-arrow"
+              id="char-modal-skin-next"
+              aria-label="Siguiente skin"
+            >
+              &#8250;
+            </button>
+          </div>
+          <div class="char-modal-name" id="char-modal-name"></div>
+          <div class="char-modal-desc" id="char-modal-desc"></div>
+          <div class="char-modal-stats" id="char-modal-stats"></div>
+          <button class="btn-primary" id="char-modal-select">
+            Seleccionar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Chest modal ───────────────────────────────── -->
+    <div id="chest-modal" class="chest-overlay hidden">
+      <div class="chest-box">
+        <div class="chest-anim" id="chest-anim">📦</div>
+        <div class="chest-title" id="chest-title">¡Cofre!</div>
+        <canvas
+          id="chest-preview-canvas"
+          width="220"
+          height="150"
+          class="chest-preview-canvas hidden"
+        ></canvas>
+        <div class="chest-reward" id="chest-reward"></div>
+        <button class="btn-primary" id="btn-chest-close">¡Genial!</button>
+      </div>
+    </div>
+
+    <!-- ── Wardrobe modal ───────────────────────────────── -->
+    <div id="wardrobe-modal" class="wardrobe-overlay hidden">
+      <div class="wardrobe-box">
+        <div class="wardrobe-header">
+          <span class="wardrobe-title">Skins</span>
+          <button class="wardrobe-close" id="btn-wardrobe-close">✕</button>
+        </div>
+        <div class="wardrobe-tabs">
+          <button class="wardrobe-tab active" id="wardrobe-tab-chars">Personajes</button>
+          <button class="wardrobe-tab" id="wardrobe-tab-arena">Arena</button>
+        </div>
+        <div class="wardrobe-content" id="wardrobe-content"></div>
+      </div>
+    </div>
+
+    <!-- ── Confirm modal ──────────────────────────────── -->
+    <div id="confirm-modal" class="confirm-overlay hidden">
+      <div class="confirm-box">
+        <div class="confirm-title" data-i18n="confirm.title">
+          ¿Volver al menú?
+        </div>
+        <div class="confirm-sub" data-i18n="confirm.sub">
+          Se perderá el progreso de la partida actual.
+        </div>
+        <div class="confirm-btns">
+          <button
+            class="btn-confirm-cancel"
+            id="btn-confirm-cancel"
+            data-i18n="btn.cancel"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn-confirm-ok"
+            id="btn-confirm-ok"
+            data-i18n="btn.exit.menu"
+          >
+            Salir al menú
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Profile panel ─────────────────────────────────── -->
+    <div id="profile-panel" class="profile-overlay hidden">
+      <div class="profile-sheet">
+        <div class="profile-drag-handle"></div>
+        <div class="profile-sheet-header">
+          <span class="profile-sheet-title">Perfil</span>
+          <button id="btn-profile-close" class="profile-close-btn">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar-circle" id="profile-avatar-circle">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="opacity: 0.4"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="profile-name-section">
+          <span class="profile-name-text" id="profile-name-display"
+            >Invitado</span
+          >
+          <button
+            class="profile-edit-btn"
+            id="btn-profile-edit-name"
+            title="Cambiar nombre"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="profile-name-edit-row hidden" id="profile-name-edit-row">
+          <input
+            class="profile-name-input"
+            id="profile-name-input"
+            maxlength="20"
+            placeholder="Tu nombre"
+          />
+          <button
+            class="profile-confirm-btn"
+            id="btn-profile-confirm"
+            title="Guardar"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="profile-stats" id="profile-stats"></div>
+      </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
