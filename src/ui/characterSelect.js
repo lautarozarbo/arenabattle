@@ -260,6 +260,28 @@ function _switchModalTab(tab) {
   if (tab === 'mastery' && _modalMeta) _renderMasteryContent(_modalMeta);
 }
 
+function _updateCharStats(meta) {
+  const el = document.getElementById('char-modal-char-stats');
+  if (!el) return;
+  const stats   = getStats();
+  const games   = stats.charUses[meta.id] ?? 0;
+  const claimed = getMasteryClaimedFor(meta.id);
+  const next    = MASTERY_MILESTONES.find(m => !claimed.has(m.games));
+  const pct     = next ? Math.min(100, Math.round((games / next.games) * 100)) : 100;
+
+  el.innerHTML = `
+    <div class="cmc-row">
+      <span class="cmc-label">Partidas con ${meta.name}</span>
+      <span class="cmc-val">${games}</span>
+    </div>
+    ${next
+      ? `<div class="cmc-bar"><div class="cmc-bar-fill" style="width:${pct}%"></div></div>
+         <div class="cmc-next">Próxima recompensa: <b>${next.games}</b> partidas</div>`
+      : `<div class="cmc-next cmc-next--done">Maestría completada</div>`
+    }
+  `;
+}
+
 function _updateEffectRow(meta) {
   const row = document.getElementById('char-modal-effect-row');
   const btn = document.getElementById('char-modal-effect-toggle');
@@ -293,7 +315,7 @@ function _renderMasteryContent(meta) {
     const isReady   = !isClaimed && games >= m.games;
     const pct       = Math.min(100, Math.round((games / m.games) * 100));
     const rewardTxt = m.effect
-      ? 'Efecto: Destellos dorados'
+      ? 'Efecto especial'
       : `${m.xp} XP${m.chests ? ` · ${m.chests} cofre${m.chests > 1 ? 's' : ''}` : ''}`;
     const stateClass = isClaimed ? 'mastery-ms--claimed' : isReady ? 'mastery-ms--ready' : 'mastery-ms--locked';
     const iconHtml   = isClaimed ? '<span class="mastery-ms-check">✓</span>' : isReady ? '🎁' : `${m.games}`;
@@ -358,6 +380,7 @@ export function openCharModal(meta, onSelect) {
   _syncModalFavBtn();
   _updateMasteryDot(meta);
   _updateEffectRow(meta);
+  _updateCharStats(meta);
 }
 
 export function closeCharModal() {

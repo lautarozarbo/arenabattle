@@ -3837,7 +3837,7 @@ td.rank {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 0 4px;
+  padding: 8px 0 12px;
   gap: 2px;
 }
 .mastery-games-val {
@@ -3908,8 +3908,9 @@ td.rank {
   color: var(--text);
 }
 .mastery-ms-reward {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
+  white-space: nowrap;
 }
 .mastery-ms-bar {
   height: 3px;
@@ -4001,4 +4002,48 @@ td.rank {
   display: block;
   font-size: 0.7rem;
   color: var(--text-dim);
+}
+
+/* ── Info panel: character mini stats ────────────────────────────────────── */
+.char-modal-char-stats {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cmc-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.cmc-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+.cmc-val {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text);
+}
+.cmc-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cmc-bar-fill {
+  height: 100%;
+  background: var(--accent, #7c6be0);
+  border-radius: 2px;
+  transition: width .4s;
+}
+.cmc-next {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+.cmc-next--done {
+  color: #64dc64;
 }
