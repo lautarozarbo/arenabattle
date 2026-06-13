@@ -256,8 +256,12 @@ function _switchModalTab(tab) {
     btn.classList.toggle('char-modal-tab--active', btn.dataset.tab === tab);
   });
   document.getElementById('char-modal-panel-info').classList.toggle('hidden', tab !== 'info');
-  document.getElementById('char-modal-panel-mastery').classList.toggle('hidden', tab !== 'mastery');
-  if (tab === 'mastery' && _modalMeta) _renderMasteryContent(_modalMeta);
+  const masteryPanel = document.getElementById('char-modal-panel-mastery');
+  masteryPanel.classList.toggle('hidden', tab !== 'mastery');
+  if (tab === 'mastery' && _modalMeta) {
+    _renderMasteryContent(_modalMeta);
+    masteryPanel.scrollTop = 0;
+  }
 }
 
 function _updateCharStats(meta) {

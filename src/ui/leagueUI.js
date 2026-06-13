@@ -182,9 +182,9 @@ export function showLeagueChampion() {
     const basePts  = POINTS.EVENT_PER_PARTICIPANT * count * mult;
     let pts = basePts;
     const ptLines = [
-      `+${basePts} pts por completar la liga (${count} × ${POINTS.EVENT_PER_PARTICIPANT}${isDouble ? ' × 2 ida y vuelta' : ''})`,
+      `+${basePts} XP por completar la liga (${count} × ${POINTS.EVENT_PER_PARTICIPANT}${isDouble ? ' × 2 ida y vuelta' : ''})`,
     ];
-    if (isPlayer) { pts += POINTS.EVENT_WIN; ptLines.push(`+${POINTS.EVENT_WIN} pts por ganar la liga`); }
+    if (isPlayer) { pts += POINTS.EVENT_WIN; ptLines.push(`+${POINTS.EVENT_WIN} XP por ganar la liga`); }
     addPoints(pts);
     _showEventPoints('lchamp-points', ptLines);
     _updateXpBar();

@@ -105,6 +105,12 @@ export class NinjaPower extends BasePower {
     });
   }
 
+  onUnsilenced() {
+    // Sync HP baseline so the smoke invulnerability doesn't restore
+    // damage that was legitimately dealt while frozen (e.g. by clock).
+    this._hpLastFrame = this.owner.hp;
+  }
+
   clearState() {
     this._throwCd = THROW_CD * 0.45;
     this._shurikens = [];

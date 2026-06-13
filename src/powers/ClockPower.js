@@ -63,6 +63,7 @@ export class ClockPower extends BasePower {
     if (this._frozenEnemy) {
       this._frozenEnemy._silenced = false;
       this._frozenEnemy._speedOverride = null;
+      this._frozenEnemy.power.onUnsilenced();
       this._frozenEnemy = null;
     }
     this._frozen = false;

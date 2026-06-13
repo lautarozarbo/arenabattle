@@ -445,8 +445,8 @@ export function showTournamentChampion() {
     const count   = tournament.participants.length;
     const basePts = POINTS.EVENT_PER_PARTICIPANT * count;
     let pts = basePts;
-    const ptLines = [`+${basePts} pts por completar el torneo (${count} × ${POINTS.EVENT_PER_PARTICIPANT})`];
-    if (isPlayer) { pts += POINTS.EVENT_WIN; ptLines.push(`+${POINTS.EVENT_WIN} pts por ganar el torneo`); }
+    const ptLines = [`+${basePts} XP por completar el torneo (${count} × ${POINTS.EVENT_PER_PARTICIPANT})`];
+    if (isPlayer) { pts += POINTS.EVENT_WIN; ptLines.push(`+${POINTS.EVENT_WIN} XP por ganar el torneo`); }
     addPoints(pts);
     _showEventPoints('tchamp-points', ptLines);
     document.getElementById('tchamp-points').classList.remove('hidden');

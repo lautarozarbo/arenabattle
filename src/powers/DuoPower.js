@@ -46,6 +46,8 @@ export class DuoPower extends BasePower {
       radius: owner.radius,
       _flashTimer: 0,
       _dmgNums: [],
+      _passesObstacles: false,
+      power: { onObstacleBounce: () => {} },
     };
     this._compReady = false;
     // Expose takeDamage so external powers can damage the companion uniformly
@@ -120,6 +122,9 @@ export class DuoPower extends BasePower {
         this._comp.y = bottom - r;
         this._comp.vy *= -1;
       }
+
+      // Obstacle collision
+      this.arena.bounceCircleOffObstacles(this._comp);
 
       // Clamp companion speed
       const spd = Math.sqrt(this._comp.vx ** 2 + this._comp.vy ** 2);

@@ -56,6 +56,10 @@ export class BasePower {
       this._idleTimer = 0;
   }
 
+  // Called when the owner is unsilenced (e.g. clock freeze ends). Powers can use
+  // this to resync stale internal state that accumulated while silenced.
+  onUnsilenced() {}
+
   // Called when owner hp reaches 0. Return true to intercept death (revive mechanic).
   _onBeforeDeath() { return false; }
 

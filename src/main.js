@@ -86,6 +86,7 @@ document.getElementById("btn-speed").addEventListener("click", () => {
 // ── Mode state ────────────────────────────────────────────────────────────────
 let gameMode  = 'quickmatch'; // 'quickmatch' | 'league' | 'tournament' | 'custom' | 'tag2v2'
 let matchResultCallback = null; // (winnerSide: 0|1|-1) => void
+let _pendingCharUseId = null; // charId to record when match actually ends
 let _confettiRaf = null;
 
 // ── Quick-match / Tag Team state ──────────────────────────────────────────────
@@ -1086,8 +1087,7 @@ function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
     document.getElementById("fight-context-label").textContent = "";
     document.getElementById("btn-restart").textContent = t('btn.pick.again');
   }
-  recordCharUse(p1meta.id);
-  refreshMasteryBadges();
+  _pendingCharUseId = p1meta.id;
   const sp1 = applySkinnedMeta(p1meta);
   const sp2 = applySkinnedMeta(p2meta);
   _startFightWithCfgs([
@@ -1114,8 +1114,7 @@ function _startFightWithCfgs(cfgs, onResult, arenaOpts = {}) {
 // ── Tag Team Fight ────────────────────────────────────────────────────────────
 function startTagTeamFight() {
   const { my, partner, e1, e2 } = _ttCfg;
-  recordCharUse(my?.meta?.id);
-  refreshMasteryBadges();
+  _pendingCharUseId = my?.meta?.id;
   _ttMatch = new TagTeamMatch([my, partner], [e1, e2]);
   _ttArenaOpts = getQuickArenaOpts();
   canvas.width = canvas.height = _ttArenaOpts.canvasSize;
@@ -1303,6 +1302,12 @@ document.getElementById("btn-restart").addEventListener("click", () => {
   document.getElementById("gameover-bar").classList.add("hidden");
   game.stop();
   stopHudLoop();
+
+  if (_pendingCharUseId) {
+    recordCharUse(_pendingCharUseId);
+    refreshMasteryBadges();
+    _pendingCharUseId = null;
+  }
 
   if (gameMode === 'tag2v2') {
     _ttMatch = null;
