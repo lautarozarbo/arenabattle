@@ -2,7 +2,7 @@ import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
 
 const ARROW_SPEED = 430;
-const ARROW_DMG = 5;
+const ARROW_DMG = 3;
 const ARROW_LIFE = 2.0;
 const MAX_INTERVAL = 1.2; // seconds between shots at base speed
 const MIN_INTERVAL = 0.25; // seconds between shots at max fury
