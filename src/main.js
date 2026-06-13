@@ -1,5 +1,6 @@
 import { initAuth, onLogin, onLogout, updateUsername } from "./auth.js";
 import { openLeaderboard } from "./social/leaderboard.js";
+import { initFriends, openFriendsPanel, refreshFriendsBadge, getMyFriendCode } from "./social/friends.js";
 import { Game     } from "./game/game.js";
 import { getAllPowerMetas } from "./powers/registry.js";
 import { TagTeamMatch  } from "./modes/TagTeam.js";
@@ -210,6 +211,7 @@ _updateXpBar();
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 initAuth();
+initFriends();
 onLogin((username) => {
   const localName = localStorage.getItem('playerName');
   if (localName && localName !== 'Invitado') {
@@ -218,10 +220,17 @@ onLogin((username) => {
     _savePlayerName(username);
   }
   _updateXpBar();
+  refreshFriendsBadge();
 });
 onLogout(() => {
   localStorage.removeItem('playerName');
   _savePlayerName('Invitado');
+  refreshFriendsBadge();
+});
+
+document.getElementById('btn-open-friends').addEventListener('click', () => {
+  sfx.uiClick();
+  openFriendsPanel();
 });
 
 document.getElementById('btn-open-leaderboard').addEventListener('click', () => {
@@ -426,9 +435,22 @@ document.getElementById("btn-open-profile").addEventListener("click", async () =
   sfx.uiClick();
   _profilePanel.classList.remove("hidden");
   _profileStatsEl.innerHTML = '<div class="pstat-loading">Cargando...</div>';
-  await Promise.all([syncStatsFromCloud(), syncRewardsFromCloud()]);
+  const [,, friendCode] = await Promise.all([
+    syncStatsFromCloud(),
+    syncRewardsFromCloud(),
+    getMyFriendCode(),
+  ]);
   _buildProfileStats();
   _updateXpBar();
+  const fcEl = document.getElementById('profile-friend-code');
+  if (fcEl) {
+    if (friendCode) {
+      fcEl.textContent = `Código: ${friendCode}`;
+      fcEl.classList.remove('hidden');
+    } else {
+      fcEl.classList.add('hidden');
+    }
+  }
 });
 
 document.getElementById("btn-profile-close").addEventListener("click", () => {

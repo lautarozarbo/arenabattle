@@ -26,9 +26,26 @@ export async function updateUsername(name) {
     .eq('user_id', me.user.id);
 }
 
+let _heartbeatId = null;
+
+async function _updateLastSeen() {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return;
+  await supabase.from('profiles')
+    .update({ last_seen: new Date().toISOString() })
+    .eq('user_id', data.user.id);
+}
+
+function _startHeartbeat() {
+  if (_heartbeatId) clearInterval(_heartbeatId);
+  _heartbeatId = setInterval(_updateLastSeen, 3 * 60 * 1000);
+}
+
 async function _syncAndNotify() {
   await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
   const username = await getUsername();
+  _updateLastSeen();
+  _startHeartbeat();
   if (_onLoginCallback) _onLoginCallback(username);
 }
 

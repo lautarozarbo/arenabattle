@@ -99,6 +99,15 @@
               <polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/>
             </svg>
           </button>
+          <button class="menu-top-left-icon menu-top-left-icon--badge" id="btn-open-friends" title="Amigos">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="friends-badge hidden" id="friends-badge">0</span>
+          </button>
         </div>
 
         <!-- Center overlay: logo + XP bar -->
@@ -1031,6 +1040,29 @@
         </div>
 
         <div class="profile-stats" id="profile-stats"></div>
+        <div class="profile-friend-code hidden" id="profile-friend-code"></div>
+      </div>
+    </div>
+
+    <!-- ── Friends Panel ─────────────────────────────────── -->
+    <div id="friends-panel" class="friends-overlay hidden">
+      <div class="friends-sheet">
+        <div class="friends-drag-handle"></div>
+        <div class="friends-header">
+          <span class="friends-title">Amigos</span>
+          <button id="btn-friends-close" class="friends-close-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="friends-tabs">
+          <button class="friends-tab friends-tab--active" data-tab="friends">Amigos</button>
+          <button class="friends-tab" data-tab="received">
+            Recibidas
+            <span class="friends-tab-badge hidden" id="friends-tab-badge">0</span>
+          </button>
+          <button class="friends-tab" data-tab="sent">Enviadas</button>
+        </div>
+        <div class="friends-content" id="friends-content"></div>
       </div>
     </div>
 

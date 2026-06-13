@@ -1,15 +1,17 @@
 import { supabase } from '../supabase.js';
 import { getAllPowerMetas } from '../powers/registry.js';
+import { refreshFriendsBadge } from './friends.js';
 
 export async function openUserProfile(userId) {
-  const modal = document.getElementById('user-profile-modal');
+  const modal   = document.getElementById('user-profile-modal');
   const content = document.getElementById('user-profile-content');
   modal.classList.remove('hidden');
   content.innerHTML = '<div class="up-loading">Cargando...</div>';
 
-  const [{ data: profile }, { data: stats }] = await Promise.all([
-    supabase.from('profiles').select('username').eq('user_id', userId).single(),
+  const [{ data: profile }, { data: stats }, { data: meData }] = await Promise.all([
+    supabase.from('profiles').select('username, last_seen').eq('user_id', userId).single(),
     supabase.from('user_stats').select('*').eq('user_id', userId).single(),
+    supabase.auth.getUser(),
   ]);
 
   if (!profile) {
@@ -17,7 +19,11 @@ export async function openUserProfile(userId) {
     return;
   }
 
-  const s = stats ?? {};
+  const me   = meData.user;
+  const myId = me?.id ?? null;
+  const rel  = myId && myId !== userId ? await _getRelationship(myId, userId) : null;
+
+  const s    = stats ?? {};
   const wins   = s.wins          ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
   const losses = s.losses        ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
   const draws  = s.draws         ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
@@ -47,8 +53,13 @@ export async function openUserProfile(userId) {
       </div>`
     : `<div class="up-fav-empty">Sin partidas registradas</div>`;
 
+  const lastSeenHtml = _formatLastSeen(profile.last_seen);
+  const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
+
   content.innerHTML = `
     <div class="up-username">${_esc(profile.username)}</div>
+    ${lastSeenHtml ? `<div class="up-last-seen">${lastSeenHtml}</div>` : ''}
+    ${friendBtnHtml}
 
     <div class="up-section-label">Resumen</div>
     <div class="up-grid">
@@ -87,8 +98,124 @@ export async function openUserProfile(userId) {
     <div class="up-section-label">Personaje más usado</div>
     ${favHtml}
   `;
+
+  _wireFriendButtons(rel, myId, userId, content);
+}
+
+async function _getRelationship(myId, theirId) {
+  const { data } = await supabase
+    .from('friendships')
+    .select('*')
+    .or(`and(requester_id.eq.${myId},addressee_id.eq.${theirId}),and(requester_id.eq.${theirId},addressee_id.eq.${myId})`)
+    .maybeSingle();
+  return data ?? null;
+}
+
+function _renderFriendBtn(rel, myId, theirId) {
+  if (!myId || myId === theirId) return '';
+  if (!rel) {
+    return `<button class="up-friend-btn up-friend-btn--add" id="up-friend-add">+ Agregar amigo</button>`;
+  }
+  if (rel.status === 'accepted') {
+    return `<button class="up-friend-btn up-friend-btn--friends" id="up-friend-remove">✓ Amigos · Eliminar</button>`;
+  }
+  if (rel.status === 'pending' && rel.requester_id === myId) {
+    return `<button class="up-friend-btn up-friend-btn--pending" id="up-friend-cancel">Solicitud enviada · Cancelar</button>`;
+  }
+  if (rel.status === 'pending' && rel.addressee_id === myId) {
+    return `<div class="up-friend-row">
+      <button class="up-friend-btn up-friend-btn--add" id="up-friend-accept">Aceptar solicitud</button>
+      <button class="up-friend-btn up-friend-btn--ghost" id="up-friend-reject">Rechazar</button>
+    </div>`;
+  }
+  return '';
+}
+
+function _wireFriendButtons(rel, myId, theirId, content) {
+  const add     = content.querySelector('#up-friend-add');
+  const remove  = content.querySelector('#up-friend-remove');
+  const cancel  = content.querySelector('#up-friend-cancel');
+  const accept  = content.querySelector('#up-friend-accept');
+  const reject  = content.querySelector('#up-friend-reject');
+
+  if (add) {
+    add.addEventListener('click', async () => {
+      add.disabled = true;
+      add.textContent = 'Enviando...';
+      const { error } = await supabase.from('friendships').insert({
+        requester_id: myId,
+        addressee_id: theirId,
+        status: 'pending',
+      });
+      if (error) { add.textContent = 'Error'; add.disabled = false; return; }
+      add.textContent = 'Solicitud enviada';
+      add.classList.remove('up-friend-btn--add');
+      add.classList.add('up-friend-btn--pending');
+    });
+  }
+
+  if (remove) {
+    remove.addEventListener('click', async () => {
+      remove.disabled = true;
+      remove.textContent = 'Eliminando...';
+      await supabase.from('friendships').delete().eq('id', rel.id);
+      remove.textContent = '+ Agregar amigo';
+      remove.classList.remove('up-friend-btn--friends');
+      remove.classList.add('up-friend-btn--add');
+      remove.disabled = false;
+      remove.id = 'up-friend-add';
+      _wireFriendButtons(null, myId, theirId, content);
+      await refreshFriendsBadge();
+    });
+  }
+
+  if (cancel) {
+    cancel.addEventListener('click', async () => {
+      cancel.disabled = true;
+      cancel.textContent = 'Cancelando...';
+      await supabase.from('friendships').delete().eq('id', rel.id);
+      cancel.textContent = '+ Agregar amigo';
+      cancel.classList.remove('up-friend-btn--pending');
+      cancel.classList.add('up-friend-btn--add');
+      cancel.disabled = false;
+      cancel.id = 'up-friend-add';
+      _wireFriendButtons(null, myId, theirId, content);
+    });
+  }
+
+  if (accept) {
+    accept.addEventListener('click', async () => {
+      accept.disabled = true;
+      await supabase.from('friendships').update({ status: 'accepted' }).eq('id', rel.id);
+      accept.closest('.up-friend-row').outerHTML =
+        `<button class="up-friend-btn up-friend-btn--friends" disabled>✓ Amigos</button>`;
+      await refreshFriendsBadge();
+    });
+  }
+
+  if (reject) {
+    reject.addEventListener('click', async () => {
+      reject.disabled = true;
+      await supabase.from('friendships').delete().eq('id', rel.id);
+      reject.closest('.up-friend-row').outerHTML =
+        `<button class="up-friend-btn up-friend-btn--add" disabled>+ Agregar amigo</button>`;
+      await refreshFriendsBadge();
+    });
+  }
+}
+
+function _formatLastSeen(lastSeenStr) {
+  if (!lastSeenStr) return '';
+  const diff = Date.now() - new Date(lastSeenStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 5)  return '🟢 En línea';
+  if (mins < 60) return `Hace ${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `Hace ${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  return `Hace ${days} día${days !== 1 ? 's' : ''}`;
 }
 
 function _esc(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
