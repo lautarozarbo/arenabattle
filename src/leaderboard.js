@@ -32,7 +32,6 @@ export async function openLeaderboard() {
       <td class="lb-name">${_esc(row.username)}</td>
       <td class="lb-wins">${row.total_wins}</td>
       <td class="lb-rate">${winRate}%</td>
-      <td class="lb-champ">${row.total_championships > 0 ? '🏆'.repeat(Math.min(row.total_championships, 5)) : '—'}</td>
     </tr>`;
   }).join('');
 }
