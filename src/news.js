@@ -4,6 +4,7 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
+  { badge: "NUEVO", text: "Maestría de personaje: objetivos, recompensas y efecto Destellos dorados" },
   { badge: "NUEVO", text: "Sistema de amigos con solicitudes y estado online" },
   { badge: "NUEVO", text: "Perfiles de usuario desde el ranking" },
   { badge: "NUEVO", text: "Registro de usuarios" },

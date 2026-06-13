@@ -3825,7 +3825,7 @@ td.rank {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 240px;
+  height: 230px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -3978,4 +3978,27 @@ td.rank {
   background: rgba(255,215,0,0.18);
   border-color: rgba(255,215,0,0.45);
   color: #FFD700;
+}
+
+/* ── Effect toggle in Info panel ─────────────────────────────────────────── */
+.char-modal-effect-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
+}
+.char-modal-effect-info { flex: 1; min-width: 0; }
+.char-modal-effect-name {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.char-modal-effect-desc {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-dim);
 }

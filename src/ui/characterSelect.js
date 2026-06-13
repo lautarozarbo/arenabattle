@@ -260,6 +260,18 @@ function _switchModalTab(tab) {
   if (tab === 'mastery' && _modalMeta) _renderMasteryContent(_modalMeta);
 }
 
+function _updateEffectRow(meta) {
+  const row = document.getElementById('char-modal-effect-row');
+  const btn = document.getElementById('char-modal-effect-toggle');
+  if (!row || !btn) return;
+  const unlocked = isEffectUnlocked(meta.id);
+  row.classList.toggle('hidden', !unlocked);
+  if (!unlocked) return;
+  const active = getEffectActive(meta.id);
+  btn.textContent = active ? 'ON' : 'OFF';
+  btn.classList.toggle('mastery-effect-toggle--on', active);
+}
+
 function _updateMasteryDot(meta) {
   const dot   = document.getElementById('char-modal-mastery-dot');
   if (!dot) return;
@@ -281,7 +293,7 @@ function _renderMasteryContent(meta) {
     const isReady   = !isClaimed && games >= m.games;
     const pct       = Math.min(100, Math.round((games / m.games) * 100));
     const rewardTxt = m.effect
-      ? '✨ Efecto: Destellos dorados'
+      ? 'Efecto: Destellos dorados'
       : `${m.xp} XP${m.chests ? ` · ${m.chests} cofre${m.chests > 1 ? 's' : ''}` : ''}`;
     const stateClass = isClaimed ? 'mastery-ms--claimed' : isReady ? 'mastery-ms--ready' : 'mastery-ms--locked';
     const iconHtml   = isClaimed ? '<span class="mastery-ms-check">✓</span>' : isReady ? '🎁' : `${m.games}`;
@@ -302,20 +314,6 @@ function _renderMasteryContent(meta) {
     </div>`;
   }).join('');
 
-  const effectActive   = getEffectActive(meta.id);
-  const effectUnlocked = isEffectUnlocked(meta.id);
-  const effectSectionHtml = effectUnlocked ? `
-    <div class="mastery-effect-row">
-      <span class="mastery-effect-icon">✨</span>
-      <div class="mastery-effect-info">
-        <div class="mastery-effect-name">Destellos dorados</div>
-        <div class="mastery-effect-desc">Brilla en combate</div>
-      </div>
-      <button class="mastery-effect-toggle ${effectActive ? 'mastery-effect-toggle--on' : ''}" id="mastery-effect-btn">
-        ${effectActive ? 'ON' : 'OFF'}
-      </button>
-    </div>
-  ` : '';
 
   content.innerHTML = `
     <div class="mastery-header">
@@ -323,7 +321,6 @@ function _renderMasteryContent(meta) {
       <span class="mastery-games-lbl">partidas</span>
     </div>
     <div class="mastery-path">${milestonesHtml}</div>
-    ${effectSectionHtml}
   `;
 
   content.querySelectorAll('.mastery-claim-btn').forEach(btn => {
@@ -338,14 +335,6 @@ function _renderMasteryContent(meta) {
     });
   });
 
-  const effectBtn = content.querySelector('#mastery-effect-btn');
-  if (effectBtn) {
-    effectBtn.addEventListener('click', () => {
-      const current = getEffectActive(meta.id);
-      setEffectActive(meta.id, !current);
-      _renderMasteryContent(meta);
-    });
-  }
 }
 
 export function openCharModal(meta, onSelect) {
@@ -368,6 +357,7 @@ export function openCharModal(meta, onSelect) {
   if (skins) _syncModalSkin();
   _syncModalFavBtn();
   _updateMasteryDot(meta);
+  _updateEffectRow(meta);
 }
 
 export function closeCharModal() {
@@ -394,6 +384,12 @@ export function syncModalSkinIfOpen(charId) {
 // ── Event listeners ───────────────────────────────────────────────────────────
 document.querySelectorAll('.char-modal-tab').forEach(btn => {
   btn.addEventListener('click', () => _switchModalTab(btn.dataset.tab));
+});
+
+document.getElementById('char-modal-effect-toggle')?.addEventListener('click', () => {
+  if (!_modalMeta) return;
+  setEffectActive(_modalMeta.id, !getEffectActive(_modalMeta.id));
+  _updateEffectRow(_modalMeta);
 });
 
 document.getElementById("char-modal-fav")?.addEventListener("click", () => {
