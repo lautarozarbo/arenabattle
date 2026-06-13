@@ -8,7 +8,7 @@ export async function openLeaderboard() {
 
   const { data, error } = await supabase
     .from('leaderboard')
-    .select('username, total_wins, total_losses, total_draws, total_championships')
+    .select('username, total_wins, total_losses, total_draws')
     .limit(50);
 
   if (error || !data?.length) {
