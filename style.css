@@ -3110,6 +3110,13 @@ td.rank {
 .profile-auth-section {
   margin-bottom: 14px;
 }
+.auth-guest-msg {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
 .btn-auth-action {
   width: 100%;
   padding: 10px;

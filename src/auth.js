@@ -26,8 +26,8 @@ export async function updateUsername(name) {
     .eq('user_id', me.user.id);
 }
 
-async function _syncAndNotify(migrateLocal = false) {
-  await Promise.all([syncRewardsFromCloud(migrateLocal), syncStatsFromCloud(migrateLocal)]);
+async function _syncAndNotify() {
+  await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
   const username = await getUsername();
   if (_onLoginCallback) _onLoginCallback(username);
 }
@@ -98,7 +98,7 @@ export function initAuth() {
       else {
         _closeModal();
         _setLoggedIn(data.user);
-        await _syncAndNotify(false);
+        await _syncAndNotify();
       }
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
@@ -108,7 +108,7 @@ export function initAuth() {
       } else {
         _closeModal();
         _setLoggedIn(data.user);
-        await _syncAndNotify(true);
+        await _syncAndNotify();
       }
     }
     submitBtn.disabled = false;
