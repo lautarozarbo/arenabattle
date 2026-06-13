@@ -435,11 +435,16 @@ document.getElementById("btn-open-profile").addEventListener("click", async () =
   sfx.uiClick();
   _profilePanel.classList.remove("hidden");
   _profileStatsEl.innerHTML = '<div class="pstat-loading">Cargando...</div>';
-  const [,, friendCode] = await Promise.all([
-    syncStatsFromCloud(),
-    syncRewardsFromCloud(),
-    getMyFriendCode(),
-  ]);
+  let friendCode = null;
+  try {
+    [,, friendCode] = await Promise.all([
+      syncStatsFromCloud(),
+      syncRewardsFromCloud(),
+      getMyFriendCode(),
+    ]);
+  } catch (err) {
+    console.warn('[profile] sync error:', err);
+  }
   _buildProfileStats();
   _updateXpBar();
   const fcEl = document.getElementById('profile-friend-code');

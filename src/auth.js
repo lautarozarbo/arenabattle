@@ -42,10 +42,15 @@ function _startHeartbeat() {
 }
 
 async function _syncAndNotify() {
-  await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
-  const username = await getUsername();
-  _updateLastSeen();
-  _startHeartbeat();
+  let username = null;
+  try {
+    await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
+    username = await getUsername();
+    _updateLastSeen();
+    _startHeartbeat();
+  } catch (err) {
+    console.warn('[auth] sync error:', err);
+  }
   if (_onLoginCallback) _onLoginCallback(username);
 }
 
