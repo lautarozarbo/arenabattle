@@ -4,7 +4,7 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
-  { badge: "FIX", text: "7 bugs corregidos: Dúo en obstáculos, reloj+ninja, parásito, XP en eventos, partidas en maestría y más" },
+  { badge: "FIX", text: "Corrección de bugs generales" },
   { badge: "NUEVO", text: "Boton para activar/desactivar vida" },
   { badge: "MEJORA", text: "Velocidad y HP de partida persistente" },
   {
