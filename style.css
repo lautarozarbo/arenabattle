@@ -3108,9 +3108,7 @@ td.rank {
 
 /* ── Auth ───────────────────────────────────────────── */
 .profile-auth-section {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 14px;
 }
 .btn-auth-action {
   width: 100%;
@@ -3171,14 +3169,21 @@ td.rank {
   background: #12182b;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 18px;
-  padding: 28px 24px 24px;
+  padding: 0 24px 24px;
   width: min(380px, 92vw);
-  position: relative;
+}
+.auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 18px;
+}
+.auth-modal-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
 }
 .auth-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
   background: none;
   border: none;
   color: rgba(255,255,255,0.45);

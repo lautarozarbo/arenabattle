@@ -959,6 +959,16 @@
           </div>
         </div>
 
+        <div class="profile-auth-section" id="profile-auth-section">
+          <div id="auth-logged-out">
+            <button class="btn-auth-action" id="btn-open-auth">Iniciar sesión / Registrarse</button>
+          </div>
+          <div id="auth-logged-in" class="hidden">
+            <span class="auth-user-email" id="auth-user-email"></span>
+            <button class="btn-auth-logout" id="btn-logout">Cerrar sesión</button>
+          </div>
+        </div>
+
         <div class="profile-name-section">
           <span class="profile-name-text" id="profile-name-display"
             >Invitado</span
@@ -1015,25 +1025,18 @@
         </div>
 
         <div class="profile-stats" id="profile-stats"></div>
-
-        <div class="profile-auth-section" id="profile-auth-section">
-          <div id="auth-logged-out">
-            <button class="btn-auth-action" id="btn-open-auth">Iniciar sesión / Registrarse</button>
-          </div>
-          <div id="auth-logged-in" class="hidden">
-            <span class="auth-user-email" id="auth-user-email"></span>
-            <button class="btn-auth-logout" id="btn-logout">Cerrar sesión</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- ── Auth Modal ─────────────────────────────────────── -->
     <div id="auth-modal" class="auth-modal-overlay hidden">
       <div class="auth-modal">
-        <button class="auth-modal-close" id="btn-auth-modal-close">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="auth-modal-header">
+          <span class="auth-modal-title">Cuenta</span>
+          <button class="auth-modal-close" id="btn-auth-modal-close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
         <div class="auth-tabs">
           <button class="auth-tab auth-tab--active" id="tab-login" data-tab="login">Iniciar sesión</button>
           <button class="auth-tab" id="tab-register" data-tab="register">Registrarse</button>
