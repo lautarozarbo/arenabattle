@@ -3772,7 +3772,7 @@ td.rank {
 .mastery-badge {
   position: absolute;
   top: 2px;
-  right: 2px;
+  left: 2px;
   width: 10px;
   height: 10px;
   background: #ff4757;
