@@ -1,3 +1,4 @@
+import { initAuth, onLogin } from "./auth.js";
 import { Game     } from "./game/game.js";
 import { getAllPowerMetas } from "./powers/registry.js";
 import { TagTeamMatch  } from "./modes/TagTeam.js";
@@ -204,6 +205,10 @@ document.getElementById('btn-chest-close').addEventListener('click', () => {
 });
 
 _updateXpBar();
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+initAuth();
+onLogin(() => { _updateXpBar(); });
 
 // ── Screen management → ui/screens.js ────────────────────────────────────────
 

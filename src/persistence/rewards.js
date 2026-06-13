@@ -1,5 +1,6 @@
 import { CHAR_SKINS } from '../skins/index.js';
 import { ARENA_SKINS } from '../skins/arenaSkins.js';
+import { supabase } from '../supabase.js';
 
 const LS_REWARDS = 'arena_rewards';
 
@@ -10,44 +11,86 @@ export const POINTS = {
   EVENT_WIN:            20,
 };
 
-function _load() {
+let _cache = null;
+
+function _loadLocal() {
   try { const r = localStorage.getItem(LS_REWARDS); return r ? JSON.parse(r) : {}; }
   catch { return {}; }
 }
-function _save(d) {
+
+function _getCache() {
+  if (!_cache) _cache = _loadLocal();
+  return _cache;
+}
+
+function _saveLocal(d) {
   try { localStorage.setItem(LS_REWARDS, JSON.stringify(d)); } catch {}
 }
 
-export function getXP()     { return _load().xp     ?? 0; }
-export function getChests() { return _load().chests  ?? 0; }
+async function _getUID() {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id ?? null;
+}
+
+async function _persist(d) {
+  _cache = d;
+  _saveLocal(d);
+  const uid = await _getUID();
+  if (!uid) return;
+  supabase.from('user_rewards').upsert({
+    user_id:        uid,
+    xp:             d.xp             ?? 0,
+    chests:         d.chests         ?? 0,
+    unlocked:       d.unlocked       ?? {},
+    unlocked_arena: d.unlockedArena  ?? {},
+    updated_at:     new Date().toISOString(),
+  }).then(() => {});
+}
+
+export async function syncRewardsFromCloud() {
+  const uid = await _getUID();
+  if (!uid) return;
+  const { data } = await supabase
+    .from('user_rewards')
+    .select('*')
+    .eq('user_id', uid)
+    .single();
+  if (data) {
+    _cache = {
+      xp:            data.xp             ?? 0,
+      chests:        data.chests         ?? 0,
+      unlocked:      data.unlocked       ?? {},
+      unlockedArena: data.unlocked_arena ?? {},
+    };
+    _saveLocal(_cache);
+  }
+}
+
+export function getXP()     { return _getCache().xp     ?? 0; }
+export function getChests() { return _getCache().chests  ?? 0; }
 
 export function isSkinUnlocked(charId, skinId) {
   if (!skinId || skinId === 'default') return true;
-  return !!(_load().unlocked ?? {})[charId]?.[skinId];
+  return !!(_getCache().unlocked ?? {})[charId]?.[skinId];
 }
 
 export function isArenaSkinUnlocked(skinId) {
   if (!skinId || skinId === 'default') return true;
-  return !!(_load().unlockedArena ?? {})[skinId];
+  return !!(_getCache().unlockedArena ?? {})[skinId];
 }
 
-// Returns { xp, chests, gained }
 export function addPoints(amount) {
   if (amount <= 0) return { xp: getXP(), chests: getChests(), gained: 0 };
-  const d = _load();
+  const d = _getCache();
   d.xp     = (d.xp     ?? 0) + amount;
   d.chests = (d.chests ?? 0);
   while (d.xp >= 100) { d.xp -= 100; d.chests++; }
-  _save(d);
+  _persist(d);
   return { xp: d.xp, chests: d.chests, gained: amount };
 }
 
-// Returns { type:'skin', charId, skinId, skinName }
-//       | { type:'arena_skin', skinId, skinName }
-//       | { type:'all_unlocked' }
-//       | null
 export function openChest() {
-  const d = _load();
+  const d = _getCache();
   if ((d.chests ?? 0) <= 0) return null;
   d.chests--;
 
@@ -69,7 +112,6 @@ export function openChest() {
   }
 
   if (!locked.length) {
-    // Don't consume the chest — player already has everything
     return { type: 'all_unlocked' };
   }
 
@@ -82,6 +124,6 @@ export function openChest() {
     d.unlockedArena = unlockedArena;
     d.unlockedArena[pick.skinId] = true;
   }
-  _save(d);
+  _persist(d);
   return pick;
 }
