@@ -6,7 +6,7 @@ export class ClockPower extends BasePower {
     super(owner);
     this._frozen = false;
     this._freezeTimer = 0;
-    this._cooldownTimer = 5.0;
+    this._cooldownTimer = 5.5;
     this._frozenEnemy = null;
     this._angle = 0;
     this._dmgAccum = 0;
@@ -30,7 +30,8 @@ export class ClockPower extends BasePower {
       this._freezeTimer -= dt;
       this._dmgAccum += dt;
       if (this._dmgAccum >= 0.5) {
-        this._frozenEnemy.takeDamage(this.FREEZE_DPS * 0.5);
+        const blocked = this._frozenEnemy.power._inSmoke?.() ?? false;
+        if (!blocked) this._frozenEnemy.takeDamage(this.FREEZE_DPS * 0.5);
         this._dmgAccum -= 0.5;
       }
       if (this._freezeTimer <= 0) this._unfreeze();
