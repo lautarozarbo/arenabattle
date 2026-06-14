@@ -36,15 +36,27 @@ export class Game {
     }));
 
     this.arena = new Arena({ x: ax, y: ay, width: size, height: size, obstacles: obstaclesAbs, skinId: arenaOpts.skinId ?? 'default' });
+    this._hideDeadCircles = arenaOpts.hideDeadCircles ?? false;
     const a = this.arena;
 
     const cpad  = (cfgs[0].radius ?? 28) + 14;
     const speed = 310;
 
+    // For 4-player FFA (no teams), start in 2×2 quadrant positions instead of a horizontal strip
+    const ffa4 = N === 4 && cfgs.every(c => c.teamId == null);
     this.circles = cfgs.map((cfg, i) => {
-      const sliceW = a.width / N;
-      const x = a.left + sliceW * i + cpad + Math.random() * Math.max(0, sliceW - cpad * 2);
-      const y = a.top + cpad + Math.random() * (a.height - cpad * 2);
+      let x, y;
+      if (ffa4) {
+        const col = i % 2, row = Math.floor(i / 2);
+        const qw = a.width / 2, qh = a.height / 2;
+        const rand = (v) => (Math.random() * 2 - 1) * Math.min(v * 0.3, 30);
+        x = a.left + qw * col + qw / 2 + rand(qw);
+        y = a.top  + qh * row + qh / 2 + rand(qh);
+      } else {
+        const sliceW = a.width / N;
+        x = a.left + sliceW * i + cpad + Math.random() * Math.max(0, sliceW - cpad * 2);
+        y = a.top + cpad + Math.random() * (a.height - cpad * 2);
+      }
       const ang = Math.random() * Math.PI * 2;
       return new Circle({ x, y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, ...cfg });
     });
@@ -205,9 +217,9 @@ export class Game {
     this.arena.render(ctx);
 
     // Phase 1: area effects behind all circles (fixes z-order for full-arena powers)
-    for (const c of this.circles) if (c.isAlive) c.renderBelowEffects(ctx);
+    for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.renderBelowEffects(ctx);
     // Phase 2: circle bodies and above-circle effects
-    for (const c of this.circles) if (c.isAlive) c.render(ctx);
+    for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.render(ctx);
   }
 
   // Returns live HP snapshot for HUD polling

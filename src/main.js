@@ -1635,6 +1635,7 @@ function startSim2v2Fight() {
   const arenaOpts = {
     ...getQuickArenaOpts(),
     canvasSize: 540, // always large for 2v2
+    hideDeadCircles: true,
   };
 
   canvas.width = canvas.height = 540;
@@ -1752,7 +1753,7 @@ let _battleHudRaf = null;
 function startBattleFight() {
   const picks = _battlePicks;
   _pendingCharUseId = picks[0]?.id;
-  const arenaOpts = { ...getQuickArenaOpts(), canvasSize: 540 };
+  const arenaOpts = { ...getQuickArenaOpts(), canvasSize: 540, hideDeadCircles: true };
   canvas.width = canvas.height = 540;
   document.getElementById("fight-context-label").textContent = "Batalla";
   document.getElementById("btn-restart").textContent = "Volver al inicio";
