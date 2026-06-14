@@ -108,7 +108,7 @@ export class TrampPower extends BasePower {
             enemy.vx -= 2 * vIn * nx;
             enemy.vy -= 2 * vIn * ny;
             if (b.hitCooldown <= 0) {
-              enemy.takeDamage(this.WALL_DAMAGE_OUT);
+              this._dealDmg(enemy, this.WALL_DAMAGE_OUT);
               sfx.bombTrap();
               b.hitCooldown = this.HIT_CD;
             }
@@ -126,7 +126,7 @@ export class TrampPower extends BasePower {
           enemy.vx -= 2 * vOut * nx;
           enemy.vy -= 2 * vOut * ny;
           if (b.hitCooldown <= 0) {
-            enemy.takeDamage(this.WALL_DAMAGE_IN);
+            this._dealDmg(enemy, this.WALL_DAMAGE_IN);
             sfx.bombTrap();
             b.hitCooldown = this.HIT_CD;
           }
@@ -166,7 +166,7 @@ export class TrampPower extends BasePower {
               comp.vx -= 2 * vIn * cnx;
               comp.vy -= 2 * vIn * cny;
               if (b.compHitCooldown <= 0) {
-                comp.takeDamage(this.WALL_DAMAGE_OUT);
+                this._dealDmg(comp, this.WALL_DAMAGE_OUT);
                 sfx.bombTrap();
                 b.compHitCooldown = this.HIT_CD;
               }
@@ -180,7 +180,7 @@ export class TrampPower extends BasePower {
             comp.vx -= 2 * vOut * cnx;
             comp.vy -= 2 * vOut * cny;
             if (b.compHitCooldown <= 0) {
-              comp.takeDamage(this.WALL_DAMAGE_IN);
+              this._dealDmg(comp, this.WALL_DAMAGE_IN);
               sfx.bombTrap();
               b.compHitCooldown = this.HIT_CD;
             }

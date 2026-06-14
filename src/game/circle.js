@@ -41,6 +41,14 @@ export class Circle {
     this._hitCooldown     = 0; // prevents rapid collision damage when circles graze
     this.teamId           = cfg.teamId ?? null;
     this.activeEffect     = cfg.activeEffect ?? null;
+    this._speedBuffTimer  = 0;
+    this._speedBuffBase   = null; // saved baseSpeed before buff
+    this._dmgBuffTimer    = 0;
+    this._dmgBuffMult     = 1;
+    this._healFlash       = 0;
+    this._healHot         = 0;   // seconds remaining for heal-over-time
+    this._healHotAccum    = 0;   // accumulator for per-second ticks
+    this._healHotRate     = 5;   // HP per second
   }
 
   clampToBaseSpeed() {
@@ -97,6 +105,44 @@ export class Circle {
       }
       if (this._bleedTimer <= 0) this._bleedTimer = 0;
     }
+    if (this._speedBuffTimer > 0) {
+      this._speedBuffTimer -= dt;
+      if (this._speedBuffTimer <= 0) {
+        this._speedBuffTimer = 0;
+        if (this._speedBuffBase !== null) {
+          this.baseSpeed = this._speedBuffBase;
+          this._speedBuffBase = null;
+        }
+      }
+    }
+    if (this._dmgBuffTimer > 0) {
+      this._dmgBuffTimer -= dt;
+      if (this._dmgBuffTimer <= 0) {
+        this._dmgBuffTimer = 0;
+        this._dmgBuffMult = 1;
+      }
+    }
+    if (this._healHot > 0) {
+      this._healHot -= dt;
+      this._healHotAccum += dt;
+      while (this._healHotAccum >= 1.0) {
+        this._healHotAccum -= 1.0;
+        const healed = Math.min(this._healHotRate, Math.max(0, this.maxHp - this.hp));
+        if (healed > 0) {
+          this.hp += healed;
+          this._healFlash = 0.3;
+          this._dmgNums.push({
+            x: this.x + (Math.random() * 14 - 7),
+            y: this.y - this.radius - 4,
+            val: `+${healed}`,
+            t: 1.0,
+            color: '#4ade80',
+          });
+        }
+      }
+      if (this._healHot <= 0) this._healHot = 0;
+    }
+    if (this._healFlash > 0) this._healFlash -= dt;
     if (this.hp <= 0) {
       if (!this.power._onBeforeDeath()) {
         this.hp = 0;
@@ -105,6 +151,24 @@ export class Circle {
     }
     for (const n of this._dmgNums) n.t -= dt * 1.1;
     this._dmgNums = this._dmgNums.filter(n => n.t > 0);
+  }
+
+  applySpeedBuff(duration, mult = 1.7) {
+    if (this._speedBuffBase === null) this._speedBuffBase = this.baseSpeed;
+    this.baseSpeed = this._speedBuffBase * mult;
+    this._speedBuffTimer = duration;
+  }
+
+  applyDamageBuff(duration, mult = 2.5) {
+    this._dmgBuffTimer = duration;
+    this._dmgBuffMult  = mult;
+  }
+
+  applyHeal(hpPerSec = 5, duration = 3) {
+    this._healHotRate  = hpPerSec;
+    this._healHot      = duration;
+    this._healHotAccum = 0;
+    this._healFlash    = 0.3;
   }
 
   applyBleed(duration, dps) {
@@ -160,6 +224,43 @@ export class Circle {
     ctx.strokeStyle = 'rgba(255,255,255,0.25)';
     ctx.lineWidth = 2;
     ctx.stroke();
+
+    // Speed buff: blue outer glow ring
+    if (this._speedBuffTimer > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(80,180,255,0.75)';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#50b4ff';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
+    // Damage buff: orange outer glow ring
+    if (this._dmgBuffTimer > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,110,0,0.8)';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#ff6e00';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
+    // Heal flash: green tint
+    if (this._healFlash > 0) {
+      const alpha = (this._healFlash / 0.4) * 0.45;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(46,204,113,${alpha})`;
+      ctx.fill();
+    }
 
     // Poison tint: green overlay
     if (this._poisonTimer > 0) {

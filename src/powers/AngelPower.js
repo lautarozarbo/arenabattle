@@ -57,7 +57,7 @@ export class AngelPower extends BasePower {
       const dx = enemy.x - r.x,
         dy = enemy.y - r.y;
       if (dx * dx + dy * dy < (this.RAY_RADIUS + enemy.radius) ** 2) {
-        enemy.takeDamage(this.RAY_DAMAGE);
+        this._dealDmg(enemy, this.RAY_DAMAGE);
         sfx.angelStrike();
         r.struck = true;
       }

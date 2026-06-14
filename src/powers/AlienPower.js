@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const ZONE_COOLDOWN = 8;
 const ZONE_LIFE = 5.0;
@@ -128,7 +128,7 @@ export class AlienPower extends BasePower {
         dx * dx + dy * dy < (ZONE_RADIUS + enemy.radius) ** 2 &&
         z.dotCd <= 0
       ) {
-        enemy.takeDamage(DOT_DMG);
+        this._dealDmg(enemy, DOT_DMG);
         z.dotCd = DOT_INTERVAL;
       }
 
@@ -142,7 +142,7 @@ export class AlienPower extends BasePower {
         c.dmgCd <= 0 &&
         ex * ex + ey * ey < (COW_RADIUS + enemy.radius) ** 2
       ) {
-        enemy.takeDamage(COW_DMG);
+        this._dealDmg(enemy, COW_DMG);
         c.dmgCd = COW_DMG_CD;
       }
 

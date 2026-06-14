@@ -125,7 +125,7 @@ export class VolcanoPower extends BasePower {
       ) {
         nowActive.add(r.id);
         if (!this._active.has(r.id)) {
-          enemy.takeDamage(this.RAY_DAMAGE);
+          this._dealDmg(enemy, this.RAY_DAMAGE);
           sfx.volcanoHit();
         }
       }
@@ -143,7 +143,7 @@ export class VolcanoPower extends BasePower {
         ) {
           compNow.add(r.id);
           if (!this._compActive.has(r.id)) {
-            comp.takeDamage(this.RAY_DAMAGE);
+            this._dealDmg(comp, this.RAY_DAMAGE);
             sfx.volcanoHit();
           }
         }

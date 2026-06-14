@@ -79,7 +79,7 @@ export class BloodShardPower extends BasePower {
       const dx = circle.x - s.x,
         dy = circle.y - s.y;
       if (dx * dx + dy * dy < threshold) {
-        circle.takeDamage(this.SHARD_DAMAGE);
+        this._dealDmg(circle, this.SHARD_DAMAGE);
         sfx.glassBreak();
         s.life = 0;
         break; // one shard hit per circle per frame

@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const THROW_CD = 2;
 const SHURIKEN_SPD = 275;
@@ -71,7 +71,7 @@ export class NinjaPower extends BasePower {
       const dx = enemy.x - s.x,
         dy = enemy.y - s.y;
       if (dx * dx + dy * dy < (SHURIKEN_R + enemy.radius) ** 2) {
-        enemy.takeDamage(SHURIKEN_DMG);
+        this._dealDmg(enemy, SHURIKEN_DMG);
         s.hit = true;
       }
     }

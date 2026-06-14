@@ -75,7 +75,7 @@ export class LaserPower extends BasePower {
       if (dist < enemy.radius) {
         nowActive.add(l.id);
         if (!this._active.has(l.id)) {
-          enemy.takeDamage(this.HIT_DAMAGE);
+          this._dealDmg(enemy, this.HIT_DAMAGE);
           sfx.laserHit();
         }
       }
@@ -92,7 +92,7 @@ export class LaserPower extends BasePower {
         ) {
           compNow.add(l.id);
           if (!this._compActive.has(l.id)) {
-            comp.takeDamage(this.HIT_DAMAGE);
+            this._dealDmg(comp, this.HIT_DAMAGE);
             sfx.laserHit();
           }
         }

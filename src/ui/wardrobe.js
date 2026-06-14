@@ -1,5 +1,5 @@
 import { CHAR_SKINS, ANIMATED_SKIN_IDS, drawCharPreview } from '../skins/index.js';
-import { ARENA_SKINS } from '../skins/arenaSkins.js';
+import { ARENA_SKINS, drawArenaBg } from '../skins/arenaSkins.js';
 import { isSkinUnlocked, isArenaSkinUnlocked } from '../persistence/rewards.js';
 import { getAllPowerMetas } from '../powers/registry.js';
 import { sfx } from '../audio/index.js';
@@ -161,39 +161,6 @@ function _drawArenaSkinThumb(canvas, skin) {
   ctx.beginPath();
   ctx.roundRect(0, 0, W, H, 8);
   ctx.clip();
-
-  if (skin.bgGrad) {
-    const grd = ctx.createLinearGradient(0, 0, W * 0.6, H);
-    grd.addColorStop(0, skin.bgGrad[0]);
-    grd.addColorStop(1, skin.bgGrad[1]);
-    ctx.fillStyle = grd;
-  } else {
-    ctx.fillStyle = skin.bg;
-  }
-  ctx.fillRect(0, 0, W, H);
-
-  if (skin.gridColor) {
-    const sq = W / 5;
-    ctx.strokeStyle = skin.gridColor;
-    ctx.lineWidth   = 0.5;
-    for (let i = 0; i <= 6; i++) {
-      ctx.beginPath(); ctx.moveTo(i * sq, 0); ctx.lineTo(i * sq, H); ctx.stroke();
-    }
-    for (let i = 0; i <= Math.ceil(H / sq) + 1; i++) {
-      ctx.beginPath(); ctx.moveTo(0, i * sq); ctx.lineTo(W, i * sq); ctx.stroke();
-    }
-  }
-
+  drawArenaBg(ctx, 0, 0, W, H, skin.id);
   ctx.restore();
-
-  ctx.beginPath();
-  ctx.roundRect(0.8, 0.8, W - 1.6, H - 1.6, 7.5);
-  ctx.strokeStyle = skin.borderColor;
-  ctx.lineWidth   = 2;
-  if (skin.borderGlow) {
-    ctx.shadowColor = skin.borderColor;
-    ctx.shadowBlur  = 8;
-  }
-  ctx.stroke();
-  ctx.shadowBlur = 0;
 }

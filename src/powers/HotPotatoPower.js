@@ -54,7 +54,11 @@ export class HotPotatoPower extends BasePower {
     }
 
     if (this._timer <= 0) {
-      this._holder.takeDamage(EXPLOSION_DMG);
+      if (this._holder === this.owner) {
+        this._holder.takeDamage(EXPLOSION_DMG);
+      } else {
+        this._dealDmg(this._holder, EXPLOSION_DMG);
+      }
       sfx.hotPotatoExplode();
       this._active = false;
       this._resetCd = RESET_CD;

@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const PORTAL_R = 30; // detection + visual radius
 const PORTAL_LIFE = 7; // s before portals relocate
@@ -87,7 +87,7 @@ export class PortalPower extends BasePower {
         const dest = this._portals[1 - idx];
         enemy.x = dest.x;
         enemy.y = dest.y;
-        enemy.takeDamage(ENEMY_DMG);
+        this._dealDmg(enemy, ENEMY_DMG);
         p.useCd = USE_CD;
         dest.useCd = USE_CD;
         this._enemyCd = USE_CD;

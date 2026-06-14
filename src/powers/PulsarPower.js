@@ -76,7 +76,7 @@ export class PulsarPower extends BasePower {
       this._hitCooldown <= 0 &&
       this._inArm(enemy.x, enemy.y)
     ) {
-      enemy.takeDamage(this.RAY_DAMAGE);
+      this._dealDmg(enemy, this.RAY_DAMAGE);
       sfx.pulsarHit();
       this._hitCooldown = this.HIT_CD;
     }
@@ -87,7 +87,7 @@ export class PulsarPower extends BasePower {
       this._compHitCooldown <= 0 &&
       this._inArm(comp.x, comp.y)
     ) {
-      comp.takeDamage(this.RAY_DAMAGE);
+      this._dealDmg(comp, this.RAY_DAMAGE);
       sfx.pulsarHit();
       this._compHitCooldown = this.HIT_CD;
     }

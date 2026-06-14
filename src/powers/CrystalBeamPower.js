@@ -110,7 +110,7 @@ export class CrystalBeamPower extends BasePower {
     const cfg = BEAM_LEVELS[this._beam.level];
     this._beam.accum += dt;
     while (this._beam.accum >= cfg.tickInterval) {
-      enemy.takeDamage(cfg.tickDmg);
+      this._dealDmg(enemy, cfg.tickDmg);
       sfx.crystalBeamTick();
       this._beam.accum -= cfg.tickInterval;
     }

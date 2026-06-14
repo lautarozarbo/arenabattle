@@ -43,7 +43,7 @@ export class VampirePower extends BasePower {
           dy = e.y - this.owner.y;
         const maxD = (this.owner.radius + e.radius) * 2.5;
         if (dx * dx + dy * dy < maxD * maxD) {
-          e.takeDamage(this.DRAIN_AMOUNT);
+          this._dealDmg(e, this.DRAIN_AMOUNT);
           const healed = Math.min(
             this.DRAIN_AMOUNT,
             this.owner.maxHp - this.owner.hp,

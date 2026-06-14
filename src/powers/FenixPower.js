@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const THROW_CD = 2.8;
 const BALL_SPD = 215;
@@ -77,7 +77,7 @@ export class FenixPower extends BasePower {
       const dx = enemy.x - b.x,
         dy = enemy.y - b.y;
       if (dx * dx + dy * dy < (BALL_R + enemy.radius) ** 2) {
-        enemy.takeDamage(BALL_DMG);
+        this._dealDmg(enemy, BALL_DMG);
         b.hit = true;
       }
     }

@@ -49,7 +49,7 @@ export class ElectricPower extends BasePower {
       this._shockAccum += dt;
       if (this._shockAccum >= this.SHOCK_TICK) {
         if (this._shockedEnemy?.isAlive) {
-          this._shockedEnemy.takeDamage(this.SHOCK_DPS);
+          this._dealDmg(this._shockedEnemy, this.SHOCK_DPS);
           sfx.electricZap();
         }
         this._shockAccum -= this.SHOCK_TICK;

@@ -32,7 +32,7 @@ export class AuraPower extends BasePower {
     if (dmg > 0) {
       this._dmgAccum += dt;
       if (this._dmgAccum >= this.TICK) {
-        enemy.takeDamage(dmg);
+        this._dealDmg(enemy, dmg);
         sfx.venomTick();
         this._dmgAccum -= this.TICK;
       }
@@ -46,7 +46,7 @@ export class AuraPower extends BasePower {
       if (cdmg > 0) {
         this._compDmgAccum += dt;
         if (this._compDmgAccum >= this.TICK) {
-          comp.takeDamage(cdmg);
+          this._dealDmg(comp, cdmg);
           sfx.venomTick();
           this._compDmgAccum -= this.TICK;
         }
