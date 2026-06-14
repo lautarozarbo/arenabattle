@@ -1,10 +1,10 @@
 import { BasePower } from "./BasePower.js";
 
-const THROW_CD   = 2.2;  // s between throws
-const SPEED_OUT  = 310;  // px/s going out
-const SPEED_IN   = 400;  // px/s coming back
-const MAX_DIST   = 220;  // px before reversing
-const BOOM_R     = 11;   // collision radius
+const THROW_CD   = 1.6;  // s between throws
+const SPEED_OUT  = 330;  // px/s going out
+const SPEED_IN   = 420;  // px/s coming back
+const MAX_DIST   = 300;  // px before reversing
+const BOOM_R     = 16;   // collision radius
 const OUT_DMG    = 4;    // damage going out
 const RETURN_DMG = 9;    // damage on return
 
@@ -128,19 +128,19 @@ export class BoomerangPower extends BasePower {
     }
 
     ctx.strokeStyle = returning ? '#FFD700' : '#CC8822';
-    ctx.lineWidth = 4.5;
+    ctx.lineWidth = 6;
     ctx.lineCap = 'round';
 
     // Wing 1
     ctx.beginPath();
-    ctx.moveTo(0, 3);
-    ctx.quadraticCurveTo(-5, -5, -13, -2);
+    ctx.moveTo(0, 4);
+    ctx.quadraticCurveTo(-7, -7, -18, -3);
     ctx.stroke();
 
     // Wing 2
     ctx.beginPath();
-    ctx.moveTo(0, 3);
-    ctx.quadraticCurveTo(5, -5, 13, -2);
+    ctx.moveTo(0, 4);
+    ctx.quadraticCurveTo(7, -7, 18, -3);
     ctx.stroke();
 
     ctx.restore();
