@@ -3,12 +3,24 @@
 
 let _ctx = null;
 let _master = null;
+let _manualSuspend = false;
 
 export function ac() {
   if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
-  if (_ctx.state === "suspended") _ctx.resume().catch(() => {});
+  if (_ctx.state === "suspended" && !_manualSuspend) _ctx.resume().catch(() => {});
   return _ctx;
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (!_ctx) return;
+  if (document.hidden) {
+    _manualSuspend = true;
+    _ctx.suspend().catch(() => {});
+  } else {
+    _manualSuspend = false;
+    _ctx.resume().catch(() => {});
+  }
+});
 
 export function masterOut() {
   if (!_master) {
