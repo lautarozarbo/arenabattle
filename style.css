@@ -1676,6 +1676,14 @@ html, body {
   font-weight: 700;
 }
 
+#quick-size-row.locked .toggle-opt:not(.active) {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+#quick-size-row.locked .toggle-opt.active {
+  opacity: 1;
+}
+
 /* ── Arena picker (quick setup) ─────────────────────── */
 .arena-picker {
   display: flex;

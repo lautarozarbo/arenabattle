@@ -4,9 +4,9 @@ let _cache = null;
 
 function _defaults() {
   return {
-    wins:          { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 },
-    losses:        { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 },
-    draws:         { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 },
+    wins:          { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
+    losses:        { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
+    draws:         { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
     championships: { league: 0, tournament: 0 },
     charUses:      {},
     favorites:     [],
@@ -68,6 +68,8 @@ export async function syncStatsFromCloud() {
 function _key(mode) {
   if (mode === 'quickmatch')  return 'quick1v1';
   if (mode === 'tag2v2')      return 'quick2v2';
+  if (mode === 'sim2v2')      return 'sim2v2';
+  if (mode === 'battle')      return 'battle';
   if (mode === 'league')      return 'league';
   if (mode === 'tournament')  return 'tournament';
   return null;
