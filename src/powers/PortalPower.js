@@ -1,6 +1,6 @@
 import { BasePower } from "./BasePower.js";
 
-const PORTAL_R    = 20;   // detection + visual radius
+const PORTAL_R    = 26;   // detection + visual radius
 const PORTAL_LIFE = 9;    // s before portals relocate
 const USE_CD      = 1.2;  // s a portal stays "used" (prevents instant back-teleport)
 const SPAWN_DELAY = 1.2;  // s before first portals appear
@@ -56,6 +56,13 @@ export class PortalPower extends BasePower {
           this.owner.x = dest.x;
           this.owner.y = dest.y;
           this.owner.hp = Math.min(this.owner.maxHp, this.owner.hp + HEAL_AMOUNT);
+          this.owner._dmgNums.push({
+            x: dest.x + (Math.random() * 16 - 8),
+            y: dest.y - this.owner.radius - 4,
+            val: `+${HEAL_AMOUNT}`,
+            t: 1.0,
+            color: '#4ade80',
+          });
           p.useCd = USE_CD;
           dest.useCd = USE_CD;
           this._ownerCd = USE_CD;

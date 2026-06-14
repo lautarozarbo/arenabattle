@@ -224,7 +224,7 @@ export class Circle {
       ctx.lineWidth = 3;
       ctx.strokeStyle = 'rgba(0,0,0,0.85)';
       ctx.strokeText(n.val, n.x, n.y - rise);
-      ctx.fillStyle = '#ff3333';
+      ctx.fillStyle = n.color ?? '#ff3333';
       ctx.fillText(n.val, n.x, n.y - rise);
       ctx.restore();
     }
