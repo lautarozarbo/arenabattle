@@ -216,13 +216,13 @@ export class Game {
 
       const sameTeam = c1.teamId != null && c1.teamId === c2.teamId;
       // Only deal damage on real impacts (not grazing/sliding contact).
-      // At 310 px/s base speed a head-on hit has vRel ~620; tangential sliding is < 30.
-      if (!sameTeam && vRel > 50) {
+      // At 310 px/s base speed a head-on hit has vRel ~620; tangential sliding is < 50.
+      if (!sameTeam && vRel > 100) {
         const c1Hit = c1._hitCooldown <= 0;
         const c2Hit = c2._hitCooldown <= 0;
         if (c1Hit && c2Hit) {
-          c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 0.5;
-          c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 0.5;
+          c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 1.0;
+          c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 1.0;
           c1.power.onCollide(c2);
           c2.power.onCollide(c1);
           sfx.collide();
