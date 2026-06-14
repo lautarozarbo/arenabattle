@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const COOLDOWN = 2;
 const ANIM_DUR = 2;
@@ -292,7 +292,7 @@ export class ApostadorPower extends BasePower {
   onEnemyFrame(enemy) {
     if (!enemy.isAlive || !this._dmgPending) return;
     this._dmgPending = false;
-    enemy.takeDamage(this._dmg);
+    this._dealDmg(enemy, this._dmg);
   }
 
   clearState() {

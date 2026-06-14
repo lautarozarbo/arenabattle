@@ -15,6 +15,7 @@ let tournament        = null;
 let tournamentCount   = null; // initialized below after metas load
 let tournamentArenaLayout  = 'random';
 let tournamentRandomMode   = true;
+let tournamentAbilitiesEnabled = false;
 let _tournamentRewarded    = false;
 let _pickedOpponentIds     = [];
 
@@ -234,7 +235,7 @@ function runNextGroupMatch() {
   showLeaguePrematch(myMeta, rival, `${t('group.prefix')} ${gName} · ${pgmPlayed + 1} / ${pgm.length}`, () => {
     document.getElementById("fight-context-label").textContent = `${pgmPlayed + 1} / ${pgm.length}`;
     document.getElementById("btn-restart").textContent = t('btn.see.groups');
-    const arenaOpts = buildCompArenaOpts();
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : match.p1;
@@ -405,7 +406,7 @@ function runNextBracketMatch() {
   showLeaguePrematch(myMeta, rival, roundName, () => {
     document.getElementById("fight-context-label").textContent = roundName;
     document.getElementById("btn-restart").textContent = t('btn.see.bracket');
-    const arenaOpts = buildCompArenaOpts();
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : match.p1;
@@ -527,6 +528,7 @@ export function showParticipantPicker(mode) {
 document.getElementById("tournament-count").textContent = tournamentCount;
 
 document.getElementById("tournament-dec").addEventListener("click", () => {
+  sfx.uiClick();
   const idx = VALID_TOURNAMENT_COUNTS.indexOf(tournamentCount);
   if (idx > 0) {
     tournamentCount = VALID_TOURNAMENT_COUNTS[idx - 1];
@@ -535,6 +537,7 @@ document.getElementById("tournament-dec").addEventListener("click", () => {
   }
 });
 document.getElementById("tournament-inc").addEventListener("click", () => {
+  sfx.uiClick();
   const idx = VALID_TOURNAMENT_COUNTS.indexOf(tournamentCount);
   if (idx < VALID_TOURNAMENT_COUNTS.length - 1) {
     tournamentCount = VALID_TOURNAMENT_COUNTS[idx + 1];
@@ -544,11 +547,13 @@ document.getElementById("tournament-inc").addEventListener("click", () => {
 });
 
 document.getElementById("tournament-random-btn").addEventListener("click", () => {
+  sfx.uiClick();
   tournamentRandomMode = true;
   document.getElementById("tournament-random-btn").classList.add("active");
   document.getElementById("tournament-pick-btn").classList.remove("active");
 });
 document.getElementById("tournament-pick-btn").addEventListener("click", () => {
+  sfx.uiClick();
   tournamentRandomMode = false;
   document.getElementById("tournament-pick-btn").classList.add("active");
   document.getElementById("tournament-random-btn").classList.remove("active");
@@ -559,10 +564,23 @@ document.getElementById("btn-tournament-reset").addEventListener("click", () =>
 
 ['tournament-arena-random', 'tournament-arena-fixed'].forEach(id => {
   document.getElementById(id)?.addEventListener('click', () => {
+    sfx.uiClick();
     tournamentArenaLayout = id === 'tournament-arena-random' ? 'random' : 'fixed';
     document.getElementById('tournament-arena-random').classList.toggle('active', tournamentArenaLayout === 'random');
     document.getElementById('tournament-arena-fixed').classList.toggle('active', tournamentArenaLayout === 'fixed');
   });
+});
+document.getElementById("tournament-abilities-off").addEventListener("click", () => {
+  sfx.uiClick();
+  tournamentAbilitiesEnabled = false;
+  document.getElementById("tournament-abilities-off").classList.add("active");
+  document.getElementById("tournament-abilities-on").classList.remove("active");
+});
+document.getElementById("tournament-abilities-on").addEventListener("click", () => {
+  sfx.uiClick();
+  tournamentAbilitiesEnabled = true;
+  document.getElementById("tournament-abilities-on").classList.add("active");
+  document.getElementById("tournament-abilities-off").classList.remove("active");
 });
 
 document.getElementById("btn-tournament-back")?.addEventListener("click", () => {

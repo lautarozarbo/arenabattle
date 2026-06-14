@@ -56,7 +56,7 @@ export class ToxicTrailPower extends BasePower {
     if (this._overlapsTrail(enemy.x, enemy.y, enemy.radius)) {
       this._enemyAccum += dt;
       if (this._enemyAccum >= this.TICK_INTERVAL) {
-        enemy.takeDamage(this.TICK_DAMAGE);
+        this._dealDmg(enemy, this.TICK_DAMAGE);
         sfx.venomTick();
         this._enemyAccum -= this.TICK_INTERVAL;
       }
@@ -69,7 +69,7 @@ export class ToxicTrailPower extends BasePower {
       if (this._overlapsTrail(comp.x, comp.y, comp.radius)) {
         this._compAccum += dt;
         if (this._compAccum >= this.TICK_INTERVAL) {
-          comp.takeDamage(this.TICK_DAMAGE);
+          this._dealDmg(comp, this.TICK_DAMAGE);
           sfx.venomTick();
           this._compAccum -= this.TICK_INTERVAL;
         }

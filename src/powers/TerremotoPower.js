@@ -60,7 +60,7 @@ export class TerremotoPower extends BasePower {
           dy = enemy.y - oy;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (ring.r >= dist - enemy.radius) {
-          enemy.takeDamage(ring.dmg);
+          this._dealDmg(enemy, ring.dmg);
           sfx.volcanoHit();
           ring.hit = true;
         }
@@ -72,7 +72,7 @@ export class TerremotoPower extends BasePower {
           cdy = comp.y - oy;
         const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
         if (ring.r >= cdist - comp.radius) {
-          comp.takeDamage(ring.dmg);
+          this._dealDmg(comp, ring.dmg);
           ring.compHit = true;
         }
       }

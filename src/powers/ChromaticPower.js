@@ -119,7 +119,7 @@ export class ChromaticPower extends BasePower {
     if (cell?.ci === this._chosenCi) {
       this[accumKey] += dt;
       if (this[accumKey] >= this.TICK) {
-        circle.takeDamage(this.DPS_TICK);
+        this._dealDmg(circle, this.DPS_TICK);
         sfx.venomTick();
         this[accumKey] -= this.TICK;
       }

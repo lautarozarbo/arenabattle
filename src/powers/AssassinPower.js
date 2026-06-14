@@ -45,7 +45,7 @@ export class AssassinPower extends BasePower {
       const dx = enemy.x - tip.x,
         dy = enemy.y - tip.y;
       if (dx * dx + dy * dy < (enemy.radius + hr) ** 2) {
-        enemy.takeDamage(this.HIT_DAMAGE);
+        this._dealDmg(enemy, this.HIT_DAMAGE);
         enemy.applyBleed(this.BLEED_DURATION, this.BLEED_DPS);
         sfx.assassinHit();
         this._hitCooldown = this.HIT_CD;
@@ -59,7 +59,7 @@ export class AssassinPower extends BasePower {
         const dx = comp.x - tip.x,
           dy = comp.y - tip.y;
         if (dx * dx + dy * dy < (comp.radius + hr) ** 2) {
-          comp.takeDamage(this.HIT_DAMAGE);
+          this._dealDmg(comp, this.HIT_DAMAGE);
           this._compBleedTimer = this.BLEED_DURATION;
           this._compBleedDPS = this.BLEED_DPS;
           this._compBleedAccum = 0;
@@ -72,7 +72,7 @@ export class AssassinPower extends BasePower {
       if (this._compBleedTimer > 0) {
         this._compBleedAccum += dt;
         if (this._compBleedAccum >= 1) {
-          comp.takeDamage(this._compBleedDPS);
+          this._dealDmg(comp, this._compBleedDPS);
           sfx.bleedTick();
           this._compBleedAccum -= 1;
         }

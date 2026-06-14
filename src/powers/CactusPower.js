@@ -84,7 +84,7 @@ export class CactusPower extends BasePower {
       circle.vx -= 2 * vIn * nx;
       circle.vy -= 2 * vIn * ny;
       if (c[cooldownKey] <= 0) {
-        circle.takeDamage(this.HIT_DAMAGE);
+        this._dealDmg(circle, this.HIT_DAMAGE);
         sfx.spikeHit();
         c[cooldownKey] = this.HIT_CD;
       }

@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 // Phase durations
 const PHASE_CHARGE = 5.0; // seconds charging before absorb
@@ -52,7 +52,7 @@ export class KarmaPower extends BasePower {
 
   onCollide(enemy) {
     if (this._phase !== 3 || this._stored <= 0) return;
-    enemy.takeDamage(this._stored);
+    this._dealDmg(enemy, this._stored);
     this._stored = 0;
     this._phase = 1;
     this._timer = PHASE_CHARGE;

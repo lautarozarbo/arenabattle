@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const THROW_CD = 1.1; // s between throws
 const SPEED_OUT = 500; // px/s going out
@@ -65,10 +65,10 @@ export class BoomerangPower extends BasePower {
     const r2 = (BOOM_R + enemy.radius) ** 2;
 
     if (!b.returning && !b.outHit && d2 < r2) {
-      enemy.takeDamage(OUT_DMG);
+      this._dealDmg(enemy, OUT_DMG);
       b.outHit = true;
     } else if (b.returning && !b.retHit && d2 < r2) {
-      enemy.takeDamage(RETURN_DMG);
+      this._dealDmg(enemy, RETURN_DMG);
       b.retHit = true;
     }
   }

@@ -168,7 +168,7 @@ export class ClusterBombPower extends BasePower {
       const dx = enemy.x - this._flash.x;
       const dy = enemy.y - this._flash.y;
       if (dx * dx + dy * dy < (EXPLOSION_R + enemy.radius) ** 2) {
-        enemy.takeDamage(EXPLOSION_DMG);
+        this._dealDmg(enemy, EXPLOSION_DMG);
         sfx.clusterBlastHit();
       }
       this._flash.dmgDealt = true;
@@ -181,7 +181,7 @@ export class ClusterBombPower extends BasePower {
       const dx = enemy.x - s.x;
       const dy = enemy.y - s.y;
       if (dx * dx + dy * dy < r2) {
-        enemy.takeDamage(SPIKE_DMG);
+        this._dealDmg(enemy, SPIKE_DMG);
         sfx.clusterSpikeHit();
         return false; // spike consumed on hit
       }

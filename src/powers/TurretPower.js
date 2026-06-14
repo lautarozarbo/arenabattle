@@ -153,7 +153,7 @@ export class TurretPower extends BasePower {
       const dx = target.x - b.x,
         dy = target.y - b.y;
       if (dx * dx + dy * dy < r2) {
-        target.takeDamage(BULLET_DMG);
+        this._dealDmg(target, BULLET_DMG);
         sfx.turretHit();
         return false;
       }

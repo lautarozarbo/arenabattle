@@ -97,7 +97,7 @@ export class WallCursePower extends BasePower {
       if (this._touchingWall(enemy, wallId)) {
         nowContact.add(wallId);
         if (!this._enemyContact.has(wallId)) {
-          enemy.takeDamage(this.HIT_DAMAGE);
+          this._dealDmg(enemy, this.HIT_DAMAGE);
           sfx.wallCurseDamage();
         }
       }

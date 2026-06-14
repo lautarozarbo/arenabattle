@@ -191,7 +191,7 @@ export class SplitPower extends BasePower {
         m._venomTimer -= dt;
         m._venomAccum += dt;
         if (m._venomAccum >= 1) {
-          m.takeDamage(m._venomDps);
+          this._dealDmg(m, m._venomDps);
           m._venomAccum -= 1;
         }
       }
@@ -249,7 +249,7 @@ export class SplitPower extends BasePower {
       const dy = enemy.y - m.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
       if (dist < m.radius + enemy.radius && m.bladeCd <= 0) {
-        enemy.takeDamage(this.BLADE_DMG);
+        this._dealDmg(enemy, this.BLADE_DMG);
         sfx.spikeHit();
         m.bladeCd = this.BLADE_CD;
       }
@@ -262,7 +262,7 @@ export class SplitPower extends BasePower {
         const dy = comp.y - m.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
         if (dist < m.radius + comp.radius && m.bladeCd <= 0) {
-          comp.takeDamage(this.BLADE_DMG);
+          this._dealDmg(comp, this.BLADE_DMG);
           sfx.spikeHit();
           m.bladeCd = this.BLADE_CD;
         }

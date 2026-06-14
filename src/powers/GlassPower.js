@@ -53,7 +53,7 @@ export class GlassPower extends BasePower {
       const dx = enemy.x - s.x,
         dy = enemy.y - s.y;
       if (dx * dx + dy * dy < hitR2) {
-        enemy.takeDamage(this.HIT_DAMAGE);
+        this._dealDmg(enemy, this.HIT_DAMAGE);
         sfx.glassBreak();
         toRemove.add(s.id);
       }

@@ -135,7 +135,7 @@ export class TerritoryPower extends BasePower {
           if (!z.enemyInside) z.dmgAccum = this.TICK;
           z.dmgAccum += dt;
           if (z.dmgAccum >= this.TICK) {
-            enemy.takeDamage(this.DPS);
+            this._dealDmg(enemy, this.DPS);
             z.dmgAccum -= this.TICK;
           }
         } else {
@@ -152,7 +152,7 @@ export class TerritoryPower extends BasePower {
           if (!z.compInside) z.compDmgAccum = this.TICK;
           z.compDmgAccum += dt;
           if (z.compDmgAccum >= this.TICK) {
-            comp.takeDamage(this.DPS);
+            this._dealDmg(comp, this.DPS);
             z.compDmgAccum -= this.TICK;
           }
         } else {

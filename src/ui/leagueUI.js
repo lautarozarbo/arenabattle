@@ -23,6 +23,7 @@ let leagueCount    = 6;
 let leagueFormat   = 'single';
 let leagueArenaLayout = 'random';
 let leagueRandomMode  = true;
+let leagueAbilitiesEnabled = false;
 let _leagueRewarded   = false;
 let _prematchMatchKey = null;
 
@@ -126,7 +127,7 @@ export function runNextLeagueMatch() {
   showLeaguePrematch(myMeta, rival, `${pp.current} / ${pp.total}`, () => {
     document.getElementById("fight-context-label").textContent = `${pp.current} / ${pp.total}`;
     document.getElementById("btn-restart").textContent = t('btn.see.standings');
-    const arenaOpts = buildCompArenaOpts();
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: leagueAbilitiesEnabled };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : null;
@@ -351,22 +352,26 @@ export function buildFixtureRound(label, matches, getInfo) {
 
 // ── Event listeners (module-level) ────────────────────────────────────────────
 document.getElementById("league-dec").addEventListener("click", () => {
+  sfx.uiClick();
   leagueCount = Math.max(2, leagueCount - 1);
   document.getElementById("league-count").textContent = leagueCount;
   updateLeagueInfo();
 });
 document.getElementById("league-inc").addEventListener("click", () => {
+  sfx.uiClick();
   leagueCount = Math.min(metas.length, leagueCount + 1);
   document.getElementById("league-count").textContent = leagueCount;
   updateLeagueInfo();
 });
 document.getElementById("league-single").addEventListener("click", () => {
+  sfx.uiClick();
   leagueFormat = 'single';
   document.getElementById("league-single").classList.add("active");
   document.getElementById("league-double").classList.remove("active");
   updateLeagueInfo();
 });
 document.getElementById("league-double").addEventListener("click", () => {
+  sfx.uiClick();
   leagueFormat = 'double';
   document.getElementById("league-double").classList.add("active");
   document.getElementById("league-single").classList.remove("active");
@@ -384,6 +389,7 @@ document.getElementById("btn-league-reset").addEventListener("click", () =>
 
 ['league-arena-random', 'league-arena-fixed'].forEach(id => {
   document.getElementById(id)?.addEventListener('click', () => {
+    sfx.uiClick();
     leagueArenaLayout = id === 'league-arena-random' ? 'random' : 'fixed';
     document.getElementById('league-arena-random').classList.toggle('active', leagueArenaLayout === 'random');
     document.getElementById('league-arena-fixed').classList.toggle('active', leagueArenaLayout === 'fixed');
@@ -391,14 +397,28 @@ document.getElementById("btn-league-reset").addEventListener("click", () =>
 });
 
 document.getElementById("league-random-btn").addEventListener("click", () => {
+  sfx.uiClick();
   leagueRandomMode = true;
   document.getElementById("league-random-btn").classList.add("active");
   document.getElementById("league-pick-btn").classList.remove("active");
 });
 document.getElementById("league-pick-btn").addEventListener("click", () => {
+  sfx.uiClick();
   leagueRandomMode = false;
   document.getElementById("league-pick-btn").classList.add("active");
   document.getElementById("league-random-btn").classList.remove("active");
+});
+document.getElementById("league-abilities-off").addEventListener("click", () => {
+  sfx.uiClick();
+  leagueAbilitiesEnabled = false;
+  document.getElementById("league-abilities-off").classList.add("active");
+  document.getElementById("league-abilities-on").classList.remove("active");
+});
+document.getElementById("league-abilities-on").addEventListener("click", () => {
+  sfx.uiClick();
+  leagueAbilitiesEnabled = true;
+  document.getElementById("league-abilities-on").classList.add("active");
+  document.getElementById("league-abilities-off").classList.remove("active");
 });
 
 document.getElementById('prematch-skin-prev').addEventListener('click', () => {

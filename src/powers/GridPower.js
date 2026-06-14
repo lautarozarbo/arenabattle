@@ -66,13 +66,13 @@ export class GridPower extends BasePower {
     for (const cell of this._cells) {
       if (enemy.x >= cell.x && enemy.x <= cell.x + cell.w &&
           enemy.y >= cell.y && enemy.y <= cell.y + cell.h) {
-        enemy.takeDamage(cell.dmg);
+        this._dealDmg(enemy, cell.dmg);
         sfx.gridHit(cell.dmg);
         return;
       }
     }
     // Fallback: shouldn't happen since grid covers the full arena
-    enemy.takeDamage(1);
+    this._dealDmg(enemy, 1);
     sfx.gridHit(1);
   }
 
@@ -94,7 +94,7 @@ export class GridPower extends BasePower {
     const row   = Math.min(ROWS - 1, Math.max(0, Math.floor((comp.y - top)  / cellH)));
     const cell  = this._cells[row * COLS + col];
     if (cell) {
-      comp.takeDamage(cell.dmg);
+      this._dealDmg(comp, cell.dmg);
       sfx.gridHit(cell.dmg);
       this._compHitCooldown = 0.15;
     }

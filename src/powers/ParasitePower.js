@@ -14,7 +14,7 @@ export class ParasitePower extends BasePower {
     if (this._charge >= 1) {
       // Instant kill — bypass invulnerability and deal lethal damage
       enemy._invulnerable = false;
-      enemy.takeDamage(enemy.hp + 1);
+      this._dealDmg(enemy, enemy.hp + 1);
       sfx.parasiteKill();
       this._charge = 0;
     }

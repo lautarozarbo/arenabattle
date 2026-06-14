@@ -113,6 +113,30 @@ export const ARENA_SKINS = [
     obsInner: 'rgba(0,200,100,0.28)', obsOuter: 'rgba(0,70,35,0.6)',
     obsRing: 'rgba(0,230,120,0.6)', obsGlow: false,
   },
+  {
+    id: 'ajedrez', name: 'Ajedrez',
+    bg: '#2c1a0a', bgGrad: null,
+    gridColor: 'rgba(195,150,80,0.88)', gridStyle: 'chess',
+    borderColor: '#6b4820', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(200,200,200,0.18)', obsOuter: 'rgba(70,70,70,0.55)',
+    obsRing: 'rgba(180,180,180,0.45)', obsGlow: false,
+  },
+  {
+    id: 'ladrillos', name: 'Ladrillos',
+    bg: '#0e0703', bgGrad: ['#0e0703', '#160b04'],
+    gridColor: 'rgba(210,140,70,0.25)', gridStyle: 'bricks',
+    borderColor: '#7a3d10', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(200,110,40,0.3)', obsOuter: 'rgba(100,45,10,0.6)',
+    obsRing: 'rgba(220,130,50,0.55)', obsGlow: false,
+  },
+  {
+    id: 'ondas', name: 'Ondas',
+    bg: '#030c14', bgGrad: ['#030c14', '#050f1a'],
+    gridColor: 'rgba(30,180,255,0.2)', gridStyle: 'waves',
+    borderColor: '#0a4d7a', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(20,160,240,0.25)', obsOuter: 'rgba(5,60,110,0.6)',
+    obsRing: 'rgba(30,190,255,0.55)', obsGlow: false,
+  },
 ];
 
 export function getSelectedArenaSkinId() {
@@ -206,6 +230,53 @@ function _drawGrid(ctx, x, y, w, h, skin) {
         const size = 0.6 + (h3 - Math.floor(h3)) * 1.4;
         ctx.beginPath(); ctx.arc(gx + ox, gy + oy, size, 0, Math.PI * 2); ctx.fill();
       }
+    }
+
+  } else if (skin.gridStyle === 'chess') {
+    // Checkerboard — alternating filled squares
+    const step = Math.min(w, h) / 8;
+    ctx.fillStyle = skin.gridColor;
+    for (let row = 0; row * step < h; row++) {
+      for (let col = 0; col * step < w; col++) {
+        if ((row + col) % 2 === 0) {
+          ctx.fillRect(x + col * step, y + row * step,
+            Math.min(step, x + w - (x + col * step)),
+            Math.min(step, y + h - (y + row * step)));
+        }
+      }
+    }
+
+  } else if (skin.gridStyle === 'bricks') {
+    // Brick wall — offset rows of rectangles
+    const bw = w / 4;
+    const bh = bw * 0.42;
+    ctx.strokeStyle = skin.gridColor;
+    ctx.lineWidth = 1.5;
+    for (let row = 0; row * bh < h + bh; row++) {
+      const off = (row % 2 === 0) ? 0 : bw / 2;
+      const gy  = y + row * bh;
+      ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x + w, gy); ctx.stroke();
+      for (let col = 0; col * bw < w + bw; col++) {
+        const gx = x + col * bw - off;
+        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, Math.min(gy + bh, y + h)); ctx.stroke();
+      }
+    }
+
+  } else if (skin.gridStyle === 'waves') {
+    // Horizontal sine waves
+    const count  = 7;
+    const spacingW = h / count;
+    const amp    = spacingW * 0.38;
+    ctx.strokeStyle = skin.gridColor;
+    ctx.lineWidth   = 1.5;
+    for (let i = 0; i <= count; i++) {
+      const cy = y + i * spacingW;
+      ctx.beginPath();
+      for (let px = 0; px <= w; px += 3) {
+        const py = cy + Math.sin((px / w) * Math.PI * 5) * amp;
+        px === 0 ? ctx.moveTo(x + px, py) : ctx.lineTo(x + px, py);
+      }
+      ctx.stroke();
     }
   }
 

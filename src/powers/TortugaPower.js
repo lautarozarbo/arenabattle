@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const TORTUGA_SPEED = 30; // px/s along path (base)
 const CONTACT_DMG = 6; // HP removed per contact hit
@@ -146,7 +146,7 @@ export class TortugaPower extends BasePower {
 
     if (this._goalFire) {
       this._goalFire = false;
-      enemy.takeDamage(GOAL_DMG);
+      this._dealDmg(enemy, GOAL_DMG);
       return;
     }
 
@@ -154,7 +154,7 @@ export class TortugaPower extends BasePower {
       const dx = enemy.x - this.owner.x;
       const dy = enemy.y - this.owner.y;
       if (dx * dx + dy * dy < (enemy.radius + this.owner.radius) ** 2) {
-        enemy.takeDamage(CONTACT_DMG);
+        this._dealDmg(enemy, CONTACT_DMG);
         this._contactCd = CONTACT_CD;
       }
     }

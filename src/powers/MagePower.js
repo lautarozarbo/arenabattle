@@ -80,7 +80,7 @@ export class MagePower extends BasePower {
       const dx = enemy.x - this._cx,
         dy = enemy.y - this._cy;
       if (dx * dx + dy * dy < this._radius * this._radius) {
-        enemy.takeDamage(this.DAMAGE);
+        this._dealDmg(enemy, this.DAMAGE);
       }
     }
 
@@ -90,7 +90,7 @@ export class MagePower extends BasePower {
       const dx = comp.x - this._cx,
         dy = comp.y - this._cy;
       if (dx * dx + dy * dy < this._radius * this._radius) {
-        comp.takeDamage(this.DAMAGE);
+        this._dealDmg(comp, this.DAMAGE);
       }
     }
   }

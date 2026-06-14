@@ -31,7 +31,7 @@ export class ClockPower extends BasePower {
       this._dmgAccum += dt;
       if (this._dmgAccum >= 0.5) {
         const blocked = this._frozenEnemy.power._inSmoke?.() ?? false;
-        if (!blocked) this._frozenEnemy.takeDamage(this.FREEZE_DPS * 0.5);
+        if (!blocked) this._dealDmg(this._frozenEnemy, this.FREEZE_DPS * 0.5);
         this._dmgAccum -= 0.5;
       }
       if (this._freezeTimer <= 0) this._unfreeze();

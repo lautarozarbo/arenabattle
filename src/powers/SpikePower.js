@@ -46,7 +46,7 @@ export class SpikePower extends BasePower {
       if (dx * dx + dy * dy < (enemy.radius + this.HIT_RADIUS) ** 2) {
         nowHit.add(s.id);
         if (!this._hit.has(s.id)) {
-          enemy.takeDamage(this.HIT_DAMAGE);
+          this._dealDmg(enemy, this.HIT_DAMAGE);
           sfx.spikeHit();
           enemy.applyVenom(
             this.SLOW_DURATION,
@@ -71,7 +71,7 @@ export class SpikePower extends BasePower {
         if (dx * dx + dy * dy < (comp.radius + this.HIT_RADIUS) ** 2) {
           compNow.add(s.id);
           if (!this._compHit.has(s.id)) {
-            comp.takeDamage(this.HIT_DAMAGE);
+            this._dealDmg(comp, this.HIT_DAMAGE);
             sfx.spikeHit();
           }
         }

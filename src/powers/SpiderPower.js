@@ -52,7 +52,7 @@ export class SpiderPower extends BasePower {
       if (dist < enemy.radius) {
         nowActive.add(t.id);
         if (!this._active.has(t.id)) {
-          enemy.takeDamage(1); // one-shot per crossing
+          this._dealDmg(enemy, 1); // one-shot per crossing
           sfx.spiderHit();
         }
       }
@@ -68,7 +68,7 @@ export class SpiderPower extends BasePower {
         if (distToSegment(comp.x, comp.y, t.wx, t.wy, x, y) < comp.radius) {
           compNow.add(t.id);
           if (!this._compActive.has(t.id)) {
-            comp.takeDamage(1);
+            this._dealDmg(comp, 1);
             sfx.spiderHit();
           }
         }

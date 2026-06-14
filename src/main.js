@@ -147,6 +147,94 @@ let matchResultCallback = null; // (winnerSide: 0|1|-1) => void
 let _pendingCharUseId = null; // charId to record when match actually ends
 let _confettiRaf = null;
 
+// ── Active abilities ──────────────────────────────────────────────────────────
+let _abilitiesEnabled = localStorage.getItem("abilitiesEnabled") !== "false";
+const _ABILITY_CD     = { speed: 18, heal: 20, damage: 18 };
+const _BUFF_DURATION  = { speed: 5,  heal: 4,  damage: 5  };
+const _abilityCd      = { speed: 0, heal: 0, damage: 0 };
+const _buffRemaining  = { speed: 0, heal: 0, damage: 0 };
+let   _abilitiesRaf   = null;
+
+const _abilityBtns = {
+  speed:  document.getElementById("ability-speed"),
+  heal:   document.getElementById("ability-heal"),
+  damage: document.getElementById("ability-damage"),
+};
+
+function _startAbilitiesLoop() {
+  if (_abilitiesRaf) { cancelAnimationFrame(_abilitiesRaf); _abilitiesRaf = null; }
+  // Reset all cooldowns and buff timers
+  for (const type of Object.keys(_abilityCd)) {
+    _abilityCd[type] = 0;
+    _buffRemaining[type] = 0;
+    _abilityBtns[type].disabled = false;
+    _abilityBtns[type].querySelector(".ability-cd-fill").style.height = "0%";
+  }
+  document.getElementById("active-abilities-bar").classList.remove("hidden");
+  let last = null;
+  function tick(ts) {
+    if (last === null) last = ts;
+    const dt = (ts - last) / 1000;
+    last = ts;
+    for (const type of Object.keys(_abilityCd)) {
+      if (_buffRemaining[type] > 0) {
+        _buffRemaining[type] = Math.max(0, _buffRemaining[type] - dt);
+        if (_buffRemaining[type] <= 0) {
+          _abilityCd[type] = _ABILITY_CD[type];
+          _abilityBtns[type].querySelector(".ability-cd-fill").style.height = "100%";
+        }
+      } else if (_abilityCd[type] > 0) {
+        _abilityCd[type] = Math.max(0, _abilityCd[type] - dt);
+        const fill = _abilityBtns[type].querySelector(".ability-cd-fill");
+        fill.style.height = (_abilityCd[type] / _ABILITY_CD[type] * 100) + "%";
+        _abilityBtns[type].disabled = _abilityCd[type] > 0;
+      }
+    }
+    _abilitiesRaf = requestAnimationFrame(tick);
+  }
+  _abilitiesRaf = requestAnimationFrame(tick);
+}
+
+function _stopAbilitiesLoop() {
+  if (_abilitiesRaf) { cancelAnimationFrame(_abilitiesRaf); _abilitiesRaf = null; }
+  document.getElementById("active-abilities-bar").classList.add("hidden");
+}
+
+for (const [type, btn] of Object.entries(_abilityBtns)) {
+  btn.addEventListener("click", () => {
+    if (game.state !== "playing" || _abilityCd[type] > 0 || _buffRemaining[type] > 0) return;
+    game.applyActiveBuff(type);
+    _buffRemaining[type] = _BUFF_DURATION[type];
+    btn.disabled = true;
+    btn.querySelector(".ability-cd-fill").style.height = "100%";
+  });
+}
+
+// Toggle buttons
+document.getElementById("quick-abilities-off").addEventListener("click", () => {
+  sfx.uiClick();
+  _abilitiesEnabled = false;
+  localStorage.setItem("abilitiesEnabled", "false");
+  document.getElementById("quick-abilities-off").classList.add("active");
+  document.getElementById("quick-abilities-on").classList.remove("active");
+});
+document.getElementById("quick-abilities-on").addEventListener("click", () => {
+  sfx.uiClick();
+  _abilitiesEnabled = true;
+  localStorage.setItem("abilitiesEnabled", "true");
+  document.getElementById("quick-abilities-on").classList.add("active");
+  document.getElementById("quick-abilities-off").classList.remove("active");
+});
+
+// Restore persisted state on load (default: enabled)
+if (_abilitiesEnabled) {
+  document.getElementById("quick-abilities-on").classList.add("active");
+  document.getElementById("quick-abilities-off").classList.remove("active");
+} else {
+  document.getElementById("quick-abilities-off").classList.add("active");
+  document.getElementById("quick-abilities-on").classList.remove("active");
+}
+
 // ── Quick-match / Tag Team state ──────────────────────────────────────────────
 let quickMatchMode = "1v1"; // '1v1' | 'tag2v2' | 'sim2v2' | 'battle'
 let quickMatchEnemyMode = "random"; // 'random' | 'pick'
@@ -731,6 +819,7 @@ document.getElementById("btn-fight-back").addEventListener("click", () => {
   showConfirm(() => {
     game.stop();
     stopHudLoop();
+    _stopAbilitiesLoop();
     matchResultCallback = null;
     _ttMatch = null;
     document.getElementById("gameover-bar").classList.add("hidden");
@@ -861,6 +950,7 @@ function goToQuickSetup() {
 ["quick-size-sm", "quick-size-md", "quick-size-lg"].forEach((id, i) => {
   document.getElementById(id).addEventListener("click", () => {
     if (_largeArenaLocked) return;
+    sfx.uiClick();
     setQuickArenaSizeIdx(i);
     document
       .querySelectorAll("#quick-size-row .toggle-opt")
@@ -870,6 +960,7 @@ function goToQuickSetup() {
 });
 
 document.getElementById("arena-prev").addEventListener("click", () => {
+  sfx.uiClick();
   setQuickArenaLayoutIdx(
     (getQuickArenaLayoutIdx() - 1 + ARENA_LAYOUTS.length) %
       ARENA_LAYOUTS.length,
@@ -877,6 +968,7 @@ document.getElementById("arena-prev").addEventListener("click", () => {
   drawArenaPreview();
 });
 document.getElementById("arena-next").addEventListener("click", () => {
+  sfx.uiClick();
   setQuickArenaLayoutIdx((getQuickArenaLayoutIdx() + 1) % ARENA_LAYOUTS.length);
   drawArenaPreview();
 });
@@ -896,6 +988,7 @@ function _syncArenaSkinSelector() {
 }
 
 document.getElementById("arena-skin-prev").addEventListener("click", () => {
+  sfx.uiClick();
   setQuickArenaSkinIdx(
     (getQuickArenaSkinIdx() - 1 + ARENA_SKINS.length) % ARENA_SKINS.length,
   );
@@ -904,6 +997,7 @@ document.getElementById("arena-skin-prev").addEventListener("click", () => {
   _syncArenaSkinSelector();
 });
 document.getElementById("arena-skin-next").addEventListener("click", () => {
+  sfx.uiClick();
   setQuickArenaSkinIdx((getQuickArenaSkinIdx() + 1) % ARENA_SKINS.length);
   const skin = ARENA_SKINS[getQuickArenaSkinIdx()];
   if (isArenaSkinUnlocked(skin.id)) setSelectedArenaSkinId(skin.id);
@@ -951,6 +1045,7 @@ function _setLargeArenaLock(locked) {
 }
 
 document.getElementById("quick-1v1-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchMode = "1v1";
   document
     .querySelectorAll("#quick-mode-row .toggle-opt")
@@ -961,6 +1056,7 @@ document.getElementById("quick-1v1-btn").addEventListener("click", () => {
 });
 
 document.getElementById("quick-2v2-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchMode = "tag2v2";
   document
     .querySelectorAll("#quick-mode-row .toggle-opt")
@@ -971,6 +1067,7 @@ document.getElementById("quick-2v2-btn").addEventListener("click", () => {
 });
 
 document.getElementById("quick-sim2v2-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchMode = "sim2v2";
   document
     .querySelectorAll("#quick-mode-row .toggle-opt")
@@ -981,6 +1078,7 @@ document.getElementById("quick-sim2v2-btn").addEventListener("click", () => {
 });
 
 document.getElementById("quick-battle-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchMode = "battle";
   document
     .querySelectorAll("#quick-mode-row .toggle-opt")
@@ -991,6 +1089,7 @@ document.getElementById("quick-battle-btn").addEventListener("click", () => {
 });
 
 document.getElementById("quick-random-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchEnemyMode = "random";
   document
     .querySelectorAll("#quick-enemy-row .toggle-opt")
@@ -1000,6 +1099,7 @@ document.getElementById("quick-random-btn").addEventListener("click", () => {
 });
 
 document.getElementById("quick-pick-btn").addEventListener("click", () => {
+  sfx.uiClick();
   quickMatchEnemyMode = "pick";
   document
     .querySelectorAll("#quick-enemy-row .toggle-opt")
@@ -1462,8 +1562,11 @@ function _startFightWithCfgs(cfgs, onResult, arenaOpts = {}) {
   document.getElementById("fight-tag-area").classList.add("hidden");
   document.getElementById("tag-flash").classList.remove("tag-flash-in");
   buildHud(cfgs);
-  game.start(cfgs, arenaOpts);
+  const _abilities = arenaOpts.activeAbilities ?? _abilitiesEnabled;
+  game.start(cfgs, { ...arenaOpts, activeAbilities: _abilities });
   startHudLoop();
+  if (_abilities) _startAbilitiesLoop();
+  else _stopAbilitiesLoop();
   showScreen("screen-fight");
 }
 
@@ -1515,8 +1618,10 @@ function _ttRunRound() {
   document.getElementById("tag-flash").classList.remove("tag-flash-in");
   buildTagHud(_ttMatch);
   updateTagBtn(_ttMatch);
-  game.start(cfgs, _ttArenaOpts);
+  game.start(cfgs, { ..._ttArenaOpts, activeAbilities: _abilitiesEnabled });
   _ttStartHudLoop();
+  if (_abilitiesEnabled) _startAbilitiesLoop();
+  else _stopAbilitiesLoop();
   showScreen("screen-fight");
 }
 
@@ -1830,6 +1935,7 @@ let _pendingWinnerSide = -1;
 
 function handleGameOver(winner, winnerSide) {
   stopHudLoop();
+  _stopAbilitiesLoop();
   music.setMode("menu");
 
   if (gameMode === "tag2v2") {

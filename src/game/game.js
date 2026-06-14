@@ -36,7 +36,8 @@ export class Game {
     }));
 
     this.arena = new Arena({ x: ax, y: ay, width: size, height: size, obstacles: obstaclesAbs, skinId: arenaOpts.skinId ?? 'default' });
-    this._hideDeadCircles = arenaOpts.hideDeadCircles ?? false;
+    this._hideDeadCircles  = arenaOpts.hideDeadCircles ?? false;
+    this._activeAbilities  = arenaOpts.activeAbilities  ?? false;
     const a = this.arena;
 
     const cpad  = (cfgs[0].radius ?? 28) + 14;
@@ -62,6 +63,19 @@ export class Game {
     });
 
     for (const c of this.circles) c.power.arena = this.arena;
+
+    // Init AI ability timers for enemy circles
+    if (this._activeAbilities) {
+      const hasTeams = this.circles.some(c => c.teamId != null);
+      this.circles.forEach((c, i) => {
+        const isPlayer = hasTeams ? c.teamId === 0 : i === 0;
+        if (!isPlayer) {
+          c._aiSpeedCd  = 8  + Math.random() * 12;
+          c._aiDamageCd = 10 + Math.random() * 14;
+          c._aiHealCd   = 4  + Math.random() * 8;
+        }
+      });
+    }
 
     this.state = 'playing';
     this._last = null;
@@ -143,6 +157,16 @@ export class Game {
 
     for (const c of alive) c.clampToBaseSpeed();
 
+    // AI abilities for enemy circles
+    if (this._activeAbilities) {
+      const hasTeams = this.circles.some(c => c.teamId != null);
+      this.circles.forEach((c, i) => {
+        if (!c.isAlive) return;
+        const isPlayer = hasTeams ? c.teamId === 0 : i === 0;
+        if (!isPlayer && c._aiSpeedCd !== undefined) this._aiUpdateAbilities(c, dt);
+      });
+    }
+
     const survivors = this.circles.filter(c => c.isAlive);
     const hasTeams  = this.circles.some(c => c.teamId != null);
     const over      = hasTeams
@@ -197,8 +221,8 @@ export class Game {
         const c1Hit = c1._hitCooldown <= 0;
         const c2Hit = c2._hitCooldown <= 0;
         if (c1Hit && c2Hit) {
-          c2.takeDamage(c1.power.getHitDamage()); c2._hitCooldown = 0.5;
-          c1.takeDamage(c2.power.getHitDamage()); c1._hitCooldown = 0.5;
+          c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 0.5;
+          c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 0.5;
           c1.power.onCollide(c2);
           c2.power.onCollide(c1);
           sfx.collide();
@@ -222,6 +246,41 @@ export class Game {
     for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.renderBelowEffects(ctx);
     // Phase 2: circle bodies and above-circle effects
     for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.render(ctx);
+  }
+
+  _aiUpdateAbilities(c, dt) {
+    // Speed: activate periodically
+    c._aiSpeedCd -= dt;
+    if (c._aiSpeedCd <= 0) {
+      c.applySpeedBuff(5, 1.7);
+      c._aiSpeedCd = 18 + Math.random() * 16;
+    }
+
+    // Damage: activate periodically
+    c._aiDamageCd -= dt;
+    if (c._aiDamageCd <= 0) {
+      c.applyDamageBuff(5, 2.5);
+      c._aiDamageCd = 20 + Math.random() * 14;
+    }
+
+    // Heal: activate periodically
+    c._aiHealCd -= dt;
+    if (c._aiHealCd <= 0) {
+      c.applyHeal(5, 4);
+      c._aiHealCd = 18 + Math.random() * 14;
+    }
+  }
+
+  applyActiveBuff(type) {
+    const hasTeams = this.circles.some(c => c.teamId != null);
+    const targets  = this.circles.filter((c, i) =>
+      c.isAlive && (hasTeams ? c.teamId === 0 : i === 0)
+    );
+    for (const c of targets) {
+      if (type === 'speed')  c.applySpeedBuff(5, 1.7);
+      if (type === 'heal')   c.applyHeal(5, 4);
+      if (type === 'damage') c.applyDamageBuff(5, 2.5);
+    }
   }
 
   // Returns live HP snapshot for HUD polling

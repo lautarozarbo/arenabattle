@@ -27,6 +27,11 @@ export class BasePower {
   // Called every frame with the other circle (for area/field effects).
   onEnemyFrame(enemy, dt) {}
 
+  // Convenience: deal damage to a target applying the owner's active damage buff.
+  _dealDmg(target, amount) {
+    target.takeDamage(amount * (this.owner._dmgBuffMult ?? 1));
+  }
+
   // Flat damage dealt to the enemy on each physical hit/bounce.
   getHitDamage() { return 1; }
 

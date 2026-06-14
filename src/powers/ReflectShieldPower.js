@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 
 const MAX_CHARGES = 5;
 const RECHARGE = 8.5; // s to fully recharge after depletion
@@ -60,7 +60,7 @@ export class ReflectShieldPower extends BasePower {
     const dx = enemy.x - this.owner.x;
     const dy = enemy.y - this.owner.y;
     if (dx * dx + dy * dy < (BURST_R + enemy.radius) ** 2) {
-      enemy.takeDamage(BURST_DMG);
+      this._dealDmg(enemy, BURST_DMG);
     }
   }
 

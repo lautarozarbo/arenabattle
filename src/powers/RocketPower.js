@@ -81,14 +81,14 @@ export class RocketPower extends BasePower {
         dy = enemy.y - this._explodePos.y;
       const inside = dx * dx + dy * dy < r2;
       if (!this._damageDone) {
-        if (inside) enemy.takeDamage(this.EXPLODE_DAMAGE);
+        if (inside) this._dealDmg(enemy, this.EXPLODE_DAMAGE);
         this._damageDone = true;
       }
       if (inside) {
         if (!this._lingerInside) this._lingerAccum = this.LINGER_TICK;
         this._lingerAccum += dt;
         if (this._lingerAccum >= this.LINGER_TICK) {
-          enemy.takeDamage(this.LINGER_DPS);
+          this._dealDmg(enemy, this.LINGER_DPS);
           this._lingerAccum -= this.LINGER_TICK;
         }
       } else {
@@ -103,14 +103,14 @@ export class RocketPower extends BasePower {
           cdy = comp.y - this._explodePos.y;
         const cInside = cdx * cdx + cdy * cdy < r2;
         if (!this._compDamageDone) {
-          if (cInside) comp.takeDamage(this.EXPLODE_DAMAGE);
+          if (cInside) this._dealDmg(comp, this.EXPLODE_DAMAGE);
           this._compDamageDone = true;
         }
         if (cInside) {
           if (!this._compLingerInside) this._compLingerAccum = this.LINGER_TICK;
           this._compLingerAccum += dt;
           if (this._compLingerAccum >= this.LINGER_TICK) {
-            comp.takeDamage(this.LINGER_DPS);
+            this._dealDmg(comp, this.LINGER_DPS);
             this._compLingerAccum -= this.LINGER_TICK;
           }
         } else {

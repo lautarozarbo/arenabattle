@@ -206,7 +206,7 @@ export class DuoPower extends BasePower {
           this._comp.vy -= imp * m2 * ny;
           enemy.vx += imp * m1 * nx;
           enemy.vy += imp * m1 * ny;
-          enemy.takeDamage(1);
+          this._dealDmg(enemy, 1);
           this._compTakeDamage(enemy.power.getHitDamage());
         }
       }
@@ -221,7 +221,7 @@ export class DuoPower extends BasePower {
     if (!beam.active) return;
     beam.accum += dt;
     if (beam.accum >= this.BEAM_TICK) {
-      enemy.takeDamage(1);
+      this._dealDmg(enemy, 1);
       sfx.duoBeamTick();
       beam.accum -= this.BEAM_TICK;
     }

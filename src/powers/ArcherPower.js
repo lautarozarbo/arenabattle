@@ -1,4 +1,4 @@
-import { BasePower } from "./BasePower.js";
+﻿import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
 
 const ARROW_SPEED = 430;
@@ -114,7 +114,7 @@ export class ArcherPower extends BasePower {
       const dx = target.x - arr.x,
         dy = target.y - arr.y;
       if (dx * dx + dy * dy < r2) {
-        target.takeDamage(ARROW_DMG);
+        this._dealDmg(target, ARROW_DMG);
         sfx.archerHit();
         return false;
       }
