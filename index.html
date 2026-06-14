@@ -87,24 +87,65 @@
             </svg>
             <span id="player-name-display">Invitado</span>
           </button>
-          <button class="menu-top-left-icon" id="btn-open-wardrobe" title="Skins">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 3a2 2 0 0 1 4 0"/>
-              <line x1="12" y1="3" x2="12" y2="7"/>
-              <polyline points="12,7 3,18 21,18 12,7"/>
+          <button
+            class="menu-top-left-icon"
+            id="btn-open-wardrobe"
+            title="Skins"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 3a2 2 0 0 1 4 0" />
+              <line x1="12" y1="3" x2="12" y2="7" />
+              <polyline points="12,7 3,18 21,18 12,7" />
             </svg>
           </button>
-          <button class="menu-top-left-icon" id="btn-open-leaderboard" title="Ranking">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/>
+          <button
+            class="menu-top-left-icon"
+            id="btn-open-leaderboard"
+            title="Ranking"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="18 20 18 10" />
+              <polyline points="12 20 12 4" />
+              <polyline points="6 20 6 14" />
             </svg>
           </button>
-          <button class="menu-top-left-icon menu-top-left-icon--badge" id="btn-open-friends" title="Amigos">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          <button
+            class="menu-top-left-icon menu-top-left-icon--badge"
+            id="btn-open-friends"
+            title="Amigos"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
             <span class="friends-badge hidden" id="friends-badge">0</span>
           </button>
@@ -149,9 +190,9 @@
               <button class="toggle-opt active" id="quick-1v1-btn">
                 1 vs 1
               </button>
-              <button class="toggle-opt" id="quick-2v2-btn">
-                2 vs 2 Relevos
-              </button>
+              <button class="toggle-opt" id="quick-2v2-btn">Relevos</button>
+              <button class="toggle-opt" id="quick-sim2v2-btn">2 vs 2</button>
+              <button class="toggle-opt" id="quick-battle-btn">Batalla</button>
             </div>
           </div>
           <div class="setup-section">
@@ -267,7 +308,9 @@
           <div class="setup-section">
             <div class="setup-label">Arena</div>
             <div class="toggle-row">
-              <button class="toggle-opt active" id="league-arena-random">Aleatoria</button>
+              <button class="toggle-opt active" id="league-arena-random">
+                Aleatoria
+              </button>
               <button class="toggle-opt" id="league-arena-fixed">Fija</button>
             </div>
           </div>
@@ -316,8 +359,12 @@
           <div class="setup-section">
             <div class="setup-label">Arena</div>
             <div class="toggle-row">
-              <button class="toggle-opt active" id="tournament-arena-random">Aleatoria</button>
-              <button class="toggle-opt" id="tournament-arena-fixed">Fija</button>
+              <button class="toggle-opt active" id="tournament-arena-random">
+                Aleatoria
+              </button>
+              <button class="toggle-opt" id="tournament-arena-fixed">
+                Fija
+              </button>
             </div>
           </div>
           <div class="setup-info-box" id="tournament-info"></div>
@@ -446,7 +493,13 @@
             >
               🔊
             </button>
-            <button class="btn-util btn-util--sm btn-hp-toggle" id="btn-hp-toggle" title="Mostrar/ocultar vida">❤</button>
+            <button
+              class="btn-util btn-util--sm btn-hp-toggle"
+              id="btn-hp-toggle"
+              title="Mostrar/ocultar vida"
+            >
+              ❤
+            </button>
             <button class="btn-speed" id="btn-speed">1×</button>
           </div>
         </div>
@@ -486,15 +539,26 @@
         </div>
         <div class="prematch-body">
           <div class="prematch-arena-section">
-            <div class="prematch-arena-layout-name" id="prematch-layout-name">Abierta</div>
+            <div class="prematch-arena-layout-name" id="prematch-layout-name">
+              Abierta
+            </div>
             <div class="prematch-arena-center-row">
               <button class="arena-nav" id="prematch-skin-prev">‹</button>
-              <canvas id="prematch-arena-preview" width="110" height="110"></canvas>
+              <canvas
+                id="prematch-arena-preview"
+                width="110"
+                height="110"
+              ></canvas>
               <button class="arena-nav" id="prematch-skin-next">›</button>
             </div>
             <div class="prematch-skin-label">
               <div class="arena-skin-name" id="prematch-skin-name">Clásico</div>
-              <div class="arena-skin-lock lock-invisible" id="prematch-skin-lock">🔒</div>
+              <div
+                class="arena-skin-lock lock-invisible"
+                id="prematch-skin-lock"
+              >
+                🔒
+              </div>
             </div>
           </div>
           <div class="prematch-vs-row">
@@ -538,7 +602,9 @@
           <div class="event-points-banner hidden" id="lchamp-points"></div>
         </div>
         <div class="lchamp-footer">
-          <button class="btn-primary" id="btn-lchamp-standings">Ver clasificación</button>
+          <button class="btn-primary" id="btn-lchamp-standings">
+            Ver clasificación
+          </button>
         </div>
       </div>
 
@@ -557,7 +623,9 @@
           <div class="event-points-banner hidden" id="tchamp-points"></div>
         </div>
         <div class="lchamp-footer">
-          <button class="btn-primary" id="btn-tchamp-bracket">Ver bracket</button>
+          <button class="btn-primary" id="btn-tchamp-bracket">
+            Ver bracket
+          </button>
         </div>
       </div>
 
@@ -593,7 +661,9 @@
         <div class="screen-tabs" id="league-view-tabs"></div>
         <div class="standings-scroll" id="standings-wrap"></div>
         <div class="select-footer">
-          <button class="btn-primary" id="btn-standings-next">Siguiente pelea</button>
+          <button class="btn-primary" id="btn-standings-next">
+            Siguiente pelea
+          </button>
         </div>
       </div>
 
@@ -805,51 +875,113 @@
       <!-- ── Character info modal ─────────────────────── -->
       <div id="char-modal" class="char-modal-overlay hidden">
         <div class="char-modal-box" id="char-modal-box">
-          <button class="char-modal-fav-btn" id="char-modal-fav" title="Favorito">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          <button
+            class="char-modal-fav-btn"
+            id="char-modal-fav"
+            title="Favorito"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
             </svg>
           </button>
           <button class="char-modal-close" id="char-modal-close">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
           <div class="char-modal-preview">
-            <canvas class="char-modal-circle" id="char-modal-circle" width="220" height="130"></canvas>
+            <canvas
+              class="char-modal-circle"
+              id="char-modal-circle"
+              width="220"
+              height="130"
+            ></canvas>
           </div>
           <div class="char-modal-name" id="char-modal-name"></div>
 
           <!-- Tabs -->
           <div class="char-modal-tabs">
-            <button class="char-modal-tab char-modal-tab--active" data-tab="info">Info</button>
+            <button
+              class="char-modal-tab char-modal-tab--active"
+              data-tab="info"
+            >
+              Info
+            </button>
             <button class="char-modal-tab" data-tab="mastery">
               Maestría
-              <span class="char-modal-mastery-dot hidden" id="char-modal-mastery-dot"></span>
+              <span
+                class="char-modal-mastery-dot hidden"
+                id="char-modal-mastery-dot"
+              ></span>
             </button>
           </div>
 
           <!-- Panel: Info -->
           <div class="char-modal-panel" id="char-modal-panel-info">
             <div class="skin-selector hidden" id="char-modal-skin-selector">
-              <button class="skin-arrow" id="char-modal-skin-prev" aria-label="Skin anterior">&#8249;</button>
+              <button
+                class="skin-arrow"
+                id="char-modal-skin-prev"
+                aria-label="Skin anterior"
+              >
+                &#8249;
+              </button>
               <div class="skin-label-group">
                 <span class="skin-label-heading">SKIN</span>
                 <span class="skin-name" id="char-modal-skin-name">Default</span>
-                <span class="skin-lock-icon lock-invisible" id="char-modal-skin-lock">🔒</span>
+                <span
+                  class="skin-lock-icon lock-invisible"
+                  id="char-modal-skin-lock"
+                  >🔒</span
+                >
               </div>
-              <button class="skin-arrow" id="char-modal-skin-next" aria-label="Siguiente skin">&#8250;</button>
+              <button
+                class="skin-arrow"
+                id="char-modal-skin-next"
+                aria-label="Siguiente skin"
+              >
+                &#8250;
+              </button>
             </div>
             <div class="char-modal-desc" id="char-modal-desc"></div>
             <div class="char-modal-stats" id="char-modal-stats"></div>
             <div class="char-modal-char-stats" id="char-modal-char-stats"></div>
-            <div class="char-modal-effect-row hidden" id="char-modal-effect-row">
+            <div
+              class="char-modal-effect-row hidden"
+              id="char-modal-effect-row"
+            >
               <div class="char-modal-effect-info">
                 <span class="char-modal-effect-name">Destellos dorados</span>
-                <span class="char-modal-effect-desc">Efecto visual en combate</span>
+                <span class="char-modal-effect-desc"
+                  >Efecto visual en combate</span
+                >
               </div>
-              <button class="mastery-effect-toggle" id="char-modal-effect-toggle">OFF</button>
+              <button
+                class="mastery-effect-toggle"
+                id="char-modal-effect-toggle"
+              >
+                OFF
+              </button>
             </div>
           </div>
 
@@ -858,7 +990,9 @@
             <div id="char-modal-mastery-content"></div>
           </div>
 
-          <button class="btn-primary" id="char-modal-select">Seleccionar</button>
+          <button class="btn-primary" id="char-modal-select">
+            Seleccionar
+          </button>
         </div>
       </div>
     </div>
@@ -887,7 +1021,9 @@
           <button class="wardrobe-close" id="btn-wardrobe-close">✕</button>
         </div>
         <div class="wardrobe-tabs">
-          <button class="wardrobe-tab active" id="wardrobe-tab-chars">Personajes</button>
+          <button class="wardrobe-tab active" id="wardrobe-tab-chars">
+            Personajes
+          </button>
           <button class="wardrobe-tab" id="wardrobe-tab-arena">Arena</button>
         </div>
         <div class="wardrobe-content" id="wardrobe-content"></div>
@@ -965,12 +1101,18 @@
 
         <div class="profile-auth-section" id="profile-auth-section">
           <div id="auth-logged-out">
-            <p class="auth-guest-msg">Iniciá sesión para guardar tu progreso y aparecer en el ranking.</p>
-            <button class="btn-auth-action" id="btn-open-auth">Iniciar sesión / Registrarse</button>
+            <p class="auth-guest-msg">
+              Iniciá sesión para guardar tu progreso y aparecer en el ranking.
+            </p>
+            <button class="btn-auth-action" id="btn-open-auth">
+              Iniciar sesión / Registrarse
+            </button>
           </div>
           <div id="auth-logged-in" class="hidden">
             <span class="auth-user-email" id="auth-user-email"></span>
-            <button class="btn-auth-logout" id="btn-logout">Cerrar sesión</button>
+            <button class="btn-auth-logout" id="btn-logout">
+              Cerrar sesión
+            </button>
           </div>
         </div>
 
@@ -1040,19 +1182,40 @@
         <div class="friends-drag-handle"></div>
         <div class="friends-header">
           <button id="btn-friends-close" class="friends-close-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <div class="fr-add-by-code">
-          <input class="fr-code-input" id="fr-code-input" placeholder="Código de amigo (ej: AB12CD34)" maxlength="8" autocomplete="off" />
+          <input
+            class="fr-code-input"
+            id="fr-code-input"
+            placeholder="Código de amigo (ej: AB12CD34)"
+            maxlength="8"
+            autocomplete="off"
+          />
           <button class="fr-code-btn" id="fr-code-submit">Enviar</button>
         </div>
         <div id="fr-code-feedback" class="fr-code-feedback hidden"></div>
         <div class="friends-tabs">
-          <button class="friends-tab friends-tab--active" data-tab="friends">Amigos</button>
+          <button class="friends-tab friends-tab--active" data-tab="friends">
+            Amigos
+          </button>
           <button class="friends-tab" data-tab="received">
             Recibidas
-            <span class="friends-tab-badge hidden" id="friends-tab-badge">0</span>
+            <span class="friends-tab-badge hidden" id="friends-tab-badge"
+              >0</span
+            >
           </button>
           <button class="friends-tab" data-tab="sent">Enviadas</button>
         </div>
@@ -1066,24 +1229,60 @@
         <div class="auth-modal-header">
           <span class="auth-modal-title">Cuenta</span>
           <button class="auth-modal-close" id="btn-auth-modal-close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <div class="auth-tabs">
-          <button class="auth-tab auth-tab--active" id="tab-login" data-tab="login">Iniciar sesión</button>
-          <button class="auth-tab" id="tab-register" data-tab="register">Registrarse</button>
+          <button
+            class="auth-tab auth-tab--active"
+            id="tab-login"
+            data-tab="login"
+          >
+            Iniciar sesión
+          </button>
+          <button class="auth-tab" id="tab-register" data-tab="register">
+            Registrarse
+          </button>
         </div>
         <form id="auth-form" autocomplete="on">
           <div class="auth-field">
             <label class="auth-label">Email</label>
-            <input class="auth-input" id="auth-email" type="email" placeholder="tu@email.com" required autocomplete="email" />
+            <input
+              class="auth-input"
+              id="auth-email"
+              type="email"
+              placeholder="tu@email.com"
+              required
+              autocomplete="email"
+            />
           </div>
           <div class="auth-field">
             <label class="auth-label">Contraseña</label>
-            <input class="auth-input" id="auth-password" type="password" placeholder="Contraseña" required autocomplete="current-password" minlength="6" />
+            <input
+              class="auth-input"
+              id="auth-password"
+              type="password"
+              placeholder="Contraseña"
+              required
+              autocomplete="current-password"
+              minlength="6"
+            />
           </div>
           <p class="auth-error hidden" id="auth-error"></p>
-          <button class="btn-auth-submit" id="btn-auth-submit" type="submit">Iniciar sesión</button>
+          <button class="btn-auth-submit" id="btn-auth-submit" type="submit">
+            Iniciar sesión
+          </button>
         </form>
       </div>
     </div>
@@ -1094,7 +1293,18 @@
         <div class="auth-modal-header">
           <span class="auth-modal-title">Ranking Global</span>
           <button class="auth-modal-close" id="btn-leaderboard-close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <div class="leaderboard-wrap">
@@ -1108,7 +1318,9 @@
               </tr>
             </thead>
             <tbody id="leaderboard-body">
-              <tr><td colspan="5" class="lb-loading">Cargando...</td></tr>
+              <tr>
+                <td colspan="5" class="lb-loading">Cargando...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -1121,7 +1333,18 @@
         <div class="auth-modal-header">
           <span class="auth-modal-title">Perfil</span>
           <button class="auth-modal-close" id="btn-user-profile-close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <div class="user-profile-scroll" id="user-profile-content"></div>

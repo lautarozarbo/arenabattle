@@ -182,9 +182,9 @@ export class Game {
       if (!sameTeam) {
         const c1Hit = c1._hitCooldown <= 0;
         const c2Hit = c2._hitCooldown <= 0;
-        if (c1Hit || c2Hit) {
-          if (c2Hit) { c2.takeDamage(c1.power.getHitDamage()); c2._hitCooldown = 0.5; }
-          if (c1Hit) { c1.takeDamage(c2.power.getHitDamage()); c1._hitCooldown = 0.5; }
+        if (c1Hit && c2Hit) {
+          c2.takeDamage(c1.power.getHitDamage()); c2._hitCooldown = 0.5;
+          c1.takeDamage(c2.power.getHitDamage()); c1._hitCooldown = 0.5;
           c1.power.onCollide(c2);
           c2.power.onCollide(c1);
           sfx.collide();
@@ -205,9 +205,9 @@ export class Game {
     this.arena.render(ctx);
 
     // Phase 1: area effects behind all circles (fixes z-order for full-arena powers)
-    for (const c of this.circles) c.renderBelowEffects(ctx);
+    for (const c of this.circles) if (c.isAlive) c.renderBelowEffects(ctx);
     // Phase 2: circle bodies and above-circle effects
-    for (const c of this.circles) c.render(ctx);
+    for (const c of this.circles) if (c.isAlive) c.render(ctx);
   }
 
   // Returns live HP snapshot for HUD polling

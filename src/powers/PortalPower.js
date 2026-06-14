@@ -1,20 +1,20 @@
 import { BasePower } from "./BasePower.js";
 
-const PORTAL_R    = 26;   // detection + visual radius
-const PORTAL_LIFE = 9;    // s before portals relocate
-const USE_CD      = 1.2;  // s a portal stays "used" (prevents instant back-teleport)
-const SPAWN_DELAY = 1.2;  // s before first portals appear
+const PORTAL_R = 30; // detection + visual radius
+const PORTAL_LIFE = 7; // s before portals relocate
+const USE_CD = 1; // s a portal stays "used" (prevents instant back-teleport)
+const SPAWN_DELAY = 1.2; // s before first portals appear
 const HEAL_AMOUNT = 5;
-const ENEMY_DMG   = 8;
+const ENEMY_DMG = 8;
 
 export class PortalPower extends BasePower {
   constructor(owner) {
     super(owner);
     this.arena = null;
-    this._portals = [];   // [{ x, y, useCd }]
+    this._portals = []; // [{ x, y, useCd }]
     this._lifeTimer = 0;
     this._spawnTimer = SPAWN_DELAY;
-    this._ownerCd = 0;   // prevents owner from re-entering immediately
+    this._ownerCd = 0; // prevents owner from re-entering immediately
     this._enemyCd = 0;
   }
 
@@ -55,13 +55,16 @@ export class PortalPower extends BasePower {
           const dest = this._portals[1 - idx];
           this.owner.x = dest.x;
           this.owner.y = dest.y;
-          this.owner.hp = Math.min(this.owner.maxHp, this.owner.hp + HEAL_AMOUNT);
+          this.owner.hp = Math.min(
+            this.owner.maxHp,
+            this.owner.hp + HEAL_AMOUNT,
+          );
           this.owner._dmgNums.push({
             x: dest.x + (Math.random() * 16 - 8),
             y: dest.y - this.owner.radius - 4,
             val: `+${HEAL_AMOUNT}`,
             t: 1.0,
-            color: '#4ade80',
+            color: "#4ade80",
           });
           p.useCd = USE_CD;
           dest.useCd = USE_CD;
@@ -113,19 +116,23 @@ export class PortalPower extends BasePower {
       [walls[i], walls[j]] = [walls[j], walls[i]];
     }
 
-    this._portals = [walls[0], walls[1]].map(wall => {
+    this._portals = [walls[0], walls[1]].map((wall) => {
       let x, y;
       const pad = PORTAL_R + 30; // padding from corners
-      if (wall === 0) { // top
+      if (wall === 0) {
+        // top
         x = left + pad + Math.random() * (right - left - pad * 2);
         y = top + m;
-      } else if (wall === 1) { // right
+      } else if (wall === 1) {
+        // right
         x = right - m;
         y = top + pad + Math.random() * (bottom - top - pad * 2);
-      } else if (wall === 2) { // bottom
+      } else if (wall === 2) {
+        // bottom
         x = left + pad + Math.random() * (right - left - pad * 2);
         y = bottom - m;
-      } else { // left
+      } else {
+        // left
         x = left + m;
         y = top + pad + Math.random() * (bottom - top - pad * 2);
       }
@@ -142,6 +149,27 @@ export class PortalPower extends BasePower {
   }
 
   // ── Render ───────────────────────────────────────────────────────────────────
+
+  renderAbove(ctx) {
+    if (this._portals.length >= 2) return;
+    const frac = Math.min(1, 1 - this._spawnTimer / SPAWN_DELAY);
+    if (frac <= 0.02) return;
+    ctx.save();
+    ctx.strokeStyle = `rgba(140,80,255,${0.3 + 0.6 * frac})`;
+    ctx.lineWidth = 2.5;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = "rgba(160,100,255,0.7)";
+    ctx.beginPath();
+    ctx.arc(
+      this.owner.x,
+      this.owner.y,
+      this.owner.radius + 7,
+      -Math.PI / 2,
+      -Math.PI / 2 + Math.PI * 2 * frac,
+    );
+    ctx.stroke();
+    ctx.restore();
+  }
 
   renderBelow(ctx) {
     if (this._portals.length < 2) return;
@@ -177,7 +205,7 @@ export class PortalPower extends BasePower {
         : `rgba(140,80,255,${alpha})`;
       ctx.lineWidth = 3;
       ctx.shadowBlur = used ? 0 : 14 * pulse;
-      ctx.shadowColor = 'rgba(160,100,255,0.7)';
+      ctx.shadowColor = "rgba(160,100,255,0.7)";
       ctx.beginPath();
       ctx.arc(0, 0, PORTAL_R, 0, Math.PI * 2);
       ctx.stroke();
@@ -190,9 +218,13 @@ export class PortalPower extends BasePower {
         const rot = t * 2.5 * (i === 0 ? 1 : -1);
         for (let k = 0; k < 3; k++) {
           ctx.beginPath();
-          ctx.arc(0, 0, PORTAL_R * 0.55,
+          ctx.arc(
+            0,
+            0,
+            PORTAL_R * 0.55,
             rot + (k / 3) * Math.PI * 2,
-            rot + (k / 3) * Math.PI * 2 + Math.PI * 0.7);
+            rot + (k / 3) * Math.PI * 2 + Math.PI * 0.7,
+          );
           ctx.stroke();
         }
       }
@@ -201,7 +233,7 @@ export class PortalPower extends BasePower {
       ctx.beginPath();
       ctx.arc(0, 0, PORTAL_R * 0.38, 0, Math.PI * 2);
       ctx.fillStyle = used
-        ? 'rgba(40,30,60,0.4)'
+        ? "rgba(40,30,60,0.4)"
         : `rgba(100,50,200,${0.25 * pulse})`;
       ctx.fill();
 
@@ -210,12 +242,12 @@ export class PortalPower extends BasePower {
   }
 
   static meta = {
-    id: 'portal',
-    name: 'Portal',
+    id: "portal",
+    name: "Portal",
     description:
-      'Abre 2 portales en las paredes. Atravesarlos te teletransporta y te cura 5 HP. Al enemigo le saca 8 HP.',
-    color: '#8040CC',
-    icon: '◎',
+      "Abre 2 portales en las paredes. Atravesarlos te teletransporta y te cura. Al enemigo le saca vida.",
+    color: "#8040CC",
+    icon: "◎",
     dmgRating: 2,
   };
 }
