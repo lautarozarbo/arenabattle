@@ -129,6 +129,15 @@ export class ArcherPower extends BasePower {
     this._hasEnemy = false;
   }
 
+  getNetState() {
+    return { arrows: this._arrows.map(a => ({ ...a })), shotTimer: this._shotTimer, timeSinceHit: this._timeSinceHit };
+  }
+  applyNetState(s) {
+    this._arrows = s.arrows;
+    this._shotTimer = s.shotTimer;
+    this._timeSinceHit = s.timeSinceHit;
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

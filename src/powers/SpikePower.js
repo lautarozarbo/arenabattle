@@ -119,6 +119,9 @@ export class SpikePower extends BasePower {
     this._compHit = new Set();
   }
 
+  getNetState() { return { spikes: this.spikes.map(s => ({ ...s })) }; }
+  applyNetState(s) { this.spikes = s.spikes; }
+
   static meta = {
     id: "spike",
     name: "Púas",

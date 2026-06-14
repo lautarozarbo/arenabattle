@@ -94,6 +94,9 @@ export class BoomerangPower extends BasePower {
     this._bm = null;
   }
 
+  getNetState() { return { throwCd: this._throwCd, bm: this._bm ? { ...this._bm } : null }; }
+  applyNetState(s) { this._throwCd = s.throwCd; this._bm = s.bm; }
+
   // ── Render ───────────────────────────────────────────────────────────────────
 
   renderAbove(ctx) {

@@ -47,6 +47,11 @@ export class BasePower {
   // Wipe all active map state (projectiles, zones, effects).
   clearState() {}
 
+  // Network sync: serialize / restore power-specific sub-entity state.
+  // Powers with bullets, companions, turrets, etc. should override both.
+  getNetState() { return null; }
+  applyNetState(_s) {}
+
   // Drain the power's charge/cooldown progress back to zero.
   // Generic fallback resets common timer fields by convention;
   // specific powers can override for precision.

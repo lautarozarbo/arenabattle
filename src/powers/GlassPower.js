@@ -111,6 +111,9 @@ export class GlassPower extends BasePower {
     this._shards = [];
   }
 
+  getNetState() { return { shards: this._shards.map(s => ({ ...s })) }; }
+  applyNetState(s) { this._shards = s.shards; }
+
   static meta = {
     id: "glass",
     name: "Vidrio",

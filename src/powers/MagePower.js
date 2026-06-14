@@ -236,6 +236,25 @@ export class MagePower extends BasePower {
     this._damageDone = false;
   }
 
+  getNetState() {
+    return {
+      state: this._state, chargeTimer: this._chargeTimer,
+      warnTimer: this._warnTimer, flashTimer: this._flashTimer, coolTimer: this._coolTimer,
+      cx: this._cx, cy: this._cy, radius: this._radius, damageDone: this._damageDone,
+    };
+  }
+  applyNetState(s) {
+    this._state       = s.state;
+    this._chargeTimer = s.chargeTimer;
+    this._warnTimer   = s.warnTimer;
+    this._flashTimer  = s.flashTimer;
+    this._coolTimer   = s.coolTimer;
+    this._cx          = s.cx;
+    this._cy          = s.cy;
+    this._radius      = s.radius;
+    this._damageDone  = s.damageDone;
+  }
+
   static meta = {
     id: "mage",
     name: "Mago Explosivo",

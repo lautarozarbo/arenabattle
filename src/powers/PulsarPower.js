@@ -178,6 +178,16 @@ export class PulsarPower extends BasePower {
     this._trail = [];
   }
 
+  getNetState() {
+    return { phase: this._phase, cdTimer: this._cdTimer, swept: this._swept, trail: [...this._trail] };
+  }
+  applyNetState(s) {
+    this._phase   = s.phase;
+    this._cdTimer = s.cdTimer;
+    this._swept   = s.swept;
+    this._trail   = s.trail;
+  }
+
   static meta = {
     id: "pulsar",
     name: "Pulsar",

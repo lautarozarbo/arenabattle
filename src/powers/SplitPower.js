@@ -363,6 +363,29 @@ export class SplitPower extends BasePower {
     }
   }
 
+  getNetState() {
+    return {
+      state: this._state, idleTimer: this._idleTimer, splitTimer: this._splitTimer,
+      minis: this._minis.map(m => ({
+        x: m.x, y: m.y, vx: m.vx, vy: m.vy,
+        hp: m.hp, maxHp: m.maxHp, radius: m.radius,
+        isAlive: m.isAlive, bladeAngle: m.bladeAngle, bladeCd: m.bladeCd,
+        baseSpeed: m.baseSpeed,
+      })),
+    };
+  }
+  applyNetState(s) {
+    this._state     = s.state;
+    this._idleTimer = s.idleTimer;
+    this._splitTimer = s.splitTimer;
+    if (s.minis.length === this._minis.length) {
+      for (let i = 0; i < this._minis.length; i++) Object.assign(this._minis[i], s.minis[i]);
+    } else {
+      const noop = () => {};
+      this._minis = s.minis.map(m => ({ ...m, _flashTimer: 0, _hitCd: 0, takeDamage: noop, applyVenom: noop, power: { _comp: null } }));
+    }
+  }
+
   static meta = {
     id: "split",
     name: "Escisión",

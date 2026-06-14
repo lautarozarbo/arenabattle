@@ -168,6 +168,20 @@ export class TurretPower extends BasePower {
     this._hasEnemy = false;
   }
 
+  getNetState() {
+    return {
+      turrets: this._turrets.map(t => ({ ...t })),
+      bullets: this._bullets.map(b => ({ ...b })),
+      spawnTimer: this._spawnTimer,
+    };
+  }
+
+  applyNetState(s) {
+    this._turrets   = s.turrets;
+    this._bullets   = s.bullets;
+    this._spawnTimer = s.spawnTimer;
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

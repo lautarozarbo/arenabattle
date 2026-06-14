@@ -210,6 +210,19 @@ export class TerritoryPower extends BasePower {
     this._state = "idle";
   }
 
+  getNetState() {
+    return {
+      state: this._state,
+      startPt: this._startPt,
+      zones: this._zones.map(z => ({ ...z, poly: z.poly ? [...z.poly] : z.poly })),
+    };
+  }
+  applyNetState(s) {
+    this._state   = s.state;
+    this._startPt = s.startPt;
+    this._zones   = s.zones;
+  }
+
   static meta = {
     id: "territory",
     name: "Territorio",

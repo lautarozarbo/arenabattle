@@ -112,6 +112,19 @@ export class NinjaPower extends BasePower {
     this._hpLastFrame = null;
   }
 
+  getNetState() {
+    return {
+      throwCd:     this._throwCd,
+      shurikens:   this._shurikens.map(s => ({ ...s })),
+      smokeClouds: this._smokeClouds.map(s => ({ ...s })),
+    };
+  }
+  applyNetState(s) {
+    this._throwCd     = s.throwCd;
+    this._shurikens   = s.shurikens;
+    this._smokeClouds = s.smokeClouds;
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

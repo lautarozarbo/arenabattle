@@ -113,6 +113,14 @@ export class WallCursePower extends BasePower {
     this._healCd = {};
   }
 
+  getNetState() {
+    return { cursedWalls: [...this._cursedWalls], curseTimer: this._curseTimer };
+  }
+  applyNetState(s) {
+    this._cursedWalls = s.cursedWalls;
+    this._curseTimer  = s.curseTimer;
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

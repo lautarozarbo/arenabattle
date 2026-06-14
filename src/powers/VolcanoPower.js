@@ -289,6 +289,20 @@ export class VolcanoPower extends BasePower {
     this._chargeTimer = 0;
   }
 
+  getNetState() {
+    return {
+      state: this._state, chargeTimer: this._chargeTimer,
+      rays:   this._rays.map(r => ({ ...r })),
+      embers: this._embers.map(e => ({ ...e })),
+    };
+  }
+  applyNetState(s) {
+    this._state       = s.state;
+    this._chargeTimer = s.chargeTimer;
+    this._rays        = s.rays;
+    this._embers      = s.embers;
+  }
+
   static meta = {
     id: "volcano",
     name: "Volcán",

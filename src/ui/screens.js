@@ -12,7 +12,7 @@ export function initScreens(deps) {
   _stopConfetti = deps.stopConfetti;
 }
 
-const _NAV_TAB_IDS = ["nav-tab-inicio", "nav-tab-play", "btn-league", "btn-tournament"];
+const _NAV_TAB_IDS = ["nav-tab-inicio", "nav-tab-play", "btn-league", "btn-tournament", "btn-online"];
 
 function _setNavTab(activeId) {
   const nav  = document.getElementById("main-nav");
@@ -53,6 +53,8 @@ export function showScreen(id) {
     "screen-tournament-bracket":  ["btn-tournament", false],
     "screen-participant-pick":    ["btn-tournament", false],
     "screen-tournament-champion": ["btn-tournament", false],
+    "screen-online-setup":        ["btn-online",     false],
+    "screen-online-lobby":        ["btn-online",     false],
   };
   const mapped = navMap[id];
   if (mapped) {

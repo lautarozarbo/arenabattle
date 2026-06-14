@@ -197,6 +197,21 @@ export class ClusterBombPower extends BasePower {
     this._hasEnemy = false;
   }
 
+  getNetState() {
+    return {
+      bomb:     this._bomb ? { ...this._bomb } : null,
+      spikes:   this._spikes.map(s => ({ ...s })),
+      flash:    this._flash ? { ...this._flash } : null,
+      launchCd: this._launchCd,
+    };
+  }
+  applyNetState(s) {
+    this._bomb    = s.bomb;
+    this._spikes  = s.spikes;
+    this._flash   = s.flash;
+    this._launchCd = s.launchCd;
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

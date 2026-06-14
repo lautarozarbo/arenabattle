@@ -146,12 +146,14 @@ export class Game {
       for (let j = i + 1; j < alive.length; j++)
         this._handlePair(alive[i], alive[j], dt);
 
-    for (const c of alive) {
-      if (c._silenced) continue;
-      for (const e of alive) {
-        if (e === c) continue;
-        if (c.teamId != null && c.teamId === e.teamId) continue;
-        c.power.onEnemyFrame(e, dt);
+    if (this.networkRole !== 'client') {
+      for (const c of alive) {
+        if (c._silenced) continue;
+        for (const e of alive) {
+          if (e === c) continue;
+          if (c.teamId != null && c.teamId === e.teamId) continue;
+          c.power.onEnemyFrame(e, dt);
+        }
       }
     }
 
@@ -218,15 +220,17 @@ export class Game {
       // Only deal damage on real impacts (not grazing/sliding contact).
       // At 310 px/s base speed a head-on hit has vRel ~620; tangential sliding is < 50.
       if (!sameTeam && vRel > 100) {
-        const c1Hit = c1._hitCooldown <= 0;
-        const c2Hit = c2._hitCooldown <= 0;
-        if (c1Hit && c2Hit) {
-          c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 1.0;
-          c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 1.0;
-          c1.power.onCollide(c2);
-          c2.power.onCollide(c1);
-          sfx.collide();
+        if (this.networkRole !== 'client') {
+          const c1Hit = c1._hitCooldown <= 0;
+          const c2Hit = c2._hitCooldown <= 0;
+          if (c1Hit && c2Hit) {
+            c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 1.0;
+            c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 1.0;
+            c1.power.onCollide(c2);
+            c2.power.onCollide(c1);
+          }
         }
+        sfx.collide();
       }
     }
   }
@@ -271,10 +275,14 @@ export class Game {
     }
   }
 
-  applyActiveBuff(type) {
+  // slot: null = default (player team/index 0), number = specific circle index
+  applyActiveBuff(type, slot = null) {
     const hasTeams = this.circles.some(c => c.teamId != null);
     const targets  = this.circles.filter((c, i) =>
-      c.isAlive && (hasTeams ? c.teamId === 0 : i === 0)
+      c.isAlive && (
+        slot !== null ? i === slot :
+        hasTeams ? c.teamId === 0 : i === 0
+      )
     );
     for (const c of targets) {
       if (type === 'speed')  c.applySpeedBuff(5, 1.7);
@@ -289,5 +297,44 @@ export class Game {
       hp: c.hp, maxHp: c.maxHp, isAlive: c.isAlive,
       _hudHp: c._hudHp, _hudMaxHp: c._hudMaxHp,
     }));
+  }
+
+  // ── Network sync ──────────────────────────────────────────────────────────────
+
+  getNetworkState() {
+    return this.circles.map(c => ({
+      x: c.x, y: c.y, vx: c.vx, vy: c.vy,
+      hp: c.hp, isAlive: c.isAlive,
+      _speedBuffTimer: c._speedBuffTimer,
+      _dmgBuffTimer:   c._dmgBuffTimer,
+      _dmgBuffMult:    c._dmgBuffMult,
+      _healHot:        c._healHot,
+      _poisonTimer:    c._poisonTimer,
+      _bleedTimer:     c._bleedTimer,
+      _slowTimer:      c._slowTimer,
+      _silenced:       c._silenced,
+      _dmgNums:        c._dmgNums,
+      powerState:      c.power.getNetState(),
+    }));
+  }
+
+  applyNetworkState(states) {
+    for (let i = 0; i < states.length && i < this.circles.length; i++) {
+      const c = this.circles[i];
+      const s = states[i];
+      c.x = s.x; c.y = s.y; c.vx = s.vx; c.vy = s.vy;
+      c.hp = s.hp;
+      if (!s.isAlive && c.isAlive) { c.hp = 0; c.isAlive = false; }
+      c._speedBuffTimer = s._speedBuffTimer;
+      c._dmgBuffTimer   = s._dmgBuffTimer;
+      c._dmgBuffMult    = s._dmgBuffMult;
+      c._healHot        = s._healHot;
+      c._poisonTimer    = s._poisonTimer;
+      c._bleedTimer     = s._bleedTimer;
+      c._slowTimer      = s._slowTimer;
+      c._silenced       = s._silenced;
+      if (s._dmgNums?.length) c._dmgNums = s._dmgNums;
+      if (s.powerState != null) c.power.applyNetState(s.powerState);
+    }
   }
 }

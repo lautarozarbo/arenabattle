@@ -124,6 +124,15 @@ export class ToxicTrailPower extends BasePower {
     this._lastDropY = null;
   }
 
+  getNetState() {
+    return { trail: this._trail.map(t => ({ ...t })), lastX: this._lastDropX, lastY: this._lastDropY };
+  }
+  applyNetState(s) {
+    this._trail     = s.trail;
+    this._lastDropX = s.lastX;
+    this._lastDropY = s.lastY;
+  }
+
   static meta = {
     id: "toxictrail",
     name: "Tóxico",

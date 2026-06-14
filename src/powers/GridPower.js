@@ -157,6 +157,15 @@ export class GridPower extends BasePower {
     this._cooldownTimer = this.COOLDOWN;
   }
 
+  getNetState() {
+    return { cells: this._cells.map(c => ({ ...c })), gridTimer: this._gridTimer, cooldownTimer: this._cooldownTimer };
+  }
+  applyNetState(s) {
+    this._cells         = s.cells;
+    this._gridTimer     = s.gridTimer;
+    this._cooldownTimer = s.cooldownTimer;
+  }
+
   static meta = {
     id: "grid",
     name: "Cuadrícula",

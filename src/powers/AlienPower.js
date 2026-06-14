@@ -164,6 +164,9 @@ export class AlienPower extends BasePower {
     this._zones = [];
   }
 
+  getNetState() { return { zones: this._zones.map(z => ({ ...z, cow: z.cow ? { ...z.cow } : null })), spawnCd: this._spawnCd }; }
+  applyNetState(s) { this._zones = s.zones; this._spawnCd = s.spawnCd; }
+
   // ── Render ───────────────────────────────────────────────────────────────────
 
   renderBelow(ctx) {

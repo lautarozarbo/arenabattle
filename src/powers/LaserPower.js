@@ -181,6 +181,9 @@ export class LaserPower extends BasePower {
     this._compActive = new Set();
   }
 
+  getNetState() { return { lasers: this.lasers.map(l => ({ ...l })), state: this._state, startPt: this._startPt }; }
+  applyNetState(s) { this.lasers = s.lasers; this._state = s.state; this._startPt = s.startPt; }
+
   static meta = {
     id: "laser",
     name: "Láser",

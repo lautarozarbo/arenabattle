@@ -250,6 +250,21 @@ export class ChromaticPower extends BasePower {
     this._compDmgAccum = 0;
   }
 
+  getNetState() {
+    return {
+      state: this._state, cells: this._cells.map(c => ({ ...c })), chosenCi: this._chosenCi,
+      idleTimer: this._idleTimer, flashTimer: this._flashTimer, activeTimer: this._activeTimer,
+    };
+  }
+  applyNetState(s) {
+    this._state       = s.state;
+    this._cells       = s.cells;
+    this._chosenCi    = s.chosenCi;
+    this._idleTimer   = s.idleTimer;
+    this._flashTimer  = s.flashTimer;
+    this._activeTimer = s.activeTimer;
+  }
+
   static meta = {
     id: "chromatic",
     name: "Cromático",

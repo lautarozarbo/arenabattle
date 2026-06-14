@@ -269,6 +269,14 @@ export class TrampPower extends BasePower {
     this._bombs = [];
   }
 
+  getNetState() {
+    return { bombs: this._bombs.map(b => ({ ...b })), volley: this._volley };
+  }
+  applyNetState(s) {
+    this._bombs = s.bombs;
+    this._volley = s.volley;
+  }
+
   static meta = {
     id: "bomb",
     name: "Trampero",

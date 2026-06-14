@@ -1,4 +1,10 @@
 import { initAuth, onLogin, onLogout, updateUsername } from "./auth.js";
+import { initOnlineMode, openOnlineSetup } from "./multiplayer/roomUI.js";
+import {
+  initGameSync, stopGameSync,
+  sendAbility, sendGameOver,
+  isOnlineHost, getMySlot,
+} from "./multiplayer/gameSync.js";
 import { openLeaderboard } from "./social/leaderboard.js";
 import {
   initFriends,
@@ -203,7 +209,13 @@ function _stopAbilitiesLoop() {
 for (const [type, btn] of Object.entries(_abilityBtns)) {
   btn.addEventListener("click", () => {
     if (game.state !== "playing" || _abilityCd[type] > 0 || _buffRemaining[type] > 0) return;
-    game.applyActiveBuff(type);
+    if (gameMode === 'online' && !isOnlineHost()) {
+      // Non-host: send to server; host applies and syncs back
+      sendAbility(type);
+    } else {
+      // Host or offline: apply locally (host syncs to non-host via broadcast)
+      game.applyActiveBuff(type, gameMode === 'online' ? getMySlot() : null);
+    }
     _buffRemaining[type] = _BUFF_DURATION[type];
     btn.disabled = true;
     btn.querySelector(".ability-cd-fill").style.height = "100%";
@@ -770,6 +782,11 @@ document.getElementById("nav-tab-inicio").addEventListener("click", () => {
 document.getElementById("nav-tab-play").addEventListener("click", () => {
   sfx.uiClick();
   goToQuickSetup();
+});
+
+document.getElementById("btn-online").addEventListener("click", () => {
+  sfx.uiClick();
+  openOnlineSetup();
 });
 
 document.getElementById("btn-custom")?.addEventListener("click", () => {
@@ -2127,3 +2144,55 @@ document
 document
   .getElementById("wardrobe-tab-arena")
   .addEventListener("click", () => switchWardrobeTab("arena"));
+
+// ── Online multiplayer ────────────────────────────────────────────────────────
+const ONLINE_COLORS = ['#4fc3f7', '#ef5350', '#66bb6a', '#ffa726'];
+
+initOnlineMode({
+  onGameStart(config) {
+    const { players, arenaSkin, abilitiesEnabled } = config;
+    const mySlot = config.mySlot ?? 0;
+    const isHost = mySlot === 0;
+
+    gameMode = 'online';
+    canvas.width = canvas.height = 420;
+    document.getElementById("fight-context-label").textContent = "Online";
+    document.getElementById("btn-restart").textContent = "Volver al inicio";
+
+    const cfgs = players.map((p, i) => {
+      const meta = metas.find(m => m.id === p.powerId) ?? metas[0];
+      return {
+        color:   ONLINE_COLORS[i] ?? meta.color,
+        label:   p.username,
+        powerId: p.powerId,
+        skinId:  p.skinId ?? 'default',
+        hp:      100,
+      };
+    });
+
+    const onResult = () => {
+      stopGameSync();
+      showScreen('screen-online-lobby');
+    };
+
+    _startFightWithCfgs(cfgs, onResult, {
+      skinId:          arenaSkin,
+      activeAbilities: abilitiesEnabled,
+    });
+
+    // Host sends game_over when fight ends, non-host listens
+    if (isHost) {
+      const origOnGameOver = game.onGameOver;
+      game.onGameOver = (winner, winnerIdx) => {
+        origOnGameOver?.(winner, winnerIdx);
+        sendGameOver(winnerIdx ?? -1);
+      };
+    }
+
+    initGameSync(game, mySlot, isHost, (winnerSlot) => {
+      // Non-host: game over received from server
+      stopGameSync();
+      showScreen('screen-online-lobby');
+    });
+  },
+});

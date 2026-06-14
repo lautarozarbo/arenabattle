@@ -85,6 +85,19 @@ export class TerremotoPower extends BasePower {
     this._timer = 0;
   }
 
+  getNetState() {
+    return {
+      rings:   this._rings.map(r => ({ ...r })),
+      pending: this._pending.map(p => ({ ...p })),
+      timer:   this._timer,
+    };
+  }
+  applyNetState(s) {
+    this._rings   = s.rings;
+    this._pending = s.pending;
+    this._timer   = s.timer;
+  }
+
   renderAbove(ctx) {
     const { x, y, radius } = this.owner;
 

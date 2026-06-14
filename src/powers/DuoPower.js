@@ -262,8 +262,25 @@ export class DuoPower extends BasePower {
     this._beamA = { ...this._beamB };
   }
 
-  getHitDamage() {
-    return 1;
+  getHitDamage() { return 1; }
+
+  getNetState() {
+    return {
+      cx: this._comp.x, cy: this._comp.y,
+      cvx: this._comp.vx, cvy: this._comp.vy,
+      chp: this._comp.hp, ca: this._comp.isAlive,
+      baActive: this._beamA.active, baCd: this._beamA.cooldown, baTimer: this._beamA.timer,
+      bbActive: this._beamB.active, bbCd: this._beamB.cooldown, bbTimer: this._beamB.timer,
+    };
+  }
+
+  applyNetState(s) {
+    this._comp.x = s.cx; this._comp.y = s.cy;
+    this._comp.vx = s.cvx; this._comp.vy = s.cvy;
+    this._comp.hp = s.chp; this._comp.isAlive = s.ca;
+    this._beamA.active = s.baActive; this._beamA.cooldown = s.baCd; this._beamA.timer = s.baTimer;
+    this._beamB.active = s.bbActive; this._beamB.cooldown = s.bbCd; this._beamB.timer = s.bbTimer;
+    this._compReady = true;
   }
 
   // ── Render ────────────────────────────────────────────────────────────────

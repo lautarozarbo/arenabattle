@@ -148,6 +148,21 @@ export class PortalPower extends BasePower {
     this._enemyCd = 0;
   }
 
+  getNetState() {
+    return {
+      portals:   this._portals.map(p => ({ ...p })),
+      lifeTimer: this._lifeTimer, spawnTimer: this._spawnTimer,
+      ownerCd:   this._ownerCd,  enemyCd:    this._enemyCd,
+    };
+  }
+  applyNetState(s) {
+    this._portals   = s.portals;
+    this._lifeTimer = s.lifeTimer;
+    this._spawnTimer = s.spawnTimer;
+    this._ownerCd   = s.ownerCd;
+    this._enemyCd   = s.enemyCd;
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────────
 
   renderAbove(ctx) {

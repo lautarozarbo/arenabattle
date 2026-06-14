@@ -182,6 +182,9 @@ export class CactusPower extends BasePower {
     this._spawnTimer = 0;
   }
 
+  getNetState() { return { cacti: this._cacti.map(c => ({ ...c })), spawnTimer: this._spawnTimer }; }
+  applyNetState(s) { this._cacti = s.cacti; this._spawnTimer = s.spawnTimer; }
+
   static meta = {
     id: "cactus",
     name: "Cactus",

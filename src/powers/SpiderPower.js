@@ -113,6 +113,13 @@ export class SpiderPower extends BasePower {
     this._compActive = new Set();
   }
 
+  getNetState() {
+    return { threads: this.threads.map(t => ({ ...t })) };
+  }
+  applyNetState(s) {
+    this.threads = s.threads;
+  }
+
   static meta = {
     id: "spider",
     name: "Araña",

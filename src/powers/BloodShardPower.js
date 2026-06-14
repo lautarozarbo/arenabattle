@@ -199,6 +199,15 @@ export class BloodShardPower extends BasePower {
     this._shards = [];
   }
 
+  getNetState() {
+    return { shards: this._shards.map(s => ({ ...s })), tickTimer: this._tickTimer, tickCount: this._tickCount };
+  }
+  applyNetState(s) {
+    this._shards = s.shards;
+    this._tickTimer = s.tickTimer;
+    this._tickCount = s.tickCount;
+  }
+
   static meta = {
     id: "bloodshard",
     name: "Sanguíneo",

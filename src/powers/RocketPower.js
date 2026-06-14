@@ -285,6 +285,24 @@ export class RocketPower extends BasePower {
     this._compLingerInside = false;
   }
 
+  getNetState() {
+    return {
+      state: this._state, lockTimer: this._lockTimer, chargeTimer: this._chargeTimer,
+      explodeTimer: this._explodeTimer, target: this._target, explodePos: this._explodePos,
+      lastEnemyPos: this._lastEnemyPos, damageDone: this._damageDone,
+    };
+  }
+  applyNetState(s) {
+    this._state        = s.state;
+    this._lockTimer    = s.lockTimer;
+    this._chargeTimer  = s.chargeTimer;
+    this._explodeTimer = s.explodeTimer;
+    this._target       = s.target;
+    this._explodePos   = s.explodePos;
+    this._lastEnemyPos = s.lastEnemyPos;
+    this._damageDone   = s.damageDone;
+  }
+
   static meta = {
     id: "rocket",
     name: "Cohete",
