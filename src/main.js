@@ -359,8 +359,8 @@ function _initTogglePill(rowEl) {
   rowEl.appendChild(pill);
 
   function _move() {
-    const btns = [...rowEl.querySelectorAll(".toggle-opt")];
-    const active = rowEl.querySelector(".toggle-opt.active");
+    const btns = [...rowEl.querySelectorAll(".toggle-opt:not(.hidden)")];
+    const active = rowEl.querySelector(".toggle-opt.active:not(.hidden)");
     if (!btns.length || !active) return;
     const idx = btns.indexOf(active);
     const n = btns.length;

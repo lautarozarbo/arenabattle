@@ -4,8 +4,8 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
-  { badge: "NUEVO", text: "Modo Batalla: 4 jugadores, todos contra todos" },
   { badge: "NUEVO", text: "Modo 2 vs 2 simultáneo" },
+  { badge: "NUEVO", text: "Nuevo personaje: Portal" },
   { badge: "NUEVO", text: "Nuevo personaje: Boomerang" },
   { badge: "NUEVO", text: "Nuevo personaje: Arquero" },
   { badge: "FIX", text: "Corrección de bugs generales" },
