@@ -91,10 +91,18 @@ export const CHAR_SKINS = {
   archer: [
     { id: "default", name: "Default", color: null },
   ],
+  karma: [
+    { id: "default", name: "Default", color: null },
+    { id: "yinyang", name: "Yin Yang", color: "#12061e" },
+  ],
+  diminuto: [
+    { id: "default", name: "Default", color: null },
+    { id: "atomo", name: "Átomo", color: "#071428" },
+  ],
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
-export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask']);
+export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo']);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 
