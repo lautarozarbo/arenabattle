@@ -37,7 +37,8 @@ export class BoomerangPower extends BasePower {
       const dy = this.owner.y - b.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < this.owner.radius + 6) {
-        this._bm = null; // caught
+        this._bm = null;
+        this._throwCd = THROW_CD; // reset CD after catching
         return;
       }
       b.x += (dx / dist) * SPEED_IN * dt;
