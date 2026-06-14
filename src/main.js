@@ -1460,6 +1460,7 @@ function _startFightWithCfgs(cfgs, onResult, arenaOpts = {}) {
   music.setMode("game");
   document.getElementById("gameover-bar").classList.add("hidden");
   document.getElementById("fight-tag-area").classList.add("hidden");
+  document.getElementById("tag-flash").classList.remove("tag-flash-in");
   buildHud(cfgs);
   game.start(cfgs, arenaOpts);
   startHudLoop();
@@ -1511,6 +1512,7 @@ function _ttRunRound() {
   sfx.fightStart();
   music.setMode("game");
   document.getElementById("gameover-bar").classList.add("hidden");
+  document.getElementById("tag-flash").classList.remove("tag-flash-in");
   buildTagHud(_ttMatch);
   updateTagBtn(_ttMatch);
   game.start(cfgs, _ttArenaOpts);
