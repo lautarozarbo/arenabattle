@@ -191,7 +191,9 @@ export class Game {
       c2.vy += imp * m1 * ny;
 
       const sameTeam = c1.teamId != null && c1.teamId === c2.teamId;
-      if (!sameTeam) {
+      // Only deal damage on real impacts (not grazing/sliding contact).
+      // At 310 px/s base speed a head-on hit has vRel ~620; tangential sliding is < 30.
+      if (!sameTeam && vRel > 50) {
         const c1Hit = c1._hitCooldown <= 0;
         const c2Hit = c2._hitCooldown <= 0;
         if (c1Hit && c2Hit) {
