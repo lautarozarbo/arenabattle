@@ -41,10 +41,11 @@ export function buildGrid(player, confirmBtnId) {
     if (meta.id === selectedId) cell.classList.add("active");
     cell.innerHTML = `
       <span class="mastery-badge hidden" data-char="${meta.id}"></span>
-      <div class="grid-peek">
-        <div class="grid-circle" style="background:${meta.color}">${meta.icon}</div>
+      <div class="grid-avatar" style="background:${meta.color}26;border-color:${meta.color}50">
+        <span class="grid-icon" style="color:${meta.color}">${meta.icon}</span>
       </div>
       <div class="grid-name">${meta.name}</div>
+      <span class="grid-fav-star">★</span>
     `;
     cell.addEventListener("click", () => {
       selectedId = meta.id;
@@ -104,6 +105,7 @@ export function buildGrid(player, confirmBtnId) {
       cell.classList.toggle("fav", favIds.includes(id));
     }
     syncGrid();
+    refreshMasteryBadges();
   }
 
   _favRebuildHooks.push(rebuildFavSection);

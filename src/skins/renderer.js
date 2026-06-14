@@ -1293,6 +1293,115 @@ function _apostadorTraje(ctx, x, y, r) {
   ctx.restore();
 }
 
+function _yinYang(ctx, x, y, r) {
+  const cr = r * 0.86;
+  const t = Date.now() * 0.001;
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(t * 0.32);
+
+  ctx.beginPath();
+  ctx.arc(0, 0, cr, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Yang half (white/light)
+  ctx.fillStyle = 'rgba(238, 232, 255, 0.97)';
+  ctx.fillRect(-cr, -cr, cr * 2, cr * 2);
+
+  // Yin half (dark)
+  ctx.fillStyle = 'rgba(12, 4, 24, 0.97)';
+  ctx.fillRect(-cr, -cr, cr, cr * 2);
+
+  // Upper bump: white circle into dark territory
+  ctx.beginPath();
+  ctx.arc(0, -cr / 2, cr / 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(238, 232, 255, 0.97)';
+  ctx.fill();
+
+  // Lower bump: dark circle into white territory
+  ctx.beginPath();
+  ctx.arc(0, cr / 2, cr / 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(12, 4, 24, 0.97)';
+  ctx.fill();
+
+  // Upper dot (dark in white bump)
+  ctx.beginPath();
+  ctx.arc(0, -cr / 2, cr / 6.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(12, 4, 24, 0.97)';
+  ctx.fill();
+
+  // Lower dot (white in dark bump)
+  ctx.beginPath();
+  ctx.arc(0, cr / 2, cr / 6.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(238, 232, 255, 0.97)';
+  ctx.fill();
+
+  // Subtle purple tint to keep Karma's identity
+  ctx.beginPath();
+  ctx.arc(0, 0, cr, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(162, 96, 255, 0.10)';
+  ctx.fill();
+
+  ctx.restore();
+
+  // Outer ring
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, cr, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(192, 132, 252, 0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function _atomOrbits(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  const orbitals = [
+    { rot: 0,              speed:  1.1 },
+    { rot: Math.PI / 3,    speed: -0.8 },
+    { rot: 2 * Math.PI / 3, speed:  1.5 },
+  ];
+  const rx = r * 1.58;
+  const ry = r * 0.38;
+
+  ctx.save();
+  for (const orb of orbitals) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(orb.rot);
+
+    // Orbit ring
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(80, 180, 255, 0.38)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Electron
+    const ea = t * orb.speed;
+    const ex = Math.cos(ea) * rx;
+    const ey = Math.sin(ea) * ry;
+    ctx.beginPath();
+    ctx.arc(ex, ey, r * 0.115, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(150, 220, 255, 0.95)';
+    ctx.shadowColor = '#55ccff';
+    ctx.shadowBlur = 7;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+  }
+
+  // Nucleus glow
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.32, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(80, 180, 255, 0.18)';
+  ctx.fill();
+
+  ctx.restore();
+}
+
 // ── Public draw API ───────────────────────────────────────────────────────────
 
 // Called BEFORE drawing the main circle (things that go behind it).
@@ -1344,9 +1453,11 @@ export function drawSkinDecorationAbove(
     _brickWall(ctx, x, y, r);
   if (charId === "apostador" && skinId === "traje")
     _apostadorTraje(ctx, x, y, r);
-  if (charId === "glass"   && skinId === "liquidglass")  _liquidGlass(ctx, x, y, r);
-  if (charId === "spider"  && skinId === "viudanegra")   _blackWidowMark(ctx, x, y, r);
-  if (charId === "laser"   && skinId === "neon")         _neonBorder(ctx, x, y, r);
+  if (charId === "glass"    && skinId === "liquidglass") _liquidGlass(ctx, x, y, r);
+  if (charId === "spider"   && skinId === "viudanegra")  _blackWidowMark(ctx, x, y, r);
+  if (charId === "laser"    && skinId === "neon")        _neonBorder(ctx, x, y, r);
+  if (charId === "karma"    && skinId === "yinyang")     _yinYang(ctx, x, y, r);
+  if (charId === "diminuto" && skinId === "atomo")       _atomOrbits(ctx, x, y, r);
 }
 
 // Renders a full character circle preview onto a canvas element.
