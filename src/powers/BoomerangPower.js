@@ -4,7 +4,7 @@ const THROW_CD   = 1.6;  // s between throws
 const SPEED_OUT  = 330;  // px/s going out
 const SPEED_IN   = 420;  // px/s coming back
 const MAX_DIST   = 300;  // px before reversing
-const BOOM_R     = 16;   // collision radius
+const BOOM_R     = 20;   // collision radius
 const OUT_DMG    = 4;    // damage going out
 const RETURN_DMG = 9;    // damage on return
 
@@ -129,19 +129,19 @@ export class BoomerangPower extends BasePower {
     }
 
     ctx.strokeStyle = returning ? '#FFD700' : '#CC8822';
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 7;
     ctx.lineCap = 'round';
 
     // Wing 1
     ctx.beginPath();
-    ctx.moveTo(0, 4);
-    ctx.quadraticCurveTo(-7, -7, -18, -3);
+    ctx.moveTo(0, 5);
+    ctx.quadraticCurveTo(-9, -9, -23, -4);
     ctx.stroke();
 
     // Wing 2
     ctx.beginPath();
-    ctx.moveTo(0, 4);
-    ctx.quadraticCurveTo(7, -7, 18, -3);
+    ctx.moveTo(0, 5);
+    ctx.quadraticCurveTo(9, -9, 23, -4);
     ctx.stroke();
 
     ctx.restore();
