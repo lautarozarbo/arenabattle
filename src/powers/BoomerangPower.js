@@ -1,12 +1,12 @@
 import { BasePower } from "./BasePower.js";
 
-const THROW_CD   = 1.6;  // s between throws
-const SPEED_OUT  = 330;  // px/s going out
-const SPEED_IN   = 420;  // px/s coming back
-const MAX_DIST   = 300;  // px before reversing
-const BOOM_R     = 20;   // collision radius
-const OUT_DMG    = 4;    // damage going out
-const RETURN_DMG = 9;    // damage on return
+const THROW_CD = 1.1; // s between throws
+const SPEED_OUT = 500; // px/s going out
+const SPEED_IN = 600; // px/s coming back
+const MAX_DIST = 300; // px before reversing
+const BOOM_R = 35; // collision radius
+const OUT_DMG = 4; // damage going out
+const RETURN_DMG = 10; // damage on return
 
 export class BoomerangPower extends BasePower {
   constructor(owner) {
@@ -105,8 +105,11 @@ export class BoomerangPower extends BasePower {
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.arc(
-          this.owner.x, this.owner.y, this.owner.radius + 7,
-          -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac,
+          this.owner.x,
+          this.owner.y,
+          this.owner.radius + 7,
+          -Math.PI / 2,
+          -Math.PI / 2 + Math.PI * 2 * frac,
         );
         ctx.stroke();
         ctx.restore();
@@ -125,12 +128,12 @@ export class BoomerangPower extends BasePower {
 
     if (returning) {
       ctx.shadowBlur = 14;
-      ctx.shadowColor = 'rgba(255,210,50,0.9)';
+      ctx.shadowColor = "rgba(255,210,50,0.9)";
     }
 
-    ctx.strokeStyle = returning ? '#FFD700' : '#CC8822';
+    ctx.strokeStyle = returning ? "#FFD700" : "#CC8822";
     ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
+    ctx.lineCap = "round";
 
     // Wing 1
     ctx.beginPath();
@@ -148,12 +151,12 @@ export class BoomerangPower extends BasePower {
   }
 
   static meta = {
-    id: 'boomerang',
-    name: 'Boomerang',
+    id: "boomerang",
+    name: "Boomerang",
     description:
-      'Lanza un boomerang que va y vuelve al lanzador. Hace más daño a la vuelta.',
-    color: '#CC8822',
-    icon: '↩',
+      "Lanza un boomerang que va y vuelve al lanzador. Hace más daño a la vuelta.",
+    color: "#CC8822",
+    icon: "↩",
     dmgRating: 2,
   };
 }
