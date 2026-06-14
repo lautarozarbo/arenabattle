@@ -49,6 +49,7 @@ import { ArcherPower         } from './ArcherPower.js';
 import { BoomerangPower      } from './BoomerangPower.js';
 import { PortalPower         } from './PortalPower.js';
 import { KarmaPower          } from './KarmaPower.js';
+import { DiminutoPower       } from './DiminutoPower.js';
 
 const POWERS = [
   NoPower,
@@ -95,6 +96,7 @@ const POWERS = [
   BoomerangPower,
   PortalPower,
   KarmaPower,
+  DiminutoPower,
 ];
 
 export const PowerRegistry = Object.fromEntries(POWERS.map(P => [P.meta.id, P]));
@@ -105,7 +107,7 @@ export function createPower(id, owner) {
 }
 
 const CATEGORIES = {
-  "Cuerpo a cuerpo": ["none", "saw", "assassin", "momentum", "electric", "vampire", "venom", "parasite", "hotpotato", "tortuga", "reflectshield", "karma"],
+  "Cuerpo a cuerpo": ["none", "saw", "assassin", "momentum", "electric", "vampire", "venom", "parasite", "hotpotato", "tortuga", "reflectshield", "karma", "diminuto"],
   "Proyectiles":     ["laser", "rocket", "bloodshard", "clusterbomb", "fenix", "crystalbeam", "volcano", "ninja", "angel", "archer", "boomerang"],
   "Control de zona": ["spider", "territory", "spike", "grid", "chromatic", "toxictrail", "glass", "aura", "earthquake", "cursedwall", "portal"],
   "Invocación":      ["cactus", "duo", "chess", "turret", "alien", "bomb", "mage", "pulsar", "apostador", "clock"],
