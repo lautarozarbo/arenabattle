@@ -42,7 +42,9 @@ export class Circle {
     this.teamId           = cfg.teamId ?? null;
     this.activeEffect     = cfg.activeEffect ?? null;
     this._speedBuffTimer  = 0;
-    this._speedBuffBase   = null; // saved baseSpeed before buff
+    this._speedBuffBase   = null; // true (pre-slow) baseSpeed saved when buff starts
+    this._speedBuffMult   = 1;
+    this._slowFactor      = 1;
     this._dmgBuffTimer    = 0;
     this._dmgBuffMult     = 1;
     this._healFlash       = 0;
@@ -80,7 +82,10 @@ export class Circle {
       if (this._slowTimer <= 0) {
         this._slowTimer = 0;
         if (this._origBaseSpeed !== null) {
-          this.baseSpeed = this._origBaseSpeed;
+          // Reapply speed buff over the restored base if buff still running
+          this.baseSpeed = this._speedBuffTimer > 0
+            ? this._origBaseSpeed * this._speedBuffMult
+            : this._origBaseSpeed;
           this._origBaseSpeed = null;
         }
       }
@@ -110,7 +115,10 @@ export class Circle {
       if (this._speedBuffTimer <= 0) {
         this._speedBuffTimer = 0;
         if (this._speedBuffBase !== null) {
-          this.baseSpeed = this._speedBuffBase;
+          // Reapply slow over the restored base if slow still running
+          this.baseSpeed = this._slowTimer > 0
+            ? this._speedBuffBase * this._slowFactor
+            : this._speedBuffBase;
           this._speedBuffBase = null;
         }
       }
@@ -154,7 +162,10 @@ export class Circle {
   }
 
   applySpeedBuff(duration, mult = 1.7) {
-    if (this._speedBuffBase === null) this._speedBuffBase = this.baseSpeed;
+    // Always anchor to pre-slow speed so the two systems don't compound
+    const trueBase = this._origBaseSpeed ?? this.baseSpeed;
+    if (this._speedBuffBase === null) this._speedBuffBase = trueBase;
+    this._speedBuffMult = mult;
     this.baseSpeed = this._speedBuffBase * mult;
     this._speedBuffTimer = duration;
   }
@@ -179,10 +190,13 @@ export class Circle {
 
   // Called by SpikePower (and any future poison power)
   applyVenom(slowDuration, poisonDuration, poisonDPS, slowFactor) {
-    // Don't stack slow multiplier — only save original once
     if (this._slowTimer <= 0) {
-      this._origBaseSpeed = this.baseSpeed;
-      this.baseSpeed = this.baseSpeed * slowFactor;
+      // Save the true (pre-buff) base so buff expiry can restore correctly
+      const trueBase = this._speedBuffBase ?? this.baseSpeed;
+      this._origBaseSpeed = trueBase;
+      this._slowFactor    = slowFactor;
+      // Apply slow on top of any active buff
+      this.baseSpeed = trueBase * slowFactor * (this._speedBuffTimer > 0 ? this._speedBuffMult : 1);
     }
     this._slowTimer    = slowDuration;
     this._poisonTimer  = poisonDuration;
