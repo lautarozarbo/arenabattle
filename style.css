@@ -3597,6 +3597,96 @@ td.rank {
 .up-friend-row          { display: flex; gap: 8px; margin-bottom: 16px; }
 .up-friend-row .up-friend-btn { margin-bottom: 0; }
 
+/* ── Profile comments ─────────────────────────────────────────────────────── */
+.up-comment-form {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.up-comment-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.85rem;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+.up-comment-textarea::placeholder { color: rgba(255,255,255,0.25); }
+.up-comment-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.up-comment-chars {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+}
+.up-comment-chars--warn { color: #f59e0b; }
+.up-comment-submit {
+  padding: 5px 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.up-comment-submit:disabled { opacity: .5; cursor: default; }
+.up-comment-submit:hover:not(:disabled) { background: #2563eb; }
+.up-comment-list { display: flex; flex-direction: column; gap: 8px; }
+.up-comment-empty {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  padding: 16px 0;
+}
+.up-comment {
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.up-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.up-comment-author {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  flex: 1;
+}
+.up-comment-time {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.25);
+}
+.up-comment-delete {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.2);
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.up-comment-delete:hover { color: #ef4444; }
+.up-comment-body {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ── Profile panel: friend code ──────────────────────────────────────────── */
 .profile-friend-code {
   margin: 8px 20px 4px;

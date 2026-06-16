@@ -1,6 +1,7 @@
 import { supabase } from '../supabase.js';
 import { getAllPowerMetas } from '../powers/registry.js';
 import { refreshFriendsBadge } from './friends.js';
+import { loadComments, renderCommentsSection, wireComments } from './profileComments.js';
 
 export async function openUserProfile(userId) {
   const modal   = document.getElementById('user-profile-modal');
@@ -14,12 +15,13 @@ export async function openUserProfile(userId) {
     supabase.auth.getSession(),
   ]);
 
+  const myId = sessionData.session?.user?.id ?? null;
+
   if (!profile) {
     content.innerHTML = '<div class="up-loading">Perfil no encontrado.</div>';
     return;
   }
 
-  const myId = sessionData.session?.user?.id ?? null;
   const rel  = myId && myId !== userId ? await _getRelationship(myId, userId) : null;
 
   const s    = stats ?? {};
@@ -51,6 +53,8 @@ export async function openUserProfile(userId) {
         </div>
       </div>`
     : `<div class="up-fav-empty">Sin partidas registradas</div>`;
+
+  const comments = await loadComments(userId, myId);
 
   const lastSeenHtml = _formatLastSeen(profile.last_seen);
   const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
@@ -96,9 +100,12 @@ export async function openUserProfile(userId) {
 
     <div class="up-section-label">Personaje más usado</div>
     ${favHtml}
+
+    ${renderCommentsSection(comments, myId, userId)}
   `;
 
   _wireFriendButtons(rel, myId, userId, content);
+  wireComments(content, userId, myId);
 }
 
 async function _getRelationship(myId, theirId) {
