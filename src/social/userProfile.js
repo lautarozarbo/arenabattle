@@ -1,7 +1,8 @@
 import { supabase } from '../supabase.js';
 import { getAllPowerMetas } from '../powers/registry.js';
 import { refreshFriendsBadge } from './friends.js';
-import { loadComments, renderCommentsSection, wireComments } from './profileComments.js';
+import { loadComments, renderCommentsSection, wireComments, clearProfileCommentsBadge } from './profileComments.js';
+import { showConfirm } from '../ui/confirmDialog.js';
 
 export async function openUserProfile(userId) {
   const modal   = document.getElementById('user-profile-modal');
@@ -106,6 +107,7 @@ export async function openUserProfile(userId) {
 
   _wireFriendButtons(rel, myId, userId, content);
   wireComments(content, userId, myId);
+  if (myId && userId === myId) clearProfileCommentsBadge();
 }
 
 async function _getRelationship(myId, theirId) {
@@ -165,7 +167,7 @@ function _wireFriendButtons(rel, myId, theirId, content) {
 
   if (remove) {
     remove.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar a este amigo?')) return;
+      if (!await showConfirm('¿Eliminar a este amigo?')) return;
       remove.disabled = true;
       remove.textContent = '...';
       await supabase.from('friendships').delete().eq('id', rel.id);

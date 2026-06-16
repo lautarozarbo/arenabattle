@@ -1,4 +1,5 @@
 import { initAuth, onLogin, onLogout, updateUsername, getMyUserId } from "./auth.js";
+import { checkProfileCommentsBadge } from "./social/profileComments.js";
 import { openLeaderboard } from "./social/leaderboard.js";
 import {
   initFriends,
@@ -396,6 +397,7 @@ onLogin((username) => {
   refreshMasteryBadges();
   document.getElementById("btn-view-own-profile").classList.remove("hidden");
   if (!_profilePanel.classList.contains("hidden")) _refreshProfilePanel();
+  getMyUserId().then(uid => { if (uid) checkProfileCommentsBadge(uid); });
 });
 onLogout(() => {
   localStorage.removeItem("playerName");

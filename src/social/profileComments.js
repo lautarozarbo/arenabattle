@@ -1,6 +1,30 @@
 import { supabase } from '../supabase.js';
+import { showConfirm } from '../ui/confirmDialog.js';
 
 const MAX_CHARS = 200;
+const BADGE_KEY = 'my_profile_comments_seen_at';
+
+export async function checkProfileCommentsBadge(myId) {
+  const { data } = await supabase
+    .from('profile_comments')
+    .select('created_at')
+    .eq('profile_id', myId)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  const newest = data?.[0]?.created_at;
+  if (!newest) return;
+  const seenAt = localStorage.getItem(BADGE_KEY);
+  if (!seenAt || new Date(newest) > new Date(seenAt)) {
+    document.getElementById('profile-notif-dot')?.classList.remove('hidden');
+    document.getElementById('profile-own-notif-dot')?.classList.remove('hidden');
+  }
+}
+
+export function clearProfileCommentsBadge() {
+  localStorage.setItem(BADGE_KEY, new Date().toISOString());
+  document.getElementById('profile-notif-dot')?.classList.add('hidden');
+  document.getElementById('profile-own-notif-dot')?.classList.add('hidden');
+}
 
 export async function loadComments(profileUserId) {
   const { data: comments } = await supabase
@@ -71,7 +95,7 @@ function _renderComment(c, myId, profileUserId) {
   return `
     <div class="up-comment" data-id="${c.id}">
       <div class="up-comment-header">
-        <span class="up-comment-author">${_esc(author)}</span>
+        <span class="up-comment-author" data-author-id="${c.author_id}">${_esc(author)}</span>
         <span class="up-comment-time">${timeStr}</span>
         ${canDelete ? `<button class="up-comment-delete" data-id="${c.id}" title="Eliminar">✕</button>` : ''}
       </div>
@@ -111,15 +135,26 @@ export function wireComments(container, profileUserId, myId) {
       if (empty) empty.remove();
       list.insertAdjacentHTML('afterbegin', _renderComment(data, myId, profileUserId));
       _wireDeleteButtons(list, myId, profileUserId);
+      _wireAuthorClicks(list);
     });
   }
 
   _wireDeleteButtons(list, myId, profileUserId);
+  _wireAuthorClicks(list);
+}
+
+function _wireAuthorClicks(list) {
+  list.querySelectorAll('.up-comment-author[data-author-id]').forEach(el => {
+    el.onclick = () => {
+      import('./userProfile.js').then(m => m.openUserProfile(el.dataset.authorId));
+    };
+  });
 }
 
 function _wireDeleteButtons(list, myId, profileUserId) {
   list.querySelectorAll('.up-comment-delete').forEach(btn => {
     btn.onclick = async () => {
+      if (!await showConfirm('¿Eliminar este comentario?')) return;
       const id = btn.dataset.id;
       btn.disabled = true;
       const { error } = await deleteComment(id);

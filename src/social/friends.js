@@ -1,4 +1,5 @@
 import { supabase } from '../supabase.js';
+import { showConfirm } from '../ui/confirmDialog.js';
 
 let _currentTab    = 'friends';
 let _friendCode    = null;
@@ -242,6 +243,7 @@ async function _renderFriends(uid, content) {
   content.querySelectorAll('.fr-btn--remove').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.stopPropagation();
+      if (!await showConfirm('¿Eliminar a este amigo?')) return;
       btn.disabled = true;
       await supabase.from('friendships').delete().eq('id', btn.dataset.fid);
       await _loadTab();
