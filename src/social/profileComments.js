@@ -2,14 +2,21 @@ import { supabase } from '../supabase.js';
 
 const MAX_CHARS = 200;
 
-export async function loadComments(profileUserId, myId) {
-  const { data } = await supabase
+export async function loadComments(profileUserId) {
+  const { data: comments } = await supabase
     .from('profile_comments')
-    .select('id, content, created_at, author_id, profiles!profile_comments_author_id_fkey(username)')
+    .select('id, content, created_at, author_id')
     .eq('profile_id', profileUserId)
     .order('created_at', { ascending: false })
     .limit(50);
-  return data ?? [];
+  if (!comments?.length) return [];
+  const authorIds = [...new Set(comments.map(c => c.author_id))];
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, username')
+    .in('user_id', authorIds);
+  const nameMap = Object.fromEntries((profiles ?? []).map(p => [p.user_id, p.username]));
+  return comments.map(c => ({ ...c, profiles: { username: nameMap[c.author_id] ?? 'Usuario' } }));
 }
 
 export async function postComment(profileUserId, authorId, content) {
@@ -18,9 +25,12 @@ export async function postComment(profileUserId, authorId, content) {
   const { data, error } = await supabase
     .from('profile_comments')
     .insert({ profile_id: profileUserId, author_id: authorId, content: trimmed })
-    .select('id, content, created_at, author_id, profiles!profile_comments_author_id_fkey(username)')
+    .select('id, content, created_at, author_id')
     .single();
-  return { data, error };
+  if (error || !data) return { data: null, error };
+  const { data: profile } = await supabase
+    .from('profiles').select('username').eq('user_id', authorId).single();
+  return { data: { ...data, profiles: { username: profile?.username ?? 'Usuario' } }, error: null };
 }
 
 export async function deleteComment(commentId) {

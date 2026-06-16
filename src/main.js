@@ -1,4 +1,4 @@
-import { initAuth, onLogin, onLogout, updateUsername } from "./auth.js";
+import { initAuth, onLogin, onLogout, updateUsername, getMyUserId } from "./auth.js";
 import { openLeaderboard } from "./social/leaderboard.js";
 import {
   initFriends,
@@ -394,12 +394,14 @@ onLogin((username) => {
   _updateXpBar();
   refreshFriendsBadge();
   refreshMasteryBadges();
+  document.getElementById("btn-view-own-profile").classList.remove("hidden");
   if (!_profilePanel.classList.contains("hidden")) _refreshProfilePanel();
 });
 onLogout(() => {
   localStorage.removeItem("playerName");
   _savePlayerName("Invitado");
   refreshFriendsBadge();
+  document.getElementById("btn-view-own-profile").classList.add("hidden");
   if (!_profilePanel.classList.contains("hidden")) _refreshProfilePanel();
 });
 
@@ -424,6 +426,13 @@ document.getElementById("leaderboard-modal").addEventListener("click", (e) => {
   if (e.target === document.getElementById("leaderboard-modal")) {
     document.getElementById("leaderboard-modal").classList.add("hidden");
   }
+});
+
+document.getElementById("btn-view-own-profile").addEventListener("click", async () => {
+  const uid = await getMyUserId();
+  if (!uid) return;
+  const { openUserProfile } = await import("./social/userProfile.js");
+  openUserProfile(uid);
 });
 
 document

@@ -54,7 +54,7 @@ export async function openUserProfile(userId) {
       </div>`
     : `<div class="up-fav-empty">Sin partidas registradas</div>`;
 
-  const comments = await loadComments(userId, myId);
+  const comments = await loadComments(userId);
 
   const lastSeenHtml = _formatLastSeen(profile.last_seen);
   const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
@@ -123,7 +123,10 @@ function _renderFriendBtn(rel, myId, theirId) {
     return `<button class="up-friend-btn up-friend-btn--add" id="up-friend-add">+ Agregar amigo</button>`;
   }
   if (rel.status === 'accepted') {
-    return `<button class="up-friend-btn up-friend-btn--friends" id="up-friend-remove">✓ Amigos · Eliminar</button>`;
+    return `<div class="up-friend-status-bar">
+      <span class="up-friend-status-label">✓ Amigos</span>
+      <button class="up-friend-remove-link" id="up-friend-remove">Eliminar</button>
+    </div>`;
   }
   if (rel.status === 'pending' && rel.requester_id === myId) {
     return `<button class="up-friend-btn up-friend-btn--pending" id="up-friend-cancel">Solicitud enviada · Cancelar</button>`;
@@ -162,14 +165,12 @@ function _wireFriendButtons(rel, myId, theirId, content) {
 
   if (remove) {
     remove.addEventListener('click', async () => {
+      if (!confirm('¿Eliminar a este amigo?')) return;
       remove.disabled = true;
-      remove.textContent = 'Eliminando...';
+      remove.textContent = '...';
       await supabase.from('friendships').delete().eq('id', rel.id);
-      remove.textContent = '+ Agregar amigo';
-      remove.classList.remove('up-friend-btn--friends');
-      remove.classList.add('up-friend-btn--add');
-      remove.disabled = false;
-      remove.id = 'up-friend-add';
+      remove.closest('.up-friend-status-bar').outerHTML =
+        `<button class="up-friend-btn up-friend-btn--add" id="up-friend-add">+ Agregar amigo</button>`;
       _wireFriendButtons(null, myId, theirId, content);
       await refreshFriendsBadge();
     });

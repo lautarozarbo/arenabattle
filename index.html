@@ -190,9 +190,13 @@
               <button class="toggle-opt active" id="quick-1v1-btn">
                 1 vs 1
               </button>
-              <button class="toggle-opt" id="quick-2v2-btn">Relevos</button>
-              <button class="toggle-opt hidden" id="quick-sim2v2-btn">2 vs 2</button>
-              <button class="toggle-opt hidden" id="quick-battle-btn">Batalla</button>
+              <button class="toggle-opt" id="quick-2v2-btn">2 vs 2</button>
+              <button class="toggle-opt hidden" id="quick-sim2v2-btn">
+                2 vs 2
+              </button>
+              <button class="toggle-opt hidden" id="quick-battle-btn">
+                Batalla
+              </button>
             </div>
           </div>
           <div class="setup-section">
@@ -207,8 +211,12 @@
           <div class="setup-section">
             <div class="setup-label">Habilidades</div>
             <div class="toggle-row">
-              <button class="toggle-opt" id="quick-abilities-off">Desactivadas</button>
-              <button class="toggle-opt active" id="quick-abilities-on">Activadas</button>
+              <button class="toggle-opt" id="quick-abilities-off">
+                Desactivadas
+              </button>
+              <button class="toggle-opt active" id="quick-abilities-on">
+                Activadas
+              </button>
             </div>
           </div>
           <div class="setup-section">
@@ -223,21 +231,41 @@
           </div>
           <div class="setup-section arena-section-combined">
             <div class="arena-picker-unified">
-              <div class="arena-layout-name" id="arena-layout-name">Abierta</div>
+              <div class="arena-layout-name" id="arena-layout-name">
+                Abierta
+              </div>
               <div class="arena-picker-row">
                 <div class="arena-nav-side">
-                  <button class="arena-nav" id="arena-prev" aria-label="Anterior">‹</button>
+                  <button
+                    class="arena-nav"
+                    id="arena-prev"
+                    aria-label="Anterior"
+                  >
+                    ‹
+                  </button>
                   <button class="arena-nav" id="arena-skin-prev">‹</button>
                 </div>
                 <canvas id="arena-preview" width="400" height="400"></canvas>
                 <div class="arena-nav-side">
-                  <button class="arena-nav" id="arena-next" aria-label="Siguiente">›</button>
+                  <button
+                    class="arena-nav"
+                    id="arena-next"
+                    aria-label="Siguiente"
+                  >
+                    ›
+                  </button>
                   <button class="arena-nav" id="arena-skin-next">›</button>
                 </div>
               </div>
               <div class="arena-skin-row">
-                <span class="arena-skin-name" id="arena-skin-name">Clásico</span>
-                <span class="arena-skin-lock lock-invisible" id="arena-skin-lock">🔒 Bloqueado</span>
+                <span class="arena-skin-name" id="arena-skin-name"
+                  >Clásico</span
+                >
+                <span
+                  class="arena-skin-lock lock-invisible"
+                  id="arena-skin-lock"
+                  >🔒 Bloqueado</span
+                >
               </div>
             </div>
           </div>
@@ -301,8 +329,12 @@
           <div class="setup-section">
             <div class="setup-label">Habilidades</div>
             <div class="toggle-row">
-              <button class="toggle-opt active" id="league-abilities-off">Desactivadas</button>
-              <button class="toggle-opt" id="league-abilities-on">Activadas</button>
+              <button class="toggle-opt active" id="league-abilities-off">
+                Desactivadas
+              </button>
+              <button class="toggle-opt" id="league-abilities-on">
+                Activadas
+              </button>
             </div>
           </div>
           <div class="setup-section">
@@ -359,8 +391,12 @@
           <div class="setup-section">
             <div class="setup-label">Habilidades</div>
             <div class="toggle-row">
-              <button class="toggle-opt active" id="tournament-abilities-off">Desactivadas</button>
-              <button class="toggle-opt" id="tournament-abilities-on">Activadas</button>
+              <button class="toggle-opt active" id="tournament-abilities-off">
+                Desactivadas
+              </button>
+              <button class="toggle-opt" id="tournament-abilities-on">
+                Activadas
+              </button>
             </div>
           </div>
           <div class="setup-section">
@@ -523,27 +559,49 @@
             </button>
           </div>
           <div id="active-abilities-bar" class="hidden">
-          <button class="ability-btn" id="ability-speed">
-            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            <span class="ability-label">Velocidad</span>
-            <div class="ability-cd-fill"></div>
-          </button>
-          <button class="ability-btn" id="ability-heal">
-            <svg class="ability-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-            <span class="ability-label">Curar</span>
-            <div class="ability-cd-fill"></div>
-          </button>
-          <button class="ability-btn" id="ability-damage">
-            <svg class="ability-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-              <path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5 0.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
-            </svg>
-            <span class="ability-label">Daño</span>
-            <div class="ability-cd-fill"></div>
-          </button>
+            <button class="ability-btn" id="ability-speed">
+              <svg
+                class="ability-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <span class="ability-label">Velocidad</span>
+              <div class="ability-cd-fill"></div>
+            </button>
+            <button class="ability-btn" id="ability-heal">
+              <svg
+                class="ability-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke="none"
+              >
+                <path
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              </svg>
+              <span class="ability-label">Curar</span>
+              <div class="ability-cd-fill"></div>
+            </button>
+            <button class="ability-btn" id="ability-damage">
+              <svg
+                class="ability-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke="none"
+              >
+                <path
+                  d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5 0.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+                />
+              </svg>
+              <span class="ability-label">Daño</span>
+              <div class="ability-cd-fill"></div>
+            </button>
           </div>
         </div>
         <div id="gameover-bar" class="hidden">
@@ -1202,6 +1260,7 @@
         </div>
 
         <div class="profile-friend-code hidden" id="profile-friend-code"></div>
+        <button class="btn-view-own-profile hidden" id="btn-view-own-profile">Ver mi perfil público</button>
         <div class="profile-stats" id="profile-stats"></div>
       </div>
     </div>

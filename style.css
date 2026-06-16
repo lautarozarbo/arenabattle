@@ -3596,6 +3596,34 @@ td.rank {
 .up-friend-btn--ghost:hover:not(:disabled) { background: rgba(239,68,68,0.15); color: #ef4444; }
 .up-friend-row          { display: flex; gap: 8px; margin-bottom: 16px; }
 .up-friend-row .up-friend-btn { margin-bottom: 0; }
+.up-friend-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  border-radius: 8px;
+  padding: 9px 14px;
+  margin-bottom: 16px;
+}
+.up-friend-status-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4ade80;
+}
+.up-friend-remove-link {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f87171;
+  padding: 4px 10px;
+  transition: background .15s, color .15s;
+}
+.up-friend-remove-link:hover:not(:disabled) { background: rgba(239,68,68,0.2); color: #ef4444; }
+.up-friend-remove-link:disabled { opacity: .4; cursor: default; }
 
 /* ── Profile comments ─────────────────────────────────────────────────────── */
 .up-comment-form {
@@ -3703,6 +3731,21 @@ td.rank {
   user-select: none;
 }
 .profile-friend-code:hover { background: rgba(255,255,255,0.09); }
+.btn-view-own-profile {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 16px 16px 4px;
+  padding: 10px 0;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-view-own-profile:hover { background: rgba(255,255,255,0.1); color: var(--text); }
 .pfc-label {
   font-size: 0.7rem;
   color: rgba(255,255,255,0.3);
@@ -3755,6 +3798,7 @@ td.rank {
   background: var(--surface);
   border-radius: 20px 20px 0 0;
   padding-bottom: env(safe-area-inset-bottom, 16px);
+  height: 80vh;
   max-height: 80vh;
   display: flex;
   flex-direction: column;

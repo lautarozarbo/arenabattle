@@ -8,6 +8,11 @@ let _onLogoutCallback = null;
 export function onLogin(cb)  { _onLoginCallback  = cb; }
 export function onLogout(cb) { _onLogoutCallback = cb; }
 
+export async function getMyUserId() {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user?.id ?? null;
+}
+
 export async function getUsername() {
   const { data: s } = await supabase.auth.getSession();
   const uid = s.session?.user?.id;
