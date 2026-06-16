@@ -656,7 +656,7 @@ async function _refreshProfilePanel() {
   if (fcEl) {
     if (friendCode) {
       fcEl.dataset.code = friendCode;
-      fcEl.innerHTML = `<span class="pfc-label">Tu código</span><span class="pfc-code">${friendCode}</span><span class="pfc-hint">Toca para copiar</span>`;
+      fcEl.innerHTML = `<span class="pfc-label">Tu código</span><span class="pfc-code">${friendCode}</span><span class="pfc-icon" id="pfc-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>`;
       fcEl.classList.remove("hidden");
     } else {
       fcEl.classList.add("hidden");
@@ -689,11 +689,11 @@ document
       document.execCommand("copy");
       document.body.removeChild(ta);
     }
-    const hint = this.querySelector(".pfc-hint");
-    if (hint) {
-      hint.textContent = "¡Copiado!";
+    const icon = this.querySelector(".pfc-icon");
+    if (icon) {
+      icon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
       setTimeout(() => {
-        hint.textContent = "Toca para copiar";
+        icon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
       }, 2000);
     }
   });
