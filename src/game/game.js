@@ -39,6 +39,7 @@ export class Game {
     this._hideDeadCircles  = arenaOpts.hideDeadCircles ?? false;
     this._activeAbilities  = arenaOpts.activeAbilities  ?? false;
     this._playerSide       = arenaOpts.playerSide       ?? 0;
+    this._impacts = [];
     const a = this.arena;
 
     const cpad  = (cfgs[0].radius ?? 28) + 14;
@@ -63,7 +64,12 @@ export class Game {
       return new Circle({ x, y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, ...cfg });
     });
 
-    for (const c of this.circles) c.power.arena = this.arena;
+    for (const c of this.circles) {
+      c.power.arena = this.arena;
+      c.power._spawnImpact = (x, y, intensity = 0.8) => {
+        this._impacts.push({ x, y, t: 0, maxT: 0.28 + intensity * 0.15, intensity, seed: Math.random() * 1000 | 0 });
+      };
+    }
 
     // Init AI ability timers for enemy circles
     if (this._activeAbilities) {
@@ -168,6 +174,12 @@ export class Game {
       });
     }
 
+    // Advance impact frame timers
+    if (this._impacts.length) {
+      for (const imp of this._impacts) imp.t += dt;
+      this._impacts = this._impacts.filter(imp => imp.t < imp.maxT);
+    }
+
     const survivors = this.circles.filter(c => c.isAlive);
     const hasTeams  = this.circles.some(c => c.teamId != null);
     const over      = hasTeams
@@ -247,6 +259,9 @@ export class Game {
     for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.renderBelowEffects(ctx);
     // Phase 2: circle bodies and above-circle effects
     for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.render(ctx);
+
+    // Phase 3: impact frames (manga-style radial lines on hit)
+    for (const imp of this._impacts) _renderImpactFrame(ctx, imp);
   }
 
   _aiUpdateAbilities(c, dt) {
@@ -260,7 +275,7 @@ export class Game {
     // Damage: activate periodically
     c._aiDamageCd -= dt;
     if (c._aiDamageCd <= 0) {
-      c.applyDamageBuff(5, 2.5);
+      c.applyDamageBuff(5, 2);
       c._aiDamageCd = 20 + Math.random() * 14;
     }
 
@@ -286,7 +301,7 @@ export class Game {
     for (const c of targets) {
       if (type === 'speed')  c.applySpeedBuff(5, 1.7);
       if (type === 'heal')   c.applyHeal(5, 4);
-      if (type === 'damage') c.applyDamageBuff(5, 2.5);
+      if (type === 'damage') c.applyDamageBuff(5, 2);
     }
   }
 
@@ -297,4 +312,83 @@ export class Game {
       _hudHp: c._hudHp, _hudMaxHp: c._hudMaxHp,
     }));
   }
+}
+
+// ── Impact frame renderer (manga-style radial lines) ─────────────────────────
+
+function _seededRand(seed, i) {
+  let h = (seed * 1664525 + i * 1013904223) & 0xffffffff;
+  h ^= h >>> 16; h = Math.imul(h, 0x45d9f3b); h ^= h >>> 16;
+  return (h >>> 0) / 0xffffffff;
+}
+
+function _renderImpactFrame(ctx, { x, y, t, maxT, intensity, seed }) {
+  const progress = t / maxT;
+  // Sharp pop then slow fade
+  const alpha = progress < 0.15
+    ? progress / 0.15
+    : 1 - (progress - 0.15) / 0.85;
+
+  const W = ctx.canvas.width;
+  const H = ctx.canvas.height;
+  // Max distance from impact point to canvas corner
+  const maxDist = Math.sqrt(
+    Math.max(x, W - x) ** 2 + Math.max(y, H - y) ** 2
+  );
+
+  const numLines = Math.round(42 + intensity * 30);
+  const innerGap = 10 + intensity * 8;
+
+  ctx.save();
+
+  // Subtle full-canvas flash — just a slight bright pulse, not blinding
+  const flashAlpha = progress < 0.15
+    ? (progress / 0.15) * (0.12 + intensity * 0.10)
+    : Math.max(0, (1 - (progress - 0.15) / 0.25)) * (0.12 + intensity * 0.10);
+  if (flashAlpha > 0.01) {
+    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Clip to canvas so lines don't bleed outside
+  ctx.beginPath();
+  ctx.rect(0, 0, W, H);
+  ctx.clip();
+
+  // Radial lines from impact point to canvas edges
+  for (let i = 0; i < numLines; i++) {
+    const r0 = _seededRand(seed, i * 3);
+    const r1 = _seededRand(seed, i * 3 + 1);
+    const r2 = _seededRand(seed, i * 3 + 2);
+
+    const angle   = (i / numLines) * Math.PI * 2 + (r0 - 0.5) * 0.18;
+    // Lines reach 70–100% of the way to the canvas corner
+    const lineLen = maxDist * (0.70 + r1 * 0.30);
+    const thick   = r2 < 0.28;
+    const lw      = thick ? 3.5 + intensity * 3 : 1.0 + intensity * 1.2;
+    const darkA   = thick
+      ? (0.85 + intensity * 0.15) * alpha
+      : (0.45 + intensity * 0.3) * alpha;
+
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(angle) * innerGap,             y + Math.sin(angle) * innerGap);
+    ctx.lineTo(x + Math.cos(angle) * (innerGap + lineLen), y + Math.sin(angle) * (innerGap + lineLen));
+    ctx.strokeStyle = `rgba(8,8,8,${darkA})`;
+    ctx.lineWidth   = lw;
+    ctx.lineCap     = 'butt';
+    ctx.stroke();
+  }
+
+  // Small bright core at impact point
+  const coreR = 8 + intensity * 14;
+  const coreGrad = ctx.createRadialGradient(x, y, 0, x, y, coreR);
+  coreGrad.addColorStop(0,   `rgba(255,255,255,${alpha})`);
+  coreGrad.addColorStop(0.5, `rgba(255,240,180,${0.6 * alpha})`);
+  coreGrad.addColorStop(1,   `rgba(255,255,255,0)`);
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, coreR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
 }
