@@ -108,7 +108,7 @@ export class KarmaPower extends BasePower {
       ctx.stroke();
       ctx.restore();
       if (this._stored >= 1)
-        _drawLabel(ctx, x, y, r, Math.ceil(this._stored), "#c084fc");
+        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2), "#c084fc");
       return;
     }
 
@@ -125,7 +125,7 @@ export class KarmaPower extends BasePower {
       ctx.stroke();
       ctx.restore();
       if (this._stored >= 1)
-        _drawLabel(ctx, x, y, r, Math.ceil(this._stored), "#f97316");
+        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2), "#f97316");
     }
   }
 
@@ -133,7 +133,7 @@ export class KarmaPower extends BasePower {
     id: "karma",
     name: "Karma",
     description:
-      "Entra en fase de absorber el daño recibido y lo devuelve en el proximo golpe.",
+      "Entra en fase de absorber el daño recibido y devuelve el doble en el proximo golpe.",
     color: "#c084fc",
     icon: "☯",
     dmgRating: 3,
