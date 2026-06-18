@@ -235,7 +235,7 @@ function runNextGroupMatch() {
   showLeaguePrematch(myMeta, rival, `${t('group.prefix')} ${gName} · ${pgmPlayed + 1} / ${pgm.length}`, () => {
     document.getElementById("fight-context-label").textContent = `${pgmPlayed + 1} / ${pgm.length}`;
     document.getElementById("btn-restart").textContent = t('btn.see.groups');
-    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled };
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled, playerSide: isP1 ? 0 : 1 };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : match.p1;
@@ -406,7 +406,7 @@ function runNextBracketMatch() {
   showLeaguePrematch(myMeta, rival, roundName, () => {
     document.getElementById("fight-context-label").textContent = roundName;
     document.getElementById("btn-restart").textContent = t('btn.see.bracket');
-    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled };
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: tournamentAbilitiesEnabled, playerSide: isP1 ? 0 : 1 };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : match.p1;

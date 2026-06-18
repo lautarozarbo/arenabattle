@@ -52,7 +52,7 @@ export class KarmaPower extends BasePower {
 
   onCollide(enemy) {
     if (this._phase !== 3 || this._stored <= 0) return;
-    this._dealDmg(enemy, this._stored);
+    this._dealDmg(enemy, this._stored * 2);
     this._stored = 0;
     this._phase = 1;
     this._timer = PHASE_CHARGE;

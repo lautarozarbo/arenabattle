@@ -1727,7 +1727,7 @@ function _ttHandleKnockout(winnerSide) {
     ];
     _ttPrevHp = [a0.hp, a1.hp];
     document.getElementById("gameover-bar").classList.add("hidden");
-    game.start(cfgs, _ttArenaOpts);
+    game.start(cfgs, { ..._ttArenaOpts, activeAbilities: _abilitiesEnabled });
     if (savedPos && game.circles[winnerSide]) {
       const c = game.circles[winnerSide];
       c.x = savedPos.x;
@@ -1737,6 +1737,8 @@ function _ttHandleKnockout(winnerSide) {
     }
     buildTagHud(_ttMatch);
     _ttStartHudLoop();
+    if (_abilitiesEnabled) _startAbilitiesLoop();
+    else _stopAbilitiesLoop();
   }
 }
 

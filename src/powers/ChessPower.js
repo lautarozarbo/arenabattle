@@ -121,8 +121,13 @@ export class ChessPower extends BasePower {
   // ── State transitions ──────────────────────────────────────────────────────
 
   _startCentering() {
-    this._savedBaseSpeed = this.owner.baseSpeed;
-    this._savedOrigSpeed = this.owner._origBaseSpeed; // preserve slow state
+    // Save the true un-buffed base so we restore correctly even if buff expires during chess
+    this._savedBaseSpeed = this.owner._speedBuffBase ?? this.owner.baseSpeed;
+    this._savedOrigSpeed = this.owner._origBaseSpeed;
+    // Clear speed buff state to prevent it from expiring to a wrong value mid-chess
+    this.owner._speedBuffTimer = 0;
+    this.owner._speedBuffBase  = null;
+    this.owner._speedBuffMult  = 1;
     this.owner.baseSpeed = this.CHESS_SPEED;
     this.owner._invulnerable = true;
     this.owner._passesObstacles = true; // follows programmatic paths, must not be blocked

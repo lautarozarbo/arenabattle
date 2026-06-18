@@ -38,6 +38,7 @@ export class Game {
     this.arena = new Arena({ x: ax, y: ay, width: size, height: size, obstacles: obstaclesAbs, skinId: arenaOpts.skinId ?? 'default' });
     this._hideDeadCircles  = arenaOpts.hideDeadCircles ?? false;
     this._activeAbilities  = arenaOpts.activeAbilities  ?? false;
+    this._playerSide       = arenaOpts.playerSide       ?? 0;
     const a = this.arena;
 
     const cpad  = (cfgs[0].radius ?? 28) + 14;
@@ -263,18 +264,24 @@ export class Game {
       c._aiDamageCd = 20 + Math.random() * 14;
     }
 
-    // Heal: activate periodically
+    // Heal: activate when HP is low, or periodically
     c._aiHealCd -= dt;
     if (c._aiHealCd <= 0) {
-      c.applyHeal(5, 4);
-      c._aiHealCd = 18 + Math.random() * 14;
+      const hpFrac = c.hp / c.maxHp;
+      if (hpFrac < 0.55) {
+        c.applyHeal(5, 4);
+        c._aiHealCd = 14 + Math.random() * 10;
+      } else {
+        c._aiHealCd = 4 + Math.random() * 6;
+      }
     }
   }
 
   applyActiveBuff(type) {
-    const hasTeams = this.circles.some(c => c.teamId != null);
-    const targets  = this.circles.filter((c, i) =>
-      c.isAlive && (hasTeams ? c.teamId === 0 : i === 0)
+    const hasTeams  = this.circles.some(c => c.teamId != null);
+    const playerIdx = this._playerSide ?? 0;
+    const targets   = this.circles.filter((c, i) =>
+      c.isAlive && (hasTeams ? c.teamId === 0 : i === playerIdx)
     );
     for (const c of targets) {
       if (type === 'speed')  c.applySpeedBuff(5, 1.7);

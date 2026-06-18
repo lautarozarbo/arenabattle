@@ -127,7 +127,7 @@ export function runNextLeagueMatch() {
   showLeaguePrematch(myMeta, rival, `${pp.current} / ${pp.total}`, () => {
     document.getElementById("fight-context-label").textContent = `${pp.current} / ${pp.total}`;
     document.getElementById("btn-restart").textContent = t('btn.see.standings');
-    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: leagueAbilitiesEnabled };
+    const arenaOpts = { ...buildCompArenaOpts(), activeAbilities: leagueAbilitiesEnabled, playerSide: isP1 ? 0 : 1 };
 
     _startFight(p1meta, p2meta, (winnerSide) => {
       const winnerIdx = winnerSide === 0 ? match.p1 : winnerSide === 1 ? match.p2 : null;
