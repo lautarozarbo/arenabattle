@@ -2,13 +2,14 @@ import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
 
 const SLASH_BURST_CD = 3.0;
-const SLASH_DUR = 1.2; // total burst: 2 full oscillations
-const SLASH_HIT_CD = 0.2; // min time between hits per enemy during burst
-const SLASH_REACH = 72;
-const SLASH_ARC = Math.PI * 0.72;
-const SLASH_DMG = 7;
-const SHIELD_CD = 8.0;
-const SHIELD_DUR = 1.8;
+const SLASH_DUR      = 1.2;
+const SLASH_HIT_CD   = 0.2;
+const SLASH_REACH    = 72;
+const SLASH_ARC      = Math.PI * 0.72;
+const SLASH_DMG      = 7;
+const SHIELD_CD      = 8.0;
+const SHIELD_DUR     = 1.8;
+const RETURN_DUR     = 0.35; // s to smoothly return sword to idle after burst
 
 export class CaballeroPower extends BasePower {
   constructor(owner) {
@@ -18,11 +19,14 @@ export class CaballeroPower extends BasePower {
     this._slashing = false;
     this._slashTimer = 0;
     this._slashStart = 0;
-    this._enemyHitCds = new Map();
-    this._shieldCd = SHIELD_CD * 0.25;
-    this._shielding = false;
-    this._shieldTimer = 0;
-    this._hpLastFrame = null;
+    this._enemyHitCds  = new Map();
+    this._returning    = false;
+    this._returnTimer  = 0;
+    this._returnFrom   = 0;
+    this._shieldCd     = SHIELD_CD * 0.7;
+    this._shielding    = false;
+    this._shieldTimer  = 0;
+    this._hpLastFrame  = null;
   }
 
   update(dt) {
@@ -60,11 +64,18 @@ export class CaballeroPower extends BasePower {
         else this._enemyHitCds.set(e, next);
       }
       if (this._slashTimer <= 0) {
-        this._slashing = false;
-        this._slashTimer = 0;
+        // sin(4π) = 0, so sword ends back at _slashStart (near idle, minimal return)
+        this._returnFrom  = this._slashStart;
+        this._returning   = true;
+        this._returnTimer = RETURN_DUR;
+        this._slashing    = false;
+        this._slashTimer  = 0;
         this._enemyHitCds.clear();
         this._slashCd = SLASH_BURST_CD;
       }
+    } else if (this._returning) {
+      this._returnTimer -= dt;
+      if (this._returnTimer <= 0) { this._returning = false; this._returnTimer = 0; }
     } else {
       this._slashCd -= dt;
       if (this._slashCd <= 0 && !this._shielding) {
@@ -76,13 +87,21 @@ export class CaballeroPower extends BasePower {
     }
   }
 
-  // Cosine oscillation: 2 full cycles → right, left, right, left, right
   _swordAngle() {
-    if (!this._slashing && !this._shielding) return this._angle;
-    if (this._shielding) return this._angle; // shield faces enemy too
-    const elapsed = 1 - this._slashTimer / SLASH_DUR;
-    const osc = Math.cos(elapsed * Math.PI * 4); // 2 full oscillations
-    return this._slashStart + osc * (SLASH_ARC / 2);
+    if (this._shielding) return this._angle;
+    if (this._slashing) {
+      // Sine oscillation: starts at 0 (no jump), 2 full swings, ends at 0
+      const elapsed = 1 - this._slashTimer / SLASH_DUR;
+      const osc = Math.sin(elapsed * Math.PI * 4);
+      return this._slashStart + osc * (SLASH_ARC / 2);
+    }
+    if (this._returning) {
+      // Ease-out return from last slash position back to idle angle
+      const p  = 1 - this._returnTimer / RETURN_DUR;
+      const ep = 1 - (1 - p) * (1 - p); // ease-out quad
+      return this._returnFrom + this._angleDiff(this._angle, this._returnFrom) * ep;
+    }
+    return this._angle;
   }
 
   _angleDiff(a, b) {
@@ -160,53 +179,38 @@ export class CaballeroPower extends BasePower {
     ctx.translate(x, y);
     ctx.rotate(angle);
 
-    const hilt = r;
+    const hilt  = r;
     const guard = hilt + 9;
-    const tip = hilt + SLASH_REACH;
+    const tip   = hilt + SLASH_REACH;
 
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = "rgba(200,220,255,0.6)";
-
-    // Blade (tapered)
+    // Blade (clean, no border, no shadow)
     ctx.beginPath();
     ctx.moveTo(guard, -3.5);
-    ctx.lineTo(guard, 3.5);
+    ctx.lineTo(guard,  3.5);
     ctx.lineTo(tip, 0);
     ctx.closePath();
-    ctx.fillStyle = "#dde8f5";
+    ctx.fillStyle = '#dde8f5';
     ctx.fill();
-
-    // Fuller
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.moveTo(guard + 4, 0);
-    ctx.lineTo(tip - 6, 0);
-    ctx.strokeStyle = "rgba(150,180,210,0.55)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
 
     // Crossguard
     ctx.beginPath();
     ctx.moveTo(guard, -10);
-    ctx.lineTo(guard, 10);
-    ctx.strokeStyle = "#8899aa";
-    ctx.lineWidth = 3;
-    ctx.lineCap = "round";
+    ctx.lineTo(guard,  10);
+    ctx.strokeStyle = '#8899aa';
+    ctx.lineWidth   = 3;
+    ctx.lineCap     = 'round';
     ctx.stroke();
 
     // Handle
     ctx.beginPath();
     ctx.rect(hilt, -2.5, guard - hilt, 5);
-    ctx.fillStyle = "#6b4f2a";
+    ctx.fillStyle = '#6b4f2a';
     ctx.fill();
-    ctx.strokeStyle = "#4a3520";
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
 
     // Pommel
     ctx.beginPath();
     ctx.arc(hilt, 0, 4.5, 0, Math.PI * 2);
-    ctx.fillStyle = "#7a8a9a";
+    ctx.fillStyle = '#7a8a9a';
     ctx.fill();
 
     ctx.restore();
@@ -263,22 +267,42 @@ export class CaballeroPower extends BasePower {
   }
 
   _drawSlashArc(ctx, x, y, r) {
-    const elapsed = 1 - this._slashTimer / SLASH_DUR;
-    const osc = Math.cos(elapsed * Math.PI * 4);
-    const currA = this._slashStart + osc * (SLASH_ARC / 2);
-    const reach = r + SLASH_REACH;
+    const elapsed  = 1 - this._slashTimer / SLASH_DUR;
+    const vel      = Math.cos(elapsed * Math.PI * 4);
+    const speed    = Math.abs(vel);
+    if (speed < 0.06) return;
 
-    // Short trailing arc around current sword position
-    const arcHalf = SLASH_ARC * 0.22;
+    // Fade out in the last 18% of the burst so lines don't snap off
+    const endFade  = Math.min(1, this._slashTimer / (SLASH_DUR * 0.18));
+    if (endFade <= 0) return;
+
+    const currA = this._slashStart + Math.sin(elapsed * Math.PI * 4) * (SLASH_ARC / 2);
+    const side  = vel > 0 ? 1 : -1;
+
+    const guard = r + 9;
+    const tip   = r + SLASH_REACH;
+
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, reach, currA - arcHalf, currA + arcHalf);
-    ctx.strokeStyle = "rgba(210,230,255,0.55)";
-    ctx.lineWidth = 7;
-    ctx.lineCap = "round";
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "rgba(180,210,255,0.6)";
-    ctx.stroke();
+    ctx.translate(x, y);
+    ctx.rotate(currA);
+
+    const numLines = 4;
+    for (let i = 0; i < numLines; i++) {
+      const p   = (i + 0.4) / numLines;
+      const ex  = guard + (tip - guard) * p;
+      const ey  = side * 3.5 * (1 - p);
+      const len = (12 + (1 - p) * 10) * speed;
+      const a   = (0.38 + 0.2 * speed) * (1 - p * 0.4) * endFade;
+
+      ctx.beginPath();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex, ey + side * len);
+      ctx.strokeStyle = `rgba(215,232,255,${a})`;
+      ctx.lineWidth   = 1.1 - p * 0.3;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+    }
+
     ctx.restore();
   }
 
@@ -287,6 +311,8 @@ export class CaballeroPower extends BasePower {
     this._slashTimer = 0;
     this._slashCd = SLASH_BURST_CD * 0.4;
     this._enemyHitCds = new Map();
+    this._returning   = false;
+    this._returnTimer = 0;
     this._shielding = false;
     this._shieldTimer = 0;
     this._shieldCd = SHIELD_CD * 0.25;

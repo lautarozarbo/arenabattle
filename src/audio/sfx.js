@@ -1365,6 +1365,40 @@ export const sfx = {
     });
   },
 
+  // ── Revolver ─────────────────────────────────────────────────────────────────
+
+  revolverShot() {
+    if (!sfx.enabled) return;
+    throttled("revolverShot", 75, () => {
+      const c = ac(), t = c.currentTime;
+      // Crack (high noise burst)
+      const n = mkNoise(0.06), f = mkFilter("highpass", 3200, 1.2), g = mkGain(0);
+      g.gain.linearRampToValueAtTime(0.38, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      pipe(n, f, g); n.start(t); n.stop(t + 0.07);
+      // Low thump
+      const o = mkOsc("sine", 150), og = mkGain(0);
+      o.frequency.exponentialRampToValueAtTime(38, t + 0.09);
+      og.gain.linearRampToValueAtTime(0.38, t + 0.004);
+      og.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+      pipe(o, og); o.start(t); o.stop(t + 0.11);
+    });
+  },
+
+  revolverCylinder() {
+    if (!sfx.enabled) return;
+    const c = ac(), t = c.currentTime;
+    // Fast mechanical clicks as cylinder spins
+    for (let i = 0; i < 6; i++) {
+      const d = i * 0.03;
+      const o = mkOsc("square", 850 - i * 25), g = mkGain(0);
+      o.frequency.exponentialRampToValueAtTime(260, t + d + 0.022);
+      g.gain.linearRampToValueAtTime(0.07, t + d + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.001, t + d + 0.032);
+      pipe(o, g); o.start(t + d); o.stop(t + d + 0.032);
+    }
+  },
+
   // ── Archer ───────────────────────────────────────────────────────────────────
 
   archerShot() {

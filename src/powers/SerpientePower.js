@@ -1,22 +1,24 @@
 import { BasePower } from "./BasePower.js";
 import { sfx } from "../audio/index.js";
 
-const HIST_STEP = 4; // px of movement before recording a history entry
-const SEG_ENTRIES = 6; // history entries between segments (~24px gap, circles overlap)
-const BASE_RATIO = 0.93; // each segment radius = prev * this
-const GROWTH_SCALE = 0.45; // growing segment appears at this fraction of full size
-const TAIL_DMG = 4; // damage per tail collision
-const TAIL_HIT_CD = 0.85; // seconds before same segment can hit again
-const HEAD_DMG = 3; // physical head collision damage
-const MAX_SEGMENTS = 8;
+const HIST_STEP = 4;
+const SEG_ENTRIES = 6;
+const BASE_RATIO = 0.93;
+const GROWTH_SCALE = 0.45;
+const GROW_CD  = 0.7;    // min seconds between tail growth events
+const TAIL_DMG = 4;
+const TAIL_HIT_CD = 0.85;
+const HEAD_DMG = 3;
+const MAX_SEGMENTS = 10;
 
 export class SerpientePower extends BasePower {
   constructor(owner) {
     super(owner);
     this._history = [];
-    this._segments = []; // { x, y, r, fullR, hitCd, state: 'full'|'growing' }
+    this._segments = [];
     this._ready = false;
     this._hpLastFrame = null;
+    this._growCd = 0;
   }
 
   _init() {
@@ -37,9 +39,12 @@ export class SerpientePower extends BasePower {
   update(dt) {
     if (!this._ready) this._init();
 
-    // Grow tail when damaged by any power (not just tail collisions)
-    if (this._hpLastFrame !== null && this.owner.hp < this._hpLastFrame) {
+    if (this._growCd > 0) this._growCd -= dt;
+
+    // Grow tail on damage, with cooldown to prevent rapid multi-growth
+    if (this._hpLastFrame !== null && this.owner.hp < this._hpLastFrame && this._growCd <= 0) {
       this._growTail();
+      this._growCd = GROW_CD;
     }
     this._hpLastFrame = this.owner.hp;
 
@@ -90,23 +95,20 @@ export class SerpientePower extends BasePower {
       enemy.y += ny * pen;
       enemy.vx += nx * 380;
       enemy.vy += ny * 380;
-
-      this._growTail();
     }
   }
 
   _growTail() {
     if (this._segments.length >= MAX_SEGMENTS) return;
-    const growingIdx = this._segments.findIndex((s) => s.state === "growing");
+    const growingIdx = this._segments.findIndex(s => s.state === 'growing');
     if (growingIdx !== -1) {
-      // Second hit — complete the growing segment
+      // Second hit — complete the growing segment to full size
       const g = this._segments[growingIdx];
       g.r = g.fullR;
-      g.state = "full";
+      g.state = 'full';
     } else {
-      // First hit — spawn a small new segment at the tail
-      const prevFullR =
-        this._segments[this._segments.length - 1]?.fullR ?? this.owner.radius;
+      // First hit — spawn a small segment at the tail
+      const prevFullR = this._segments[this._segments.length - 1]?.fullR ?? this.owner.radius;
       const fullR = prevFullR * BASE_RATIO;
       const last = this._segments[this._segments.length - 1];
       this._segments.push({
@@ -115,7 +117,7 @@ export class SerpientePower extends BasePower {
         r: fullR * GROWTH_SCALE,
         fullR,
         hitCd: 0,
-        state: "growing",
+        state: 'growing',
       });
     }
   }
@@ -131,7 +133,7 @@ export class SerpientePower extends BasePower {
     for (let i = this._segments.length - 1; i >= 0; i--) {
       const seg = this._segments[i];
       ctx.save();
-      if (seg.state === "growing") ctx.globalAlpha = 0.5;
+      if (seg.state === 'growing') ctx.globalAlpha = 0.5;
       ctx.beginPath();
       ctx.arc(seg.x, seg.y, seg.r, 0, Math.PI * 2);
       ctx.fillStyle = this.owner.color;
