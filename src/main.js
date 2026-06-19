@@ -196,6 +196,33 @@ function _startAbilitiesLoop() {
   _abilitiesRaf = requestAnimationFrame(tick);
 }
 
+function _resumeAbilitiesLoop() {
+  if (_abilitiesRaf) { cancelAnimationFrame(_abilitiesRaf); _abilitiesRaf = null; }
+  document.getElementById("active-abilities-bar").classList.remove("hidden");
+  let last = null;
+  function tick(ts) {
+    if (last === null) last = ts;
+    const dt = (ts - last) / 1000;
+    last = ts;
+    for (const type of Object.keys(_abilityCd)) {
+      if (_buffRemaining[type] > 0) {
+        _buffRemaining[type] = Math.max(0, _buffRemaining[type] - dt);
+        if (_buffRemaining[type] <= 0) {
+          _abilityCd[type] = _ABILITY_CD[type];
+          _abilityBtns[type].querySelector(".ability-cd-fill").style.height = "100%";
+        }
+      } else if (_abilityCd[type] > 0) {
+        _abilityCd[type] = Math.max(0, _abilityCd[type] - dt);
+        const fill = _abilityBtns[type].querySelector(".ability-cd-fill");
+        fill.style.height = (_abilityCd[type] / _ABILITY_CD[type] * 100) + "%";
+        _abilityBtns[type].disabled = _abilityCd[type] > 0;
+      }
+    }
+    _abilitiesRaf = requestAnimationFrame(tick);
+  }
+  _abilitiesRaf = requestAnimationFrame(tick);
+}
+
 function _stopAbilitiesLoop() {
   if (_abilitiesRaf) { cancelAnimationFrame(_abilitiesRaf); _abilitiesRaf = null; }
   document.getElementById("active-abilities-bar").classList.add("hidden");
@@ -1737,7 +1764,7 @@ function _ttHandleKnockout(winnerSide) {
     }
     buildTagHud(_ttMatch);
     _ttStartHudLoop();
-    if (_abilitiesEnabled) _startAbilitiesLoop();
+    if (_abilitiesEnabled) _resumeAbilitiesLoop();
     else _stopAbilitiesLoop();
   }
 }
