@@ -149,7 +149,7 @@ let _pendingCharUseId = null; // charId to record when match actually ends
 let _confettiRaf = null;
 
 // ── Active abilities ──────────────────────────────────────────────────────────
-let _abilitiesEnabled = localStorage.getItem("abilitiesEnabled") !== "false";
+let _abilitiesEnabled = localStorage.getItem("abilitiesEnabled") === "true";
 const _ABILITY_CD     = { speed: 18, heal: 20, damage: 18 };
 const _BUFF_DURATION  = { speed: 5,  heal: 4,  damage: 5  };
 const _abilityCd      = { speed: 0, heal: 0, damage: 0 };

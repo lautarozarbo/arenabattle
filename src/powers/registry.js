@@ -51,6 +51,8 @@ import { PortalPower         } from './PortalPower.js';
 import { KarmaPower          } from './KarmaPower.js';
 import { DiminutoPower         } from './DiminutoPower.js';
 import { DomainExpansionPower } from './DomainExpansionPower.js';
+import { SerpientePower       } from './SerpientePower.js';
+import { CaballeroPower      } from './CaballeroPower.js';
 
 const POWERS = [
   NoPower,
@@ -99,6 +101,8 @@ const POWERS = [
   KarmaPower,
   DiminutoPower,
   DomainExpansionPower,
+  SerpientePower,
+  CaballeroPower,
 ];
 
 export const PowerRegistry = Object.fromEntries(POWERS.map(P => [P.meta.id, P]));
@@ -109,10 +113,10 @@ export function createPower(id, owner) {
 }
 
 const CATEGORIES = {
-  "Cuerpo a cuerpo": ["none", "saw", "assassin", "momentum", "electric", "vampire", "venom", "parasite", "hotpotato", "tortuga", "reflectshield", "karma", "diminuto"],
+  "Cuerpo a cuerpo": ["none", "saw", "assassin", "momentum", "electric", "vampire", "venom", "parasite", "hotpotato", "tortuga", "reflectshield", "karma", "diminuto", "caballero"],
   "Proyectiles":     ["rocket", "bloodshard", "clusterbomb", "fenix", "crystalbeam", "volcano", "ninja", "angel", "archer", "boomerang"],
   "Control de zona": ["spider", "territory", "spike", "grid", "chromatic", "toxictrail", "glass", "aura", "earthquake", "cursedwall", "portal", "domainexpansion", "laser"],
-  "Invocación":      ["cactus", "duo", "chess", "turret", "alien", "bomb", "mage", "pulsar", "apostador", "clock"],
+  "Invocación":      ["cactus", "duo", "chess", "turret", "alien", "bomb", "mage", "pulsar", "apostador", "clock", "serpiente"],
 };
 
 const _idToCategory = Object.fromEntries(

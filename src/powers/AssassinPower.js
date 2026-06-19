@@ -8,7 +8,7 @@ export class AssassinPower extends BasePower {
     this._hitCooldown = 0;
 
     this.ORBIT_RADIUS = owner.radius + 20;
-    this.BLADE_LEN = 28;
+    this.BLADE_LEN = 46;
     this.BLADE_WIDTH = 4.5;
     this.ROT_SPEED = 5.0; // rad/s
     this.HIT_RADIUS = 8;

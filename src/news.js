@@ -4,6 +4,8 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
+  { badge: "NUEVO", text: "Nuevo personaje: Caballero" },
+  { badge: "NUEVO", text: "Nuevo personaje: Serpiente" },
   { badge: "NUEVO", text: "Nuevo personaje: Dominio" },
   { badge: "NUEVO", text: "Comentarios en perfiles de usuario" },
   { badge: "NUEVO", text: "Habilidades activas" },
