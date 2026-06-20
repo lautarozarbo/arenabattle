@@ -43,7 +43,7 @@ export class PortalPower extends BasePower {
     this._lifeTimer -= dt;
     if (this._lifeTimer <= 0) {
       this._portals = [];
-      this._spawnTimer = 0.4;
+      this._spawnTimer = this._cd(0.4);
     }
 
     // Owner teleport check

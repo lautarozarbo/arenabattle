@@ -188,7 +188,7 @@ export class ChessPower extends BasePower {
     switch (this._state) {
       case "idle":
         this._idleTimer += dt;
-        if (this._idleTimer >= this.IDLE_INTERVAL) this._startCentering();
+        if (this._idleTimer >= this._cd(this.IDLE_INTERVAL)) this._startCentering();
         break;
 
       case "centering":

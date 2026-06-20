@@ -22,7 +22,7 @@ export class CactusPower extends BasePower {
   update(dt) {
     if (!this.arena) return;
     this._spawnTimer += dt;
-    if (this._spawnTimer >= this.SPAWN_INTERVAL) {
+    if (this._spawnTimer >= this._cd(this.SPAWN_INTERVAL)) {
       this._spawnTimer = 0;
       this._spawnCacti();
     }
@@ -42,7 +42,7 @@ export class CactusPower extends BasePower {
     const h = bottom - top - margin * 2;
     if (w <= 0 || h <= 0) return;
 
-    for (let i = 0; i < this.CACTUS_COUNT; i++) {
+    for (let i = 0; i < this.CACTUS_COUNT + this._extraProj(); i++) {
       let x,
         y,
         tries = 0;
@@ -58,7 +58,7 @@ export class CactusPower extends BasePower {
       this._cacti.push({
         x,
         y,
-        life: this.CACTUS_LIFE,
+        life: this.CACTUS_LIFE * this._zoneDurMult(),
         hitCooldown: 0,
         compHitCooldown: 0,
       });

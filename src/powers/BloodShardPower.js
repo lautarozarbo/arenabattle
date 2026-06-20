@@ -20,8 +20,9 @@ export class BloodShardPower extends BasePower {
   _fireShardsFrom(ox, oy) {
     // 8 shards at 45° intervals, randomly rotated per burst for variety
     const baseAngle = Math.random() * (Math.PI / 4);
-    for (let i = 0; i < 8; i++) {
-      const angle = baseAngle + (i / 8) * Math.PI * 2;
+    const shardCount = 8 + this._extraProj() * 2;
+    for (let i = 0; i < shardCount; i++) {
+      const angle = baseAngle + (i / shardCount) * Math.PI * 2;
       this._shards.push({
         x: ox,
         y: oy,
@@ -36,8 +37,8 @@ export class BloodShardPower extends BasePower {
 
   update(dt) {
     this._tickTimer += dt;
-    if (this._tickTimer >= this.TICK_INTERVAL) {
-      this._tickTimer -= this.TICK_INTERVAL;
+    if (this._tickTimer >= this._cd(this.TICK_INTERVAL)) {
+      this._tickTimer -= this._cd(this.TICK_INTERVAL);
       this._tickCount++;
 
       if (this.owner.isAlive) {

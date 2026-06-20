@@ -42,7 +42,7 @@ export class MagePower extends BasePower {
 
     if (this._state === "charging") {
       this._chargeTimer += dt;
-      if (this._chargeTimer >= this.CHARGE_TIME) {
+      if (this._chargeTimer >= this._cd(this.CHARGE_TIME)) {
         this._state = "warning";
         this._warnTimer = this.WARN_TIME;
         this._chargeTimer = 0;

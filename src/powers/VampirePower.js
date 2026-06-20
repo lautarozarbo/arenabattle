@@ -108,7 +108,7 @@ export class VampirePower extends BasePower {
     }
 
     this._enemyRef = null;
-    this._latchCooldown = this.LATCH_COOLDOWN;
+    this._latchCooldown = this._cd(this.LATCH_COOLDOWN);
   }
 
   onEnemyFrame(enemy) {

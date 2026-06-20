@@ -21,7 +21,7 @@ export class TrampPower extends BasePower {
   update(dt) {
     this._volley -= dt;
     if (this._volley <= 0) {
-      this._volley = this.VOLLEY_CD;
+      this._volley = this._cd(this.VOLLEY_CD);
       this._launch();
     }
 
@@ -30,7 +30,7 @@ export class TrampPower extends BasePower {
         b.fallTimer -= dt;
         if (b.fallTimer <= 0) {
           b.landed = true;
-          b.timer = this.ZONE_LIFE;
+          b.timer = this.ZONE_LIFE * this._zoneDurMult();
           b.checkPending = true; // evaluate trap once on first onEnemyFrame
           b.compCheckPending = true; // same for companion
           sfx.bombLand();

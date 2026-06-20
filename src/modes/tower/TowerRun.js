@@ -25,9 +25,10 @@ export class TowerRun {
 
     // Power-specific mods — read by powers that support them via this.owner
     this.powerMods  = {
-      cdMult:         1.0,  // cooldown multiplier (<1 = faster)
-      extraProjectile:0,    // extra bullets/arrows per volley
-      invocationCap:  0,    // extra simultaneous invocations
+      cdMult:           1.0,  // cooldown multiplier (<1 = faster)
+      extraProjectile:  0,    // extra bullets/rays/things per activation
+      extraPlacement:   0,    // extra map-placed items (webs, shards, lasers…)
+      zoneDurationMult: 1.0,  // multiplier on zone/trail/element lifetime
     };
   }
 

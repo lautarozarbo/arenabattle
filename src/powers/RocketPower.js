@@ -60,7 +60,7 @@ export class RocketPower extends BasePower {
     if (!enemy.isAlive) return;
     this._lastEnemyPos = { x: enemy.x, y: enemy.y };
 
-    if (this._state === "tracking" && this._lockTimer >= this.LOCK_INTERVAL) {
+    if (this._state === "tracking" && this._lockTimer >= this._cd(this.LOCK_INTERVAL)) {
       this._startCharge(enemy.x, enemy.y);
     }
 

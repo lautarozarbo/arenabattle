@@ -31,7 +31,7 @@ export class ToxicTrailPower extends BasePower {
     const dx = x - this._lastDropX;
     const dy = y - this._lastDropY;
     if (dx * dx + dy * dy >= this.DROP_DIST * this.DROP_DIST) {
-      this._trail.push({ x, y, life: this.TRAIL_LIFE });
+      this._trail.push({ x, y, life: this.TRAIL_LIFE * this._zoneDurMult() });
       this._lastDropX = x;
       this._lastDropY = y;
     }

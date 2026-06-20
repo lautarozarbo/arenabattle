@@ -68,7 +68,7 @@ export class FenixPower extends BasePower {
     if (!enemy.isAlive) return;
 
     if (this._throwCd <= 0) {
-      this._throwCd = THROW_CD;
+      this._throwCd = this._cd(THROW_CD);
       this._throw(enemy);
     }
 
@@ -88,7 +88,10 @@ export class FenixPower extends BasePower {
     const dy = enemy.y - this.owner.y;
     const base = Math.atan2(dy, dx);
 
-    for (const spread of [-0.22, 0, 0.22]) {
+    const extra = this._extraProj();
+    const spreads = [-0.22, 0, 0.22];
+    for (let i = 0; i < extra; i++) spreads.push((i % 2 === 0 ? 1 : -1) * (0.44 + Math.floor(i / 2) * 0.22));
+    for (const spread of spreads) {
       const a = base + spread;
       this._balls.push({
         x: this.owner.x,

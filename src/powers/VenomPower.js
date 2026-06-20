@@ -27,7 +27,7 @@ export class VenomPower extends BasePower {
       this.POISON_DPS,
       this.SLOW_FACTOR,
     );
-    this._cooldown = this.COOLDOWN;
+    this._cooldown = this._cd(this.COOLDOWN);
     sfx.venomApply();
   }
 

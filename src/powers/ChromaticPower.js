@@ -82,7 +82,7 @@ export class ChromaticPower extends BasePower {
     if (this._state === "idle") {
       if (this._cells.length === 0) this._buildGrid();
       this._idleTimer += dt;
-      if (this._idleTimer >= this.IDLE_TIME) {
+      if (this._idleTimer >= this._cd(this.IDLE_TIME)) {
         this._idleTimer = 0;
         // Choose the color of the cell the owner is standing on
         const standing = this._cellOf(this.owner.x, this.owner.y);

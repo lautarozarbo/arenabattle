@@ -40,7 +40,7 @@ export class DomainExpansionPower extends BasePower {
   update(dt) {
     if (this._state === "idle") {
       this._idleTimer += dt;
-      if (this._idleTimer >= SURGE_INTERVAL) {
+      if (this._idleTimer >= this._cd(SURGE_INTERVAL)) {
         this._state = "surging";
         this._surgeTimer = SURGE_DUR;
         this._dmgAccum = 0;

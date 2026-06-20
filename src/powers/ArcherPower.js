@@ -75,16 +75,21 @@ export class ArcherPower extends BasePower {
     const dx = this._lastEnemyX - this.owner.x;
     const dy = this._lastEnemyY - this.owner.y;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    const angle = Math.atan2(dy, dx);
+    const baseAngle = Math.atan2(dy, dx);
     const spawnDist = this.owner.radius + 6;
-    this._arrows.push({
-      x: this.owner.x + (dx / len) * spawnDist,
-      y: this.owner.y + (dy / len) * spawnDist,
-      vx: (dx / len) * ARROW_SPEED,
-      vy: (dy / len) * ARROW_SPEED,
-      life: ARROW_LIFE,
-      angle,
-    });
+    const count = 1 + this._extraProj();
+    for (let i = 0; i < count; i++) {
+      const offset = count === 1 ? 0 : (i - (count - 1) / 2) * (5 * Math.PI / 180);
+      const angle = baseAngle + offset;
+      this._arrows.push({
+        x: this.owner.x + Math.cos(baseAngle) * spawnDist,
+        y: this.owner.y + Math.sin(baseAngle) * spawnDist,
+        vx: Math.cos(angle) * ARROW_SPEED,
+        vy: Math.sin(angle) * ARROW_SPEED,
+        life: ARROW_LIFE,
+        angle,
+      });
+    }
     sfx.archerShot();
   }
 
@@ -124,7 +129,7 @@ export class ArcherPower extends BasePower {
 
   clearState() {
     this._arrows = [];
-    this._shotTimer = MAX_INTERVAL;
+    this._shotTimer = this._cd(MAX_INTERVAL);
     this._timeSinceHit = 0;
     this._hasEnemy = false;
   }

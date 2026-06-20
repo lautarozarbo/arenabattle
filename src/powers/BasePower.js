@@ -68,6 +68,12 @@ export class BasePower {
   // Called when owner hp reaches 0. Return true to intercept death (revive mechanic).
   _onBeforeDeath() { return false; }
 
+  // Tower run helpers — safe to call from any power, return neutral defaults outside tower mode.
+  _cd(base)        { return base * (this.owner?.towerMods?.cdMult         ?? 1); }
+  _extraProj()     { return        this.owner?.towerMods?.extraProjectile  ?? 0; }
+  _extraPlace()    { return        this.owner?.towerMods?.extraPlacement   ?? 0; }
+  _zoneDurMult()   { return        this.owner?.towerMods?.zoneDurationMult ?? 1; }
+
   static meta = {
     id: 'base',
     name: 'Base',

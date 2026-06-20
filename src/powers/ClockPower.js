@@ -68,7 +68,7 @@ export class ClockPower extends BasePower {
       this._frozenEnemy = null;
     }
     this._frozen = false;
-    this._cooldownTimer = this.COOLDOWN;
+    this._cooldownTimer = this._cd(this.COOLDOWN);
   }
 
   clearState() {

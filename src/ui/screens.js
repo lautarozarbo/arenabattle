@@ -12,7 +12,7 @@ export function initScreens(deps) {
   _stopConfetti = deps.stopConfetti;
 }
 
-const _NAV_TAB_IDS = ["nav-tab-inicio", "nav-tab-play", "btn-league", "btn-tournament"];
+const _NAV_TAB_IDS = ["nav-tab-inicio", "nav-tab-play", "btn-league", "btn-tournament", "btn-tower"];
 
 function _setNavTab(activeId) {
   const nav  = document.getElementById("main-nav");

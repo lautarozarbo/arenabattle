@@ -39,7 +39,7 @@ export class GlassPower extends BasePower {
 
   _addShard(x, y, delay) {
     this._shards.push({ x, y, id: this._nextId++, delay });
-    if (this._shards.length > this.MAX) this._shards.shift();
+    if (this._shards.length > this.MAX + this._extraPlace()) this._shards.shift();
     sfx.glassPlace();
   }
 

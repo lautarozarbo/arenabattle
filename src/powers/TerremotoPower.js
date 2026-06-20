@@ -20,7 +20,7 @@ export class TerremotoPower extends BasePower {
   update(dt) {
     this._timer -= dt;
     if (this._timer <= 0) {
-      this._timer = this.INTERVAL;
+      this._timer = this._cd(this.INTERVAL);
       this._spawnQuake();
     }
 
@@ -46,6 +46,15 @@ export class TerremotoPower extends BasePower {
     sfx.quake();
     for (const cfg of RING_CONFIGS) {
       this._pending.push({ ...cfg });
+    }
+    // Extra rings via extraProj: evenly spaced delay between first and last ring
+    const extra = this._extraProj();
+    for (let i = 0; i < extra; i++) {
+      const delay = 0.35 * ((i + 1) / (extra + 1)) * 3;
+      const t = i / (extra + 1);
+      const maxR = 100 + t * 170;
+      const dmg = Math.round(10 - t * 7);
+      this._pending.push({ delay, maxR, dmg });
     }
   }
 

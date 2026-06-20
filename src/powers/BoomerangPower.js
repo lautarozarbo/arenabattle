@@ -1,4 +1,4 @@
-﻿import { BasePower } from "./BasePower.js";
+import { BasePower } from "./BasePower.js";
 
 const THROW_CD = 1.1; // s between throws
 const SPEED_OUT = 500; // px/s going out
@@ -12,37 +12,48 @@ export class BoomerangPower extends BasePower {
   constructor(owner) {
     super(owner);
     this._throwCd = THROW_CD * 0.4;
-    this._bm = null; // { x, y, vx, vy, returning, outHit, retHit, spin }
+    this._bms = []; // [{ x, y, vx, vy, returning, outHit, retHit, spin, angleOffset }]
   }
 
   // ── Update ──────────────────────────────────────────────────────────────────
 
   update(dt) {
     this._throwCd -= dt;
-    if (!this._bm) return;
 
-    const b = this._bm;
-    b.spin += 9 * dt;
+    const toRemove = [];
+    for (let i = 0; i < this._bms.length; i++) {
+      const b = this._bms[i];
+      b.spin += 9 * dt;
 
-    if (!b.returning) {
-      b.x += b.vx * dt;
-      b.y += b.vy * dt;
-      const dx = b.x - this.owner.x;
-      const dy = b.y - this.owner.y;
-      if (dx * dx + dy * dy >= MAX_DIST * MAX_DIST) {
-        b.returning = true;
+      if (!b.returning) {
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        const dx = b.x - this.owner.x;
+        const dy = b.y - this.owner.y;
+        if (dx * dx + dy * dy >= MAX_DIST * MAX_DIST) {
+          b.returning = true;
+        }
+      } else {
+        const dx = this.owner.x - b.x;
+        const dy = this.owner.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < this.owner.radius + 6) {
+          toRemove.push(i);
+          continue;
+        }
+        b.x += (dx / dist) * SPEED_IN * dt;
+        b.y += (dy / dist) * SPEED_IN * dt;
       }
-    } else {
-      const dx = this.owner.x - b.x;
-      const dy = this.owner.y - b.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < this.owner.radius + 6) {
-        this._bm = null;
-        this._throwCd = THROW_CD; // reset CD after catching
-        return;
-      }
-      b.x += (dx / dist) * SPEED_IN * dt;
-      b.y += (dy / dist) * SPEED_IN * dt;
+    }
+
+    // Remove caught boomerangs (reverse order to preserve indices)
+    for (let i = toRemove.length - 1; i >= 0; i--) {
+      this._bms.splice(toRemove[i], 1);
+    }
+
+    // Reset CD after all boomerangs are caught
+    if (toRemove.length > 0 && this._bms.length === 0) {
+      this._throwCd = this._cd(THROW_CD);
     }
   }
 
@@ -51,25 +62,24 @@ export class BoomerangPower extends BasePower {
   onEnemyFrame(enemy) {
     if (!enemy.isAlive) return;
 
-    if (this._throwCd <= 0 && !this._bm) {
-      this._throwCd = THROW_CD;
+    if (this._throwCd <= 0 && this._bms.length === 0) {
+      this._throwCd = this._cd(THROW_CD);
       this._throw(enemy);
     }
 
-    if (!this._bm) return;
-    const b = this._bm;
+    for (const b of this._bms) {
+      const dx = enemy.x - b.x;
+      const dy = enemy.y - b.y;
+      const d2 = dx * dx + dy * dy;
+      const r2 = (BOOM_R + enemy.radius) ** 2;
 
-    const dx = enemy.x - b.x;
-    const dy = enemy.y - b.y;
-    const d2 = dx * dx + dy * dy;
-    const r2 = (BOOM_R + enemy.radius) ** 2;
-
-    if (!b.returning && !b.outHit && d2 < r2) {
-      this._dealDmg(enemy, OUT_DMG);
-      b.outHit = true;
-    } else if (b.returning && !b.retHit && d2 < r2) {
-      this._dealDmg(enemy, RETURN_DMG);
-      b.retHit = true;
+      if (!b.returning && !b.outHit && d2 < r2) {
+        this._dealDmg(enemy, OUT_DMG);
+        b.outHit = true;
+      } else if (b.returning && !b.retHit && d2 < r2) {
+        this._dealDmg(enemy, RETURN_DMG);
+        b.retHit = true;
+      }
     }
   }
 
@@ -77,27 +87,35 @@ export class BoomerangPower extends BasePower {
     const dx = enemy.x - this.owner.x;
     const dy = enemy.y - this.owner.y;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    this._bm = {
-      x: this.owner.x,
-      y: this.owner.y,
-      vx: (dx / len) * SPEED_OUT,
-      vy: (dy / len) * SPEED_OUT,
-      returning: false,
-      outHit: false,
-      retHit: false,
-      spin: Math.atan2(dy, dx),
-    };
+    const baseAngle = Math.atan2(dy, dx);
+    const count = 1 + this._extraProj();
+    // Fan spread: ±8° per extra boomerang
+    for (let i = 0; i < count; i++) {
+      const offset = count === 1 ? 0 : (i - (count - 1) / 2) * (8 * Math.PI / 180);
+      const angle = baseAngle + offset;
+      this._bms.push({
+        x: this.owner.x,
+        y: this.owner.y,
+        vx: Math.cos(angle) * SPEED_OUT,
+        vy: Math.sin(angle) * SPEED_OUT,
+        returning: false,
+        outHit: false,
+        retHit: false,
+        spin: angle,
+        angleOffset: offset,
+      });
+    }
   }
 
   clearState() {
     this._throwCd = THROW_CD * 0.4;
-    this._bm = null;
+    this._bms = [];
   }
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
   renderAbove(ctx) {
-    if (!this._bm) {
+    if (this._bms.length === 0) {
       const frac = Math.min(1, 1 - this._throwCd / THROW_CD);
       if (frac > 0.04) {
         ctx.save();
@@ -117,8 +135,9 @@ export class BoomerangPower extends BasePower {
       return;
     }
 
-    const b = this._bm;
-    this._drawBoomerang(ctx, b.x, b.y, b.spin, b.returning);
+    for (const b of this._bms) {
+      this._drawBoomerang(ctx, b.x, b.y, b.spin, b.returning);
+    }
   }
 
   _drawBoomerang(ctx, x, y, spin, returning) {

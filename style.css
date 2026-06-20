@@ -1467,7 +1467,7 @@ html, body {
   top: 4px;
   bottom: 4px;
   left: 4px;
-  width: calc((100% - 8px) / 4);
+  width: calc((100% - 8px) / 5);
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: 16px;

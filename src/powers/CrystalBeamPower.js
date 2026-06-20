@@ -46,8 +46,8 @@ export class CrystalBeamPower extends BasePower {
 
     // Spawn new fragment
     this._spawnCd -= dt;
-    if (this._spawnCd <= 0 && this._frags.length < this.MAX_FRAGS) {
-      this._spawnCd = this.SPAWN_INTERVAL;
+    if (this._spawnCd <= 0 && this._frags.length < this.MAX_FRAGS + this._extraProj()) {
+      this._spawnCd = this._cd(this.SPAWN_INTERVAL);
       const a = this.arena,
         pad = 24;
       const x = a.left + pad + Math.random() * (a.width - pad * 2);
@@ -74,7 +74,7 @@ export class CrystalBeamPower extends BasePower {
       this._beam.timer -= dt;
       if (this._beam.timer <= 0) {
         this._beam = null;
-        this._beamCd = this.BEAM_COOLDOWN;
+        this._beamCd = this._cd(this.BEAM_COOLDOWN);
         this._charge = 0;
       }
     } else {
@@ -119,8 +119,8 @@ export class CrystalBeamPower extends BasePower {
   clearState() {
     this._frags = [];
     this._charge = 0;
-    this._spawnCd = this.SPAWN_INTERVAL;
-    this._beamCd = this.BEAM_COOLDOWN;
+    this._spawnCd = this._cd(this.SPAWN_INTERVAL);
+    this._beamCd = this._cd(this.BEAM_COOLDOWN);
     this._beam = null;
     this._hasEnemy = false;
   }

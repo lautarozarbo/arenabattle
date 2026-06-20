@@ -45,7 +45,7 @@ export class ReflectShieldPower extends BasePower {
           // Shield exhausted → explosion
           this._burstTimer = BURST_DUR;
           this._burstFire = true;
-          this._rechargeCd = RECHARGE;
+          this._rechargeCd = this._cd(RECHARGE);
         }
       }
     }

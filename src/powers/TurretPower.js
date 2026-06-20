@@ -46,7 +46,7 @@ export class TurretPower extends BasePower {
     // Spawn timer
     this._spawnTimer -= dt;
     if (this._spawnTimer <= 0) {
-      this._spawnTimer = SPAWN_INTERVAL;
+      this._spawnTimer = this._cd(SPAWN_INTERVAL);
       this._spawnTurret();
     }
 
@@ -110,12 +110,12 @@ export class TurretPower extends BasePower {
         t.burstAccum -= BURST_INTERVAL;
         this._fireBullet(t.x, t.y, t.angle);
         t.burstLeft--;
-        if (t.burstLeft === 0) t.burstCd = BURST_COOLDOWN;
+        if (t.burstLeft === 0) t.burstCd = this._cd(BURST_COOLDOWN);
       }
     } else {
       t.burstCd -= dt;
       if (t.burstCd <= 0) {
-        t.burstLeft = BURST_SHOTS;
+        t.burstLeft = BURST_SHOTS + this._extraProj();
         t.burstAccum = 0;
         sfx.turretBurstStart();
       }
@@ -164,7 +164,7 @@ export class TurretPower extends BasePower {
   clearState() {
     this._turrets = [];
     this._bullets = [];
-    this._spawnTimer = SPAWN_INTERVAL;
+    this._spawnTimer = this._cd(SPAWN_INTERVAL);
     this._hasEnemy = false;
   }
 

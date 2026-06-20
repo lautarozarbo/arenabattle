@@ -29,7 +29,7 @@ export class SpiderPower extends BasePower {
       wy: y - wallNormal.y * radius,
       id: this._nextId++,
     });
-    if (this.threads.length > this.MAX) this.threads.shift();
+    if (this.threads.length > this.MAX + this._extraPlace()) this.threads.shift();
     sfx.spiderWeb();
   }
 

@@ -29,7 +29,7 @@ export class SpikePower extends BasePower {
     const wx = x - nx * radius;
     const wy = y - ny * radius;
     this.spikes.push({ wx, wy, nx, ny, id: this._nextId++ });
-    if (this.spikes.length > this.MAX) this.spikes.shift();
+    if (this.spikes.length > this.MAX + this._extraPlace()) this.spikes.shift();
     sfx.spikePlace();
   }
 

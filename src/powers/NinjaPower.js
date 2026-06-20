@@ -61,7 +61,7 @@ export class NinjaPower extends BasePower {
 
     // Throw when cooldown expires
     if (this._throwCd <= 0) {
-      this._throwCd = THROW_CD;
+      this._throwCd = this._cd(THROW_CD);
       this._throw(enemy);
     }
 
@@ -82,8 +82,11 @@ export class NinjaPower extends BasePower {
     const dy = enemy.y - this.owner.y;
     const base = Math.atan2(dy, dx);
 
-    // 2 shurikens with slight spread
-    for (const spread of [-0.18, 0.18]) {
+    // 2 + extraProj shurikens with slight spread
+    const baseSpreads = [-0.18, 0.18];
+    const extra = this._extraProj();
+    for (let i = 0; i < extra; i++) baseSpreads.push((i % 2 === 0 ? 1 : -1) * (0.36 + Math.floor(i / 2) * 0.18));
+    for (const spread of baseSpreads) {
       const a = base + spread;
       this._shurikens.push({
         x: this.owner.x,

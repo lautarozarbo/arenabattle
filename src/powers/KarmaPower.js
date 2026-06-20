@@ -35,16 +35,16 @@ export class KarmaPower extends BasePower {
     if (this._timer <= 0) {
       if (this._phase === 1) {
         this._phase = 2;
-        this._timer = PHASE_ABSORB;
+        this._timer = this._cd(PHASE_ABSORB);
         this._stored = 0;
         this._hpLastFrame = this.owner.hp;
       } else if (this._phase === 2) {
         this._phase = 3;
-        this._timer = PHASE_RELEASE;
+        this._timer = this._cd(PHASE_RELEASE);
       } else {
         // Phase 3 expired without collision — back to charging
         this._phase = 1;
-        this._timer = PHASE_CHARGE;
+        this._timer = this._cd(PHASE_CHARGE);
         this._stored = 0;
       }
     }
@@ -55,7 +55,7 @@ export class KarmaPower extends BasePower {
     this._dealDmg(enemy, this._stored * 2);
     this._stored = 0;
     this._phase = 1;
-    this._timer = PHASE_CHARGE;
+    this._timer = this._cd(PHASE_CHARGE);
   }
 
   getHitDamage() {
@@ -64,7 +64,7 @@ export class KarmaPower extends BasePower {
 
   clearState() {
     this._phase = 1;
-    this._timer = PHASE_CHARGE;
+    this._timer = this._cd(PHASE_CHARGE);
     this._stored = 0;
     this._hpLastFrame = null;
   }

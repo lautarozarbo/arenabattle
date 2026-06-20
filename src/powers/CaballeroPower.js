@@ -44,7 +44,7 @@ export class CaballeroPower extends BasePower {
       this._shieldTimer -= dt;
       if (this._shieldTimer <= 0) {
         this._shielding = false;
-        this._shieldCd = SHIELD_CD;
+        this._shieldCd = this._cd(SHIELD_CD);
       }
     } else {
       this._shieldCd -= dt;
@@ -71,7 +71,7 @@ export class CaballeroPower extends BasePower {
         this._slashing    = false;
         this._slashTimer  = 0;
         this._enemyHitCds.clear();
-        this._slashCd = SLASH_BURST_CD;
+        this._slashCd = this._cd(SLASH_BURST_CD);
       }
     } else if (this._returning) {
       this._returnTimer -= dt;

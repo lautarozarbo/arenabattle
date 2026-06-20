@@ -51,10 +51,10 @@ export class VolcanoPower extends BasePower {
     // 3 rays spaced ~120° apart, random base rotation
     const base = Math.random() * Math.PI * 2;
     this._rays = [];
-    for (let i = 0; i < this.RAY_COUNT; i++) {
+    for (let i = 0; i < this.RAY_COUNT + this._extraProj(); i++) {
       const angle =
         base +
-        ((Math.PI * 2) / this.RAY_COUNT) * i +
+        ((Math.PI * 2) / (this.RAY_COUNT + this._extraProj())) * i +
         (Math.random() - 0.5) * 0.55;
       const cos = Math.cos(angle),
         sin = Math.sin(angle);
@@ -95,7 +95,7 @@ export class VolcanoPower extends BasePower {
 
     if (this._state === "charging") {
       this._chargeTimer += dt;
-      if (this._chargeTimer >= this.CHARGE_TIME) {
+      if (this._chargeTimer >= this._cd(this.CHARGE_TIME)) {
         this._chargeTimer = 0;
         this._state = "firing";
         this._fireRays();

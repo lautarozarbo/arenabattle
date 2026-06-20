@@ -39,7 +39,7 @@ export class ClusterBombPower extends BasePower {
       this._launchCd -= dt;
       if (this._launchCd <= 0 && this._hasEnemy) {
         this._launch();
-        this._launchCd = LAUNCH_CD;
+        this._launchCd = this._cd(LAUNCH_CD);
       }
     }
 
@@ -139,7 +139,7 @@ export class ClusterBombPower extends BasePower {
     sfx.clusterExplode();
 
     // Scatter spikes evenly with small random offset per angle
-    for (let i = 0; i < SPIKE_COUNT; i++) {
+    for (let i = 0; i < SPIKE_COUNT + this._extraProj() * 3; i++) {
       const baseAngle = (i / SPIKE_COUNT) * Math.PI * 2;
       const angle = baseAngle + (Math.random() - 0.5) * 0.45;
       const speed = SPIKE_SPEED * (0.8 + Math.random() * 0.4);

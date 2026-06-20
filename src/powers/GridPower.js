@@ -23,7 +23,7 @@ export class GridPower extends BasePower {
       this._gridTimer -= dt;
       if (this._gridTimer <= 0) {
         this._cells = [];
-        this._cooldownTimer = this.COOLDOWN;
+        this._cooldownTimer = this._cd(this.COOLDOWN);
       }
     } else {
       this._cooldownTimer -= dt;
@@ -154,7 +154,7 @@ export class GridPower extends BasePower {
 
   clearState() {
     this._cells = [];
-    this._cooldownTimer = this.COOLDOWN;
+    this._cooldownTimer = this._cd(this.COOLDOWN);
   }
 
   static meta = {

@@ -1,265 +1,207 @@
 /**
  * TowerUpgrades — upgrade catalog for the infinite tower.
  *
+ * Upgrades are selected based on what the chosen power ACTUALLY DOES,
+ * not its broad category label. Each upgrade set is only offered to powers
+ * whose mechanics benefit from it.
+ *
  * Each upgrade:
  *   id          — unique string
  *   label       — short display name
  *   description — one-line description shown on the upgrade card
- *   categories  — array of category strings this upgrade applies to
- *                 (or ['*'] for universal)
- *   apply(run)  — mutates run.playerMods / run.powerMods
- *
- * Upgrades are stackable: apply() is called once per pick and accumulates.
+ *   apply(run)  — mutates run.playerMods / run.powerMods (stackable)
  */
 
-// ── Universal upgrades (all characters) ──────────────────────────────────────
+// ── Capability sets ─────────────────────────────────────────────────────────
+// Determines which upgrade pools are offered, based on mechanics not category.
+
+/** Powers that have a visible recharge circle — cdMult applies. */
+const POWERS_WITH_COOLDOWN = new Set([
+  'angel', 'apostador', 'bomb', 'boomerang', 'caballero', 'chess',
+  'chromatic', 'clock', 'clusterbomb', 'crystalbeam', 'domainexpansion',
+  'duo', 'electric', 'fenix', 'grid', 'karma', 'mage', 'ninja', 'portal',
+  'pulsar', 'revolver', 'rocket', 'split', 'terremoto', 'turret',
+  'vampire', 'venom', 'volcano', 'cursedwall', 'cactus',
+  'archer', 'bloodshard', 'reflectshield',
+]);
+
+/** Powers where "more projectiles/rays/things per activation" is meaningful. */
+const POWERS_WITH_PROJECTILE = new Set([
+  'angel',        // +rays per wave
+  'boomerang',    // +boomerangs per throw
+  'ninja',        // +shurikens per throw
+  'revolver',     // +bullets in cylinder dump
+  'fenix',        // +fireballs per throw
+  'volcano',      // +rays per charge
+  'crystalbeam',  // +max fragments on map
+  'turret',       // +shots per burst
+  'clusterbomb',  // +spikes per explosion
+  'archer',       // +arrows per shot
+  'bloodshard',   // +shards per burst
+  'cactus',       // +cacti per spawn
+  'terremoto',    // +rings per earthquake
+]);
+
+/** Powers that place things on the map with a hard cap — extraPlacement raises it. */
+const POWERS_WITH_PLACEMENT = new Set([
+  'spider',    // max web threads
+  'glass',     // max shards on map
+  'laser',     // max laser lines
+  'spike',     // max spike traps
+  'territory', // max marked zones
+]);
+
+/** Powers that place timed zones/trails — zoneDurationMult extends lifetime. */
+const POWERS_WITH_ZONE_DUR = new Set([
+  'toxictrail', // trail segment lifetime
+  'territory',  // zone duration
+  'bomb',       // lingering zone after explosion
+  'cactus',     // cactus lifetime
+]);
+
+// ── Universal upgrades (always in the pool) ─────────────────────────────────
 
 const UNIVERSAL = [
   {
     id: 'hp_up',
     label: '+20 HP máx.',
     description: 'Tu HP máximo aumenta en 20.',
-    categories: ['*'],
     apply(run) { run.playerMods.hpBonus += 20; },
   },
   {
     id: 'hp_up_big',
     label: '+35 HP máx.',
     description: 'Tu HP máximo aumenta en 35.',
-    categories: ['*'],
     apply(run) { run.playerMods.hpBonus += 35; },
+  },
+  {
+    id: 'regen_small',
+    label: 'Regeneración +1 HP/s',
+    description: 'Recuperás 1 HP por segundo durante la pelea.',
+    apply(run) { run.playerMods.regenPerSec += 1; },
+  },
+  {
+    id: 'regen_med',
+    label: 'Regeneración +2.5 HP/s',
+    description: 'Recuperás 2.5 HP por segundo durante la pelea.',
+    apply(run) { run.playerMods.regenPerSec += 2.5; },
   },
   {
     id: 'speed_up',
     label: 'Velocidad +12%',
     description: 'Te movés un 12% más rápido.',
-    categories: ['*'],
     apply(run) { run.playerMods.speedMult *= 1.12; },
   },
   {
-    id: 'regen_small',
-    label: 'Regeneración leve',
-    description: 'Recuperás 1 HP por segundo durante la pelea.',
-    categories: ['*'],
-    apply(run) { run.playerMods.regenPerSec += 1; },
-  },
-  {
-    id: 'regen_med',
-    label: 'Regeneración moderada',
-    description: 'Recuperás 2.5 HP por segundo durante la pelea.',
-    categories: ['*'],
-    apply(run) { run.playerMods.regenPerSec += 2.5; },
-  },
-];
-
-// ── Cuerpo a cuerpo ───────────────────────────────────────────────────────────
-
-const MELEE = [
-  {
-    id: 'melee_dmg',
-    label: 'Daño de contacto +15%',
-    description: 'Todos tus golpes de contacto hacen más daño.',
-    categories: ['Cuerpo a cuerpo'],
-    apply(run) { run.playerMods.dmgMult *= 1.15; },
-  },
-  {
-    id: 'melee_dmg_big',
-    label: 'Daño de contacto +25%',
-    description: 'Golpes de contacto notablemente más fuertes.',
-    categories: ['Cuerpo a cuerpo'],
-    apply(run) { run.playerMods.dmgMult *= 1.25; },
-  },
-  {
-    id: 'melee_contact_add',
+    id: 'contact_dmg',
     label: '+2 daño por choque',
     description: 'Cada choque de cuerpo hace 2 de daño extra.',
-    categories: ['Cuerpo a cuerpo'],
     apply(run) { run.playerMods.contactDmgAdd += 2; },
   },
   {
-    id: 'melee_speed',
-    label: 'Velocidad de combate +18%',
-    description: 'Te movés más rápido, dando más oportunidades de golpear.',
-    categories: ['Cuerpo a cuerpo'],
-    apply(run) { run.playerMods.speedMult *= 1.18; },
-  },
-  {
-    id: 'melee_tank',
-    label: 'Tanque (+30 HP, +1 regen)',
-    description: 'Más aguante para pelear de cerca.',
-    categories: ['Cuerpo a cuerpo'],
-    apply(run) { run.playerMods.hpBonus += 30; run.playerMods.regenPerSec += 1; },
+    id: 'contact_dmg_big',
+    label: '+4 daño por choque',
+    description: 'Cada choque de cuerpo hace 4 de daño extra.',
+    apply(run) { run.playerMods.contactDmgAdd += 4; },
   },
 ];
 
-// ── Proyectiles ───────────────────────────────────────────────────────────────
+// ── Damage upgrades (compete with specific slots, offered to all) ────────────
+
+const DAMAGE = [
+  {
+    id: 'dmg_up',
+    label: 'Daño +15%',
+    description: 'Todo el daño que hacés aumenta un 15%.',
+    apply(run) { run.playerMods.dmgMult *= 1.15; },
+  },
+  {
+    id: 'dmg_up_big',
+    label: 'Daño +28%',
+    description: 'Todo el daño que hacés aumenta un 28%.',
+    apply(run) { run.playerMods.dmgMult *= 1.28; },
+  },
+];
+
+// ── Cooldown upgrades (powers with a recharge circle) ───────────────────────
+
+const COOLDOWN = [
+  {
+    id: 'cd_reduce',
+    label: 'Recarga -20%',
+    description: 'Tu poder se recarga un 20% más rápido.',
+    apply(run) { run.powerMods.cdMult *= 0.80; },
+  },
+  {
+    id: 'cd_reduce_big',
+    label: 'Recarga -35%',
+    description: 'Tu poder se recarga un 35% más rápido.',
+    apply(run) { run.powerMods.cdMult *= 0.65; },
+  },
+];
+
+// ── Projectile upgrades (powers that fire countable things) ─────────────────
 
 const PROJECTILE = [
   {
-    id: 'proj_dmg',
-    label: 'Daño de proyectil +15%',
-    description: 'Tus proyectiles hacen un 15% más de daño.',
-    categories: ['Proyectiles'],
-    apply(run) { run.playerMods.dmgMult *= 1.15; },
-  },
-  {
-    id: 'proj_dmg_big',
-    label: 'Daño de proyectil +28%',
-    description: 'Proyectiles notablemente más destructivos.',
-    categories: ['Proyectiles'],
-    apply(run) { run.playerMods.dmgMult *= 1.28; },
-  },
-  {
-    id: 'proj_cd',
-    label: 'Recarga -15%',
-    description: 'Tu poder se recarga un 15% más rápido.',
-    categories: ['Proyectiles'],
-    apply(run) { run.powerMods.cdMult *= 0.85; },
-  },
-  {
-    id: 'proj_cd_big',
-    label: 'Recarga -25%',
-    description: 'Disparás con mucha más frecuencia.',
-    categories: ['Proyectiles'],
-    apply(run) { run.powerMods.cdMult *= 0.75; },
-  },
-  {
-    id: 'proj_extra',
-    label: 'Proyectil extra',
-    description: 'Cada vez que disparás, sale un proyectil adicional.',
-    categories: ['Proyectiles'],
+    id: 'extra_proj',
+    label: '+1 al disparar',
+    description: 'Cada activación lanza un proyectil o rayo extra.',
     apply(run) { run.powerMods.extraProjectile += 1; },
   },
+];
+
+// ── Placement upgrades (powers that place things on the map) ────────────────
+
+const PLACEMENT = [
   {
-    id: 'proj_speed',
-    label: 'Velocidad +10%, recarga -10%',
-    description: 'Más movilidad y disparos más frecuentes.',
-    categories: ['Proyectiles'],
-    apply(run) { run.playerMods.speedMult *= 1.10; run.powerMods.cdMult *= 0.90; },
+    id: 'extra_placement',
+    label: '+2 elementos en campo',
+    description: 'Podés tener 2 elementos más activos en el mapa a la vez.',
+    apply(run) { run.powerMods.extraPlacement += 2; },
   },
 ];
 
-// ── Control de zona ───────────────────────────────────────────────────────────
+// ── Zone duration upgrades (powers with timed zones or trails) ───────────────
 
-const ZONE = [
+const ZONE_DUR = [
   {
-    id: 'zone_dmg',
-    label: 'Daño de zona +15%',
-    description: 'Tu zona hace un 15% más de daño.',
-    categories: ['Control de zona'],
-    apply(run) { run.playerMods.dmgMult *= 1.15; },
-  },
-  {
-    id: 'zone_dmg_big',
-    label: 'Daño de zona +25%',
-    description: 'Zona significativamente más peligrosa.',
-    categories: ['Control de zona'],
-    apply(run) { run.playerMods.dmgMult *= 1.25; },
-  },
-  {
-    id: 'zone_cd',
-    label: 'Recarga de zona -20%',
-    description: 'Podés desplegar tu zona más seguido.',
-    categories: ['Control de zona'],
-    apply(run) { run.powerMods.cdMult *= 0.80; },
-  },
-  {
-    id: 'zone_hp',
-    label: '+25 HP, regeneración +1',
-    description: 'Más resistencia para sostener la zona más tiempo.',
-    categories: ['Control de zona'],
-    apply(run) { run.playerMods.hpBonus += 25; run.playerMods.regenPerSec += 1; },
-  },
-  {
-    id: 'zone_speed',
-    label: 'Velocidad +15%',
-    description: 'Te reposicionás más rápido para controlar el área.',
-    categories: ['Control de zona'],
-    apply(run) { run.playerMods.speedMult *= 1.15; },
+    id: 'zone_duration',
+    label: 'Zonas duran +50%',
+    description: 'Tus zonas, trampas y efectos del mapa duran un 50% más.',
+    apply(run) { run.powerMods.zoneDurationMult *= 1.5; },
   },
 ];
-
-// ── Invocación ────────────────────────────────────────────────────────────────
-
-const SUMMON = [
-  {
-    id: 'summon_dmg',
-    label: 'Daño de invocados +20%',
-    description: 'Tus invocados hacen más daño.',
-    categories: ['Invocación'],
-    apply(run) { run.playerMods.dmgMult *= 1.20; },
-  },
-  {
-    id: 'summon_cd',
-    label: 'Recarga de invocación -20%',
-    description: 'Invocás más seguido.',
-    categories: ['Invocación'],
-    apply(run) { run.powerMods.cdMult *= 0.80; },
-  },
-  {
-    id: 'summon_cd_big',
-    label: 'Recarga de invocación -30%',
-    description: 'Llená el campo de aliados mucho más rápido.',
-    categories: ['Invocación'],
-    apply(run) { run.powerMods.cdMult *= 0.70; },
-  },
-  {
-    id: 'summon_cap',
-    label: '+1 invocado simultáneo',
-    description: 'Podés tener un aliado más en el campo a la vez.',
-    categories: ['Invocación'],
-    apply(run) { run.powerMods.invocationCap += 1; },
-  },
-  {
-    id: 'summon_hp',
-    label: '+30 HP máx.',
-    description: 'Más vida para aguantar mientras tus invocados trabajan.',
-    categories: ['Invocación'],
-    apply(run) { run.playerMods.hpBonus += 30; },
-  },
-  {
-    id: 'summon_regen',
-    label: 'Regeneración +2',
-    description: 'Recuperás 2 HP por segundo, te mantenés vivo más tiempo.',
-    categories: ['Invocación'],
-    apply(run) { run.playerMods.regenPerSec += 2; },
-  },
-];
-
-// ── All upgrades combined ─────────────────────────────────────────────────────
-
-const ALL_UPGRADES = [...UNIVERSAL, ...MELEE, ...PROJECTILE, ...ZONE, ...SUMMON];
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
- * Get a random selection of `count` upgrades relevant to the given category.
- * Always mixes category-specific + universal upgrades so the player sees
- * a variety. No repeats within the same pick.
+ * Get a random selection of `count` upgrades for this run.
+ * Picks upgrades based on what the power ACTUALLY DOES, not its category.
  *
- * @param {string}   category  — power category of the chosen character
- * @param {TowerRun} run       — current run (for future exclusion logic)
- * @param {number}   count     — how many options to show (default 3)
+ * @param {TowerRun} run   — current run (has powerMeta.id)
+ * @param {number}   count — how many options to show (default 3)
  * @returns {Upgrade[]}
  */
-export function getUpgradeChoices(category, run, count = 3) {
-  const categoryPool = ALL_UPGRADES.filter(u =>
-    u.categories.includes('*') || u.categories.includes(category)
-  );
+export function getUpgradeChoices(run, count = 3) {
+  const powerId = run.powerMeta?.id ?? '';
 
-  // Prefer category-specific first, pad with universals if needed
-  const specific  = categoryPool.filter(u => !u.categories.includes('*'));
-  const universal = categoryPool.filter(u =>  u.categories.includes('*'));
+  // Build specific pool for this power
+  const specific = [...DAMAGE];
+  if (POWERS_WITH_COOLDOWN.has(powerId))   specific.push(...COOLDOWN);
+  if (POWERS_WITH_PROJECTILE.has(powerId)) specific.push(...PROJECTILE);
+  if (POWERS_WITH_PLACEMENT.has(powerId))  specific.push(...PLACEMENT);
+  if (POWERS_WITH_ZONE_DUR.has(powerId))   specific.push(...ZONE_DUR);
 
-  // Shuffle each group
   _shuffle(specific);
-  _shuffle(universal);
+  const univ = [...UNIVERSAL];
+  _shuffle(univ);
 
-  // Build pool: up to 2 specific + fill rest with universal
-  const pool = [...specific.slice(0, 2), ...universal].slice(0, count * 3);
+  // Up to 2 specific, fill with universal
+  const pool = [...specific.slice(0, 2), ...univ];
   _shuffle(pool);
 
-  // Deduplicate by id and take `count`
+  // Deduplicate and take count
   const seen = new Set();
   const result = [];
   for (const u of pool) {
@@ -267,9 +209,9 @@ export function getUpgradeChoices(category, run, count = 3) {
     if (result.length >= count) break;
   }
 
-  // Safety: if we somehow don't have enough, fill from universal
+  // Safety: fill remainder from universal
   if (result.length < count) {
-    for (const u of universal) {
+    for (const u of univ) {
       if (!seen.has(u.id)) { seen.add(u.id); result.push(u); }
       if (result.length >= count) break;
     }

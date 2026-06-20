@@ -43,7 +43,7 @@ export class ElectricPower extends BasePower {
 
     if (this._state === "charging") {
       this._chargeTimer += dt;
-      if (this._chargeTimer >= this.CHARGE_DURATION) this._state = "charged";
+      if (this._chargeTimer >= this._cd(this.CHARGE_DURATION)) this._state = "charged";
     } else if (this._state === "shocking") {
       this._shockTimer -= dt;
       this._shockAccum += dt;

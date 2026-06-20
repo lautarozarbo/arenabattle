@@ -47,7 +47,7 @@ export class PulsarPower extends BasePower {
 
       if (this._swept >= this.BURST_TOTAL) {
         this._phase = "cooldown";
-        this._cdTimer = this.BURST_CD;
+        this._cdTimer = this._cd(this.BURST_CD);
         this._trail = [];
       }
     }
@@ -173,7 +173,7 @@ export class PulsarPower extends BasePower {
 
   clearState() {
     this._phase = "cooldown";
-    this._cdTimer = this.BURST_CD;
+    this._cdTimer = this._cd(this.BURST_CD);
     this._swept = 0;
     this._trail = [];
   }

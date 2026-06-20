@@ -210,7 +210,7 @@ export class ApostadorPower extends BasePower {
       this._resultTimer -= dt;
       if (this._resultTimer <= 0) {
         this._mode = null;
-        this._cooldown = COOLDOWN;
+        this._cooldown = this._cd(COOLDOWN);
       }
     }
   }

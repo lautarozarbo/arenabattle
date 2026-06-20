@@ -168,7 +168,7 @@ export class SplitPower extends BasePower {
 
     if (this._state === "idle") {
       this._idleTimer += dt;
-      if (this._idleTimer >= this.IDLE_TIME) {
+      if (this._idleTimer >= this._cd(this.IDLE_TIME)) {
         this._idleTimer = 0;
         this._doSplit();
       }

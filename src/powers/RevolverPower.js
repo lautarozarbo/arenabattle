@@ -103,7 +103,7 @@ export class RevolverPower extends BasePower {
   }
 
   update(dt) {
-    const DUMP_TOTAL = CYLINDER_SHOTS * CYLINDER_FIRE_INT;
+    const DUMP_TOTAL = (CYLINDER_SHOTS + this._extraProj()) * CYLINDER_FIRE_INT;
 
     // Cylinder visual rotation (slow idle, fast while dumping)
     this._cylAngle += dt * (this._dumping ? 18 : 0.5);
@@ -118,12 +118,12 @@ export class RevolverPower extends BasePower {
       if (this._dumpFireTimer <= 0 && this._dumpShotsLeft > 0) {
         this._spawn(this._dumpAngle, SHOT_SPEED, CYLINDER_DMG, CYLINDER_BOUNCES);
         sfx.revolverShot();
-        this._dumpAngle     += Math.PI * 2 / CYLINDER_SHOTS;
+        this._dumpAngle     += Math.PI * 2 / (CYLINDER_SHOTS + this._extraProj());
         this._dumpShotsLeft -= 1;
         this._dumpFireTimer  = CYLINDER_FIRE_INT;
         if (this._dumpShotsLeft === 0) {
           this._dumping      = false;
-          this._cylinderCd   = CYLINDER_CD;
+          this._cylinderCd   = this._cd(CYLINDER_CD);
           this._returning    = true;
           this._returnTimer  = 0.35;
           this._returnFrom   = this._dumpDrawAngle;
@@ -136,7 +136,7 @@ export class RevolverPower extends BasePower {
       this._cylinderCd -= dt;
       if (this._cylinderCd <= 0) {
         this._dumping        = true;
-        this._dumpShotsLeft  = CYLINDER_SHOTS;
+        this._dumpShotsLeft  = CYLINDER_SHOTS + this._extraProj();
         this._dumpFireTimer  = 0;
         this._dumpAngle      = this._angle;
         this._dumpStartAngle = this._angle;
@@ -147,7 +147,7 @@ export class RevolverPower extends BasePower {
         this._shotCd -= dt;
         if (this._shotCd <= 0) {
           this._fireSingle();
-          this._shotCd = SHOT_CD;
+          this._shotCd = this._cd(SHOT_CD);
         }
       }
     }

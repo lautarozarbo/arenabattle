@@ -25,7 +25,7 @@ export class AngelPower extends BasePower {
 
     this._spawnTimer -= dt;
     if (this._spawnTimer <= 0) {
-      this._spawnTimer = this.SPAWN_INTERVAL;
+      this._spawnTimer = this._cd(this.SPAWN_INTERVAL);
       this._spawnRays();
     }
   }
@@ -36,7 +36,7 @@ export class AngelPower extends BasePower {
       w = right - left - m * 2,
       h = bottom - top - m * 2;
     if (w <= 0 || h <= 0) return;
-    for (let i = 0; i < this.RAY_COUNT; i++) {
+    for (let i = 0; i < this.RAY_COUNT + this._extraProj(); i++) {
       this._rays.push({
         x: left + m + Math.random() * w,
         y: top + m + Math.random() * h,
@@ -66,7 +66,7 @@ export class AngelPower extends BasePower {
 
   clearState() {
     this._rays = [];
-    this._spawnTimer = 0;
+    this._spawnTimer = this._cd(this.SPAWN_INTERVAL);
   }
 
   // ── Render ───────────────────────────────────────────────────────────────────

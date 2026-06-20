@@ -150,7 +150,7 @@ export class DuoPower extends BasePower {
       beam.timer -= dt;
       if (beam.timer <= 0) {
         beam.active = false;
-        beam.cooldown = this.BEAM_COOLDOWN;
+        beam.cooldown = this._cd(this.BEAM_COOLDOWN);
       }
     } else {
       beam.cooldown -= dt;

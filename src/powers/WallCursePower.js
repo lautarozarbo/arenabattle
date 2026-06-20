@@ -61,7 +61,7 @@ export class WallCursePower extends BasePower {
     }
 
     this._curseTimer += dt;
-    if (this._curseTimer >= this.CURSE_INTERVAL) {
+    if (this._curseTimer >= this._cd(this.CURSE_INTERVAL)) {
       this._curseTimer = 0;
       const uncursed = [0, 1, 2, 3].filter(
         (w) => !this._cursedWalls.includes(w),

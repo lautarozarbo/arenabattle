@@ -102,7 +102,7 @@ export class TerritoryPower extends BasePower {
 
     if (this._state === "idle") {
       // Only start drawing if there's room for another zone
-      if (this._zones.length < this.MAX_ZONES) {
+      if (this._zones.length < this.MAX_ZONES + this._extraPlace()) {
         this._startPt = wallPt;
         this._state = "drawing";
       }
@@ -111,8 +111,8 @@ export class TerritoryPower extends BasePower {
       const poly = buildZonePoly(this._startPt, wallPt, this.arena);
       this._zones.push({
         poly,
-        timer: this.DURATION,
-        maxTimer: this.DURATION,
+        timer: this.DURATION * this._zoneDurMult(),
+        maxTimer: this.DURATION * this._zoneDurMult(),
         dmgAccum: 0,
         enemyInside: false,
       });

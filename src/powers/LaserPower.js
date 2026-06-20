@@ -51,7 +51,7 @@ export class LaserPower extends BasePower {
         by: wy,
         id: this._nextId++,
       });
-      if (this.lasers.length > this.MAX) this.lasers.shift();
+      if (this.lasers.length > this.MAX + this._extraPlace()) this.lasers.shift();
       this._startPt = null;
       this._state = "idle";
       sfx.laserPlace();
