@@ -1,67 +1,55 @@
 /**
  * InfiniteTower — orchestrator for the infinite tower roguelike mode.
  *
- * Responsibilities:
- *  - Manage the full lifecycle of a run (floor progression, win/lose)
- *  - Bridge between TowerRun state and the game engine via startFightFn
- *  - Drive TowerUI between fights (banner → fight → upgrade picker → next floor)
- *
- * Usage (from main.js):
- *   const tower = new InfiniteTower({ game, startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta });
- *   tower.startRun(powerMeta, category);
- *   // In handleGameOver:
- *   tower.handleGameOver(winner, winnerSide);
+ * Flow per floor:
+ *   advanceFloor → floor transition animation (+ enemy preview)
+ *   → player taps → launchFight (+ in-fight stats bar)
+ *   → win  → upgrade picker → pick upgrade → advanceFloor
+ *   → lose → run-over screen → onRunEnd
  */
 
-import { TowerRun }            from './tower/TowerRun.js';
+import { TowerRun }          from './tower/TowerRun.js';
 import { getNormalEnemyConfig, isBossFloor } from './tower/TowerScaling.js';
-import { generateBoss }        from './tower/TowerBoss.js';
-import { getUpgradeChoices }   from './tower/TowerUpgrades.js';
-import { TowerUI }             from './tower/TowerUI.js';
+import { generateBoss }      from './tower/TowerBoss.js';
+import { getUpgradeChoices } from './tower/TowerUpgrades.js';
+import { TowerUI }           from './tower/TowerUI.js';
 
 export class InfiniteTower {
   /**
    * @param {object} deps
-   * @param {object}   deps.game            — Game instance (used for reference only)
    * @param {Function} deps.startFightFn    — (cfgs, null, arenaOpts) => void
    * @param {Function} deps.onRunEnd        — (floorReached: number) => void
-   * @param {Function} deps.getArenaOpts    — () => arenaOpts object
+   * @param {Function} deps.getArenaOpts    — () => arenaOpts
    * @param {Function} deps.applySkinnedMeta — (meta) => skinned meta
+   * @param {Function} deps.getPowerName    — (powerId: string) => string  (display name)
    */
-  constructor({ game, startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta }) {
-    this._game             = game;
+  constructor({ startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta, getPowerName }) {
     this._startFightFn     = startFightFn;
     this._onRunEnd         = onRunEnd;
     this._getArenaOpts     = getArenaOpts;
     this._applySkinnedMeta = applySkinnedMeta;
+    this._getPowerName     = getPowerName ?? (id => id);
 
-    this._run = null;
-    this._ui  = new TowerUI({
+    this._run  = null;
+    this._ui   = new TowerUI({
       onUpgradeChosen: (upg) => this._onUpgradeChosen(upg),
       onRunOverClose:  ()    => this._onRunEnd(this._run?.floor ?? 0),
     });
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // ── Public ────────────────────────────────────────────────────────────────
 
-  /** Start a brand-new run with the given character. */
   startRun(powerMeta, category) {
     this._run = new TowerRun(powerMeta, category);
     this._ui.reset();
     this._advanceFloor();
   }
 
-  /**
-   * Must be called by main.js handleGameOver when gameMode === 'tower'.
-   * winnerSide 0 = player, 1 = enemy.
-   */
+  /** Called by main.js handleGameOver when gameMode === 'tower'. */
   handleGameOver(winner, winnerSide) {
-    const playerWon = winnerSide === 0;
-    if (playerWon) {
-      this._onFloorWon();
-    } else {
-      this._onRunFailed();
-    }
+    this._ui.hideInFightStats();
+    if (winnerSide === 0) this._onFloorWon();
+    else                  this._onRunFailed();
   }
 
   get currentFloor() { return this._run?.floor ?? 0; }
@@ -69,18 +57,21 @@ export class InfiniteTower {
   // ── Private — floor lifecycle ─────────────────────────────────────────────
 
   _advanceFloor() {
-    const floor = this._run.nextFloor();
-    const boss  = isBossFloor(floor) ? generateBoss(floor) : null;
-    const sub   = boss ? `¡JEFE: ${boss.label}!` : null;
+    const fromFloor = this._run.floor;
+    const toFloor   = fromFloor + 1;           // peek ahead for the preview
+    const boss      = isBossFloor(toFloor) ? generateBoss(toFloor) : null;
+    const enemyInfo = this._buildEnemyInfo(toFloor, boss);
 
-    this._ui.showFloorBanner(floor, sub, () => {
-      this._launchFight(floor, boss);
+    this._ui.showFloorTransition(fromFloor, toFloor, enemyInfo, () => {
+      // Commit the floor advance and launch the actual fight
+      this._run.nextFloor();
+      this._launchFight(toFloor, boss);
     });
   }
 
   _launchFight(floor, boss) {
-    const playerCfg  = this._buildPlayerCfg();
-    const arenaOpts  = {
+    const playerCfg = this._buildPlayerCfg();
+    const arenaOpts = {
       ...this._getArenaOpts(),
       fightContextLabel: boss
         ? `Piso ${floor} — JEFE: ${boss.label}`
@@ -91,7 +82,7 @@ export class InfiniteTower {
     if (boss) {
       enemyCfgs = boss.fight.fighters.map(f => this._buildEnemyCfg(f));
       if (boss.fight.type === 'duo') {
-        playerCfg.teamId  = 0;
+        playerCfg.teamId = 0;
         enemyCfgs = enemyCfgs.map(c => ({ ...c, teamId: 1 }));
       }
     } else {
@@ -99,6 +90,9 @@ export class InfiniteTower {
     }
 
     this._startFightFn([playerCfg, ...enemyCfgs], null, arenaOpts);
+
+    // Show accumulated buffs inside the fight
+    this._ui.showInFightStats(this._run);
   }
 
   _onFloorWon() {
@@ -115,14 +109,13 @@ export class InfiniteTower {
 
   _onRunFailed() {
     this._ui.showRunOver(this._run.floor, this._run.upgrades);
-    // onRunOverClose callback triggers this._onRunEnd via TowerUI button
   }
 
   // ── Private — config builders ─────────────────────────────────────────────
 
   _buildPlayerCfg() {
-    const meta   = this._run.powerMeta;
-    const mods   = this._run.playerMods;
+    const meta    = this._run.powerMeta;
+    const mods    = this._run.playerMods;
     const skinned = this._applySkinnedMeta(meta);
     return {
       color:      skinned.color,
@@ -137,12 +130,38 @@ export class InfiniteTower {
 
   _buildEnemyCfg({ hp, radius, speed, powerId, label, color }) {
     return {
-      color:       color  ?? '#e74c3c',
-      label:       label  ?? 'Enemigo',
-      powerId:     powerId ?? 'none',
-      hp:          hp      ?? 100,
-      radius:      radius  ?? 28,
-      enemySpeed:  speed   ?? 200,
+      color:      color   ?? '#e74c3c',
+      label:      label   ?? 'Enemigo',
+      powerId:    powerId ?? 'none',
+      hp:         hp      ?? 100,
+      radius:     radius  ?? 28,
+      enemySpeed: speed   ?? 200,
+    };
+  }
+
+  /** Build a plain-data summary of the upcoming enemy for the UI preview. */
+  _buildEnemyInfo(floor, boss) {
+    if (boss) {
+      const fighters = boss.fight.fighters;
+      // For display use the first fighter's HP as representative
+      return {
+        isBoss:    true,
+        label:     boss.label,
+        bossDesc:  boss.description,
+        count:     fighters.length,
+        hp:        fighters[0]?.hp ?? 100,
+        powerId:   fighters[0]?.powerId ?? 'none',
+        powerName: this._getPowerName(fighters[0]?.powerId ?? 'none'),
+      };
+    }
+    const ec = getNormalEnemyConfig(floor);
+    return {
+      isBoss:    false,
+      label:     'Enemigo',
+      count:     1,
+      hp:        ec.hp,
+      powerId:   ec.powerId,
+      powerName: this._getPowerName(ec.powerId),
     };
   }
 }

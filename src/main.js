@@ -2000,9 +2000,9 @@ function _startTowerRun(powerMeta) {
   const allMetas = getAllPowerMetas();
   const charMeta = allMetas.find(m => m.id === powerMeta.id);
   const category = charMeta?.category ?? "Cuerpo a cuerpo";
+  const nameMap  = Object.fromEntries(allMetas.map(m => [m.id, m.name]));
 
   _tower = new InfiniteTower({
-    game,
     startFightFn: (cfgs, _ignored, arenaOpts) => {
       document.getElementById("fight-context-label").textContent =
         arenaOpts?.fightContextLabel ?? "";
@@ -2010,10 +2010,11 @@ function _startTowerRun(powerMeta) {
       _startFightWithCfgs(cfgs, null, { ...getQuickArenaOpts(), ...arenaOpts });
     },
     onRunEnd: (_floor) => {
-      // btn-restart handler shows the run-over screen; nothing extra needed here
+      // TowerUI's run-over button calls this; btn-restart also cleans up
     },
     getArenaOpts: getQuickArenaOpts,
     applySkinnedMeta,
+    getPowerName: (id) => nameMap[id] ?? id,
   });
 
   _pendingCharUseId = powerMeta.id;

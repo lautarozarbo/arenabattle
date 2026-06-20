@@ -1,179 +1,298 @@
 /**
- * TowerUI — manages all DOM elements specific to the infinite tower mode.
+ * TowerUI — all DOM for the infinite tower mode.
  *
- * Creates its own overlay elements dynamically on first use so the HTML
- * stays clean. All elements are appended to #screen-fight so they sit
- * on top of the game canvas.
- *
- * Provides:
- *  - Floor banner (brief overlay before each fight)
- *  - Upgrade picker (shown after winning a floor)
- *  - Run-over screen (shown when the player loses)
+ * Screens / overlays:
+ *  1. Floor transition  — animated tower shaft + enemy preview (shown before each fight)
+ *  2. Upgrade picker    — 3 cards after winning a floor, with selection animation
+ *  3. Run-over screen   — summary when player dies
+ *  4. In-fight stats bar — compact strip showing accumulated buffs during fight
  */
 export class TowerUI {
-  /**
-   * @param {object} callbacks
-   * @param {Function} callbacks.onUpgradeChosen — (upgrade) => void
-   * @param {Function} callbacks.onRunOverClose  — () => void  (return to menu)
-   */
   constructor({ onUpgradeChosen, onRunOverClose }) {
     this._onUpgradeChosen = onUpgradeChosen;
     this._onRunOverClose  = onRunOverClose;
-    this._banner    = null;
-    this._picker    = null;
-    this._runOver   = null;
-    this._bannerTimer = null;
+
+    this._transition = null;  // floor-transition overlay
+    this._picker     = null;  // upgrade picker overlay
+    this._runOver    = null;  // run-over overlay
+    this._statsBar   = null;  // in-fight stats strip
   }
 
-  // ── Floor banner ─────────────────────────────────────────────────────────
+  // ── 1. Floor transition ───────────────────────────────────────────────────
 
   /**
-   * Show a brief overlay banner announcing the next floor.
-   * @param {number} floor
-   * @param {string|null} bossLine — extra text for boss floors
-   * @param {Function} onDone — called after banner hides
+   * Show the animated tower ascension + enemy preview.
+   * @param {number}  fromFloor  — floor just beaten (0 = start of run)
+   * @param {number}  toFloor    — floor about to fight
+   * @param {object}  enemyInfo  — { label, hp, count, powerId, powerName, isBoss, bossDesc }
+   * @param {Function} onComplete — called when animation finishes and player taps/waits
    */
-  showFloorBanner(floor, bossLine, onDone) {
-    this._ensureBanner();
-    const isBoss = !!bossLine;
+  showFloorTransition(fromFloor, toFloor, enemyInfo, onComplete) {
+    this._ensureTransition();
 
-    this._banner.querySelector('.tower-banner-floor').textContent =
-      floor === 0 ? 'Torre Infinita' : `Piso ${floor}`;
-    this._banner.querySelector('.tower-banner-sub').textContent =
-      bossLine ?? (floor === 0 ? 'Prepárate para el combate' : '');
+    const el       = this._transition;
+    const shaft    = el.querySelector('.tt-shaft');
+    const plateOld = el.querySelector('.tt-plate-old');
+    const plateNew = el.querySelector('.tt-plate-new');
 
-    this._banner.classList.toggle('tower-banner--boss', isBoss);
-    this._banner.classList.remove('tower-banner--hide');
-    this._banner.classList.add('tower-banner--show');
+    // Fill floor plates
+    plateOld.innerHTML = _plateContent(fromFloor, null, false);
+    plateNew.innerHTML = _plateContent(toFloor, enemyInfo, enemyInfo?.isBoss ?? false);
 
-    if (this._bannerTimer) clearTimeout(this._bannerTimer);
-    this._bannerTimer = setTimeout(() => {
-      this._banner.classList.remove('tower-banner--show');
-      this._banner.classList.add('tower-banner--hide');
-      if (onDone) onDone();
-    }, 1600);
+    // Reset animation state
+    el.classList.remove('tt--hidden');
+    shaft.classList.remove('tt-animate');
+    void shaft.offsetWidth; // reflow to restart animation
+
+    // Start ascent after a tiny delay so the user sees "piso X" before moving
+    setTimeout(() => shaft.classList.add('tt-animate'), 180);
+
+    // After animation settles, show the "tap to fight" hint
+    const ANIM_MS = 1100;
+    setTimeout(() => {
+      el.querySelector('.tt-tap-hint').classList.remove('tt-tap-hint--hidden');
+    }, ANIM_MS + 200);
+
+    // Auto-advance or tap to continue
+    const advance = () => {
+      el.removeEventListener('click', advance);
+      clearTimeout(autoTimer);
+      el.classList.add('tt--hidden');
+      onComplete();
+    };
+
+    el.addEventListener('click', advance, { once: true });
+    const autoTimer = setTimeout(advance, ANIM_MS + 2400);
   }
 
-  hideBanner() {
-    if (!this._banner) return;
-    this._banner.classList.remove('tower-banner--show');
-    this._banner.classList.add('tower-banner--hide');
+  hideTransition() {
+    this._transition?.classList.add('tt--hidden');
   }
 
-  // ── Upgrade picker ────────────────────────────────────────────────────────
+  // ── 2. Upgrade picker ─────────────────────────────────────────────────────
 
   /**
-   * Show the upgrade choice screen.
-   * @param {number}    floor    — just beaten floor (for display)
+   * @param {number}    floor    — just-won floor
    * @param {Upgrade[]} upgrades — array of 3 upgrade objects
    */
   showUpgradePicker(floor, upgrades) {
     this._ensurePicker();
-    this._picker.querySelector('.tower-picker-title').textContent =
-      `¡Piso ${floor} superado!`;
-    this._picker.querySelector('.tower-picker-sub').textContent =
-      'Elegí una mejora para continuar';
+    const el = this._picker;
 
-    const list = this._picker.querySelector('.tower-picker-cards');
+    el.querySelector('.tp-title').textContent = `¡Piso ${floor} superado!`;
+    el.querySelector('.tp-sub').textContent   = 'Elegí una mejora para continuar';
+
+    const list = el.querySelector('.tp-cards');
     list.innerHTML = '';
 
     for (const upg of upgrades) {
       const card = document.createElement('button');
-      card.className = 'tower-upgrade-card';
+      card.className = 'tp-card';
+      card.dataset.id = upg.id;
       card.innerHTML = `
-        <span class="tower-card-label">${upg.label}</span>
-        <span class="tower-card-desc">${upg.description}</span>
+        <span class="tp-card-label">${upg.label}</span>
+        <span class="tp-card-desc">${upg.description}</span>
       `;
-      card.addEventListener('click', () => {
-        this._onUpgradeChosen(upg);
-      });
+      card.addEventListener('click', () => this._selectUpgrade(upg, card));
       list.appendChild(card);
     }
 
-    this._picker.classList.remove('hidden');
+    el.classList.remove('tt--hidden');
+    // Staggered card entrance
+    requestAnimationFrame(() => {
+      list.querySelectorAll('.tp-card').forEach((c, i) => {
+        c.style.animationDelay = `${i * 90}ms`;
+        c.classList.add('tp-card--enter');
+      });
+    });
+  }
+
+  _selectUpgrade(upg, cardEl) {
+    // Disable all cards immediately
+    this._picker.querySelectorAll('.tp-card').forEach(c => {
+      c.disabled = true;
+      if (c !== cardEl) c.classList.add('tp-card--dim');
+    });
+    cardEl.classList.add('tp-card--chosen');
+
+    setTimeout(() => {
+      this._picker.classList.add('tt--hidden');
+      this._onUpgradeChosen(upg);
+    }, 620);
   }
 
   hideUpgradePicker() {
-    this._picker?.classList.add('hidden');
+    this._picker?.classList.add('tt--hidden');
   }
 
-  // ── Run over ──────────────────────────────────────────────────────────────
+  // ── 3. Run-over screen ────────────────────────────────────────────────────
 
-  /**
-   * Show the end-of-run summary.
-   * @param {number}   floor       — floor the player reached
-   * @param {string[]} upgradeIds  — list of picked upgrade ids
-   */
   showRunOver(floor, upgradeIds) {
     this._ensureRunOver();
-    this._runOver.querySelector('.tower-runover-floor').textContent =
-      `Llegaste al piso ${floor}`;
-    this._runOver.querySelector('.tower-runover-upgrades').textContent =
+    const el = this._runOver;
+    el.querySelector('.tro-floor').textContent   = `Llegaste al piso ${floor}`;
+    el.querySelector('.tro-upgrades').textContent =
       upgradeIds.length > 0
-        ? `Mejoras elegidas: ${upgradeIds.length}`
+        ? `${upgradeIds.length} mejora${upgradeIds.length > 1 ? 's' : ''} aplicada${upgradeIds.length > 1 ? 's' : ''}`
         : 'Sin mejoras aplicadas';
-
-    this._runOver.classList.remove('hidden');
+    el.classList.remove('tt--hidden');
   }
 
   hideRunOver() {
-    this._runOver?.classList.add('hidden');
+    this._runOver?.classList.add('tt--hidden');
+  }
+
+  // ── 4. In-fight stats bar ─────────────────────────────────────────────────
+
+  /**
+   * Inject a compact strip below the fight topbar showing active tower buffs.
+   * @param {TowerRun} run
+   */
+  showInFightStats(run) {
+    this._ensureStatsBar();
+    const bar  = this._statsBar;
+    const mods = run.playerMods;
+    const pmods = run.powerMods;
+
+    const chips = [];
+    if (mods.dmgMult   > 1)   chips.push(`⚔ Daño ×${mods.dmgMult.toFixed(2)}`);
+    if (mods.speedMult > 1)   chips.push(`⚡ Vel ×${mods.speedMult.toFixed(2)}`);
+    if (mods.regenPerSec > 0) chips.push(`❤ ${mods.regenPerSec.toFixed(1)}/s`);
+    if (mods.contactDmgAdd > 0) chips.push(`+${mods.contactDmgAdd} choque`);
+    if (mods.hpBonus > 0)    chips.push(`+${mods.hpBonus} HP`);
+    if (pmods.cdMult < 1)    chips.push(`⏱ CD ×${pmods.cdMult.toFixed(2)}`);
+
+    if (chips.length === 0) {
+      bar.classList.add('tt--hidden');
+      return;
+    }
+
+    bar.innerHTML = chips.map(c => `<span class="tsb-chip">${c}</span>`).join('');
+    bar.classList.remove('tt--hidden');
+  }
+
+  hideInFightStats() {
+    this._statsBar?.classList.add('tt--hidden');
   }
 
   // ── Teardown ──────────────────────────────────────────────────────────────
 
-  /** Hide everything — call when the tower mode ends. */
   reset() {
-    this.hideBanner();
+    this.hideTransition();
     this.hideUpgradePicker();
     this.hideRunOver();
+    this.hideInFightStats();
   }
 
   // ── Private: lazy DOM builders ────────────────────────────────────────────
 
-  _ensureBanner() {
-    if (this._banner) return;
-    this._banner = document.createElement('div');
-    this._banner.className = 'tower-banner';
-    this._banner.innerHTML = `
-      <div class="tower-banner-content">
-        <div class="tower-banner-floor"></div>
-        <div class="tower-banner-sub"></div>
+  _ensureTransition() {
+    if (this._transition) return;
+    const el = document.createElement('div');
+    el.className = 'tower-transition tt--hidden';
+    el.innerHTML = `
+      <div class="tt-tracks">
+        <div class="tt-track tt-track--left"></div>
+        <div class="tt-track tt-track--right"></div>
       </div>
+      <div class="tt-shaft-wrap">
+        <div class="tt-shaft">
+          <div class="tt-plate tt-plate-old"></div>
+          <div class="tt-plate tt-plate-new"></div>
+        </div>
+      </div>
+      <div class="tt-tap-hint tt-tap-hint--hidden">Toca para continuar</div>
     `;
-    document.getElementById('screen-fight').appendChild(this._banner);
+    document.getElementById('screen-fight').appendChild(el);
+    this._transition = el;
   }
 
   _ensurePicker() {
     if (this._picker) return;
-    this._picker = document.createElement('div');
-    this._picker.className = 'tower-upgrade-picker hidden';
-    this._picker.innerHTML = `
-      <div class="tower-picker-box">
-        <div class="tower-picker-title"></div>
-        <div class="tower-picker-sub"></div>
-        <div class="tower-picker-cards"></div>
+    const el = document.createElement('div');
+    el.className = 'tower-picker tt--hidden';
+    el.innerHTML = `
+      <div class="tp-box">
+        <div class="tp-title"></div>
+        <div class="tp-sub"></div>
+        <div class="tp-cards"></div>
       </div>
     `;
-    document.getElementById('screen-fight').appendChild(this._picker);
+    document.getElementById('screen-fight').appendChild(el);
+    this._picker = el;
   }
 
   _ensureRunOver() {
     if (this._runOver) return;
-    this._runOver = document.createElement('div');
-    this._runOver.className = 'tower-runover hidden';
-    this._runOver.innerHTML = `
-      <div class="tower-runover-box">
-        <div class="tower-runover-title">Run terminado</div>
-        <div class="tower-runover-floor"></div>
-        <div class="tower-runover-upgrades"></div>
-        <button class="btn-primary tower-runover-btn">Volver al menú</button>
+    const el = document.createElement('div');
+    el.className = 'tower-runover tt--hidden';
+    el.innerHTML = `
+      <div class="tro-box">
+        <div class="tro-title">RUN TERMINADO</div>
+        <div class="tro-floor"></div>
+        <div class="tro-upgrades"></div>
+        <button class="btn-primary tro-btn">Volver al menú</button>
       </div>
     `;
-    this._runOver.querySelector('.tower-runover-btn').addEventListener('click', () => {
+    el.querySelector('.tro-btn').addEventListener('click', () => {
       this.hideRunOver();
-      if (this._onRunOverClose) this._onRunOverClose();
+      this._onRunOverClose?.();
     });
-    document.getElementById('screen-fight').appendChild(this._runOver);
+    document.getElementById('screen-fight').appendChild(el);
+    this._runOver = el;
   }
+
+  _ensureStatsBar() {
+    if (this._statsBar) return;
+    const el = document.createElement('div');
+    el.className = 'tower-stats-bar tt--hidden';
+    // Insert right after fight-topbar
+    const topbar = document.getElementById('fight-topbar');
+    topbar.insertAdjacentElement('afterend', el);
+    this._statsBar = el;
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function _plateContent(floor, enemyInfo, isBoss) {
+  if (!enemyInfo) {
+    // "From" plate — just show the floor we're leaving
+    return `
+      <div class="tt-plate-floor">${floor === 0 ? 'Inicio' : `Piso ${floor}`}</div>
+      <div class="tt-plate-status">${floor === 0 ? 'Torre Infinita' : '✓ Superado'}</div>
+    `;
+  }
+
+  const bossTag = isBoss
+    ? `<span class="tt-boss-badge">JEFE</span>`
+    : '';
+
+  const countLine = enemyInfo.count > 1
+    ? `<div class="tt-enemy-row"><span class="tt-label">Enemigos</span><span class="tt-val">${enemyInfo.count}</span></div>`
+    : '';
+
+  const descLine = isBoss && enemyInfo.bossDesc
+    ? `<div class="tt-boss-desc">${enemyInfo.bossDesc}</div>`
+    : '';
+
+  return `
+    <div class="tt-plate-floor">${bossTag} Piso ${floor}</div>
+    <div class="tt-enemy-card">
+      <div class="tt-enemy-row">
+        <span class="tt-label">Enemigo</span>
+        <span class="tt-val">${enemyInfo.label}</span>
+      </div>
+      <div class="tt-enemy-row">
+        <span class="tt-label">Poder</span>
+        <span class="tt-val">${enemyInfo.powerName ?? enemyInfo.powerId}</span>
+      </div>
+      ${countLine}
+      <div class="tt-enemy-row">
+        <span class="tt-label">HP</span>
+        <span class="tt-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ` c/u` : ''}</span>
+      </div>
+      ${descLine}
+    </div>
+  `;
 }
