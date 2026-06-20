@@ -87,6 +87,32 @@ export function getUpgradeColor(id) {
   return _BY_ID[id]?.color ?? '#fff';
 }
 
+/**
+ * Aplica una lista de IDs de mejoras y devuelve chips de resumen acumulado,
+ * igual que la barra in-fight pero como array de { label, color }.
+ */
+export function summarizeUpgrades(ids) {
+  const pm = { hpBonus: 0, dmgAdd: 0, speedMult: 1, regenPerSec: 0, contactDmgAdd: 0 };
+  const pw = { cdMult: 1, extraProjectile: 0, extraPlacement: 0, zoneDurationMult: 1 };
+  const mockRun = { playerMods: pm, powerMods: pw };
+
+  for (const id of ids) {
+    _BY_ID[id]?.apply(mockRun);
+  }
+
+  const chips = [];
+  if (pm.dmgAdd        > 0) chips.push({ label: `+${pm.dmgAdd} daño poder`,                color: '#a78bfa' });
+  if (pm.hpBonus       > 0) chips.push({ label: `+${pm.hpBonus} HP`,                       color: '#f87171' });
+  if (pm.regenPerSec   > 0) chips.push({ label: `Regen +${pm.regenPerSec} HP/s`,           color: '#f472b6' });
+  if (pm.speedMult     > 1) chips.push({ label: `Vel +${Math.round((pm.speedMult-1)*100)}%`, color: '#22d3ee' });
+  if (pm.contactDmgAdd > 0) chips.push({ label: `+${pm.contactDmgAdd} choque`,             color: '#fb923c' });
+  if (pw.cdMult        < 1) chips.push({ label: `CD -${Math.round((1-pw.cdMult)*100)}%`,   color: '#60a5fa' });
+  if (pw.extraProjectile>0) chips.push({ label: `+${pw.extraProjectile} proyectil`,        color: '#facc15' });
+  if (pw.extraPlacement >0) chips.push({ label: `+${pw.extraPlacement} elemento`,          color: '#4ade80' });
+  if (pw.zoneDurationMult>1)chips.push({ label: `Zona +${Math.round((pw.zoneDurationMult-1)*100)}%`, color: '#2dd4bf' });
+  return chips;
+}
+
 // ── Probabilidades ────────────────────────────────────────────────────────────
 //
 // Peso de cada GRUPO (cuántas veces más probable que aparezca ese tipo):

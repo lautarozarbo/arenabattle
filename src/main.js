@@ -113,6 +113,7 @@ import {
   maybeSaveBestRun,
   getBestTowerRun,
 } from "./persistence/towerSave.js";
+import { summarizeUpgrades } from "./modes/tower/TowerUpgrades.js";
 
 const canvas = document.getElementById("game-canvas");
 canvas.width = canvas.height = 420;
@@ -2065,23 +2066,45 @@ let _pendingWinnerSide = -1;
 async function _refreshTowerSetupScreen() {
   const allMetas = getAllPowerMetas();
 
-  // Best run: prefer cloud stats (synced), fall back to localStorage
+  // Best run: cloud for floor/char, local for full upgrades list
   const cloudStats = getStats();
+  const localBest  = getBestTowerRun();
   let bestFloor = cloudStats.towerMaxFloor ?? 0;
-  let bestChar  = cloudStats.towerBestChar ?? null;
+  let bestCharId = cloudStats.towerBestChar ?? null;
+  let bestUpgrades = localBest?.upgrades ?? [];
   if (!bestFloor) {
-    const localBest = getBestTowerRun();
-    bestFloor = localBest?.floor ?? 0;
-    bestChar  = localBest?.powerName ?? null;
+    bestFloor  = localBest?.floor ?? 0;
+    bestCharId = localBest?.powerMetaId ?? null;
   }
 
   const bestEl = document.getElementById("tower-best-run");
   if (bestEl) {
     if (bestFloor > 0) {
+      const meta = bestCharId
+        ? (allMetas.find(m => m.id === bestCharId) ?? allMetas.find(m => m.name === bestCharId) ?? null)
+        : null;
+
+      const charHtml = meta
+        ? `<div class="tbr-char">
+            <div class="tbr-char-circle" style="background:${meta.color}">${meta.icon}</div>
+            <span class="tbr-char-name" style="color:${meta.color}">${meta.name}</span>
+          </div>`
+        : '';
+
+      const summary = summarizeUpgrades(bestUpgrades);
+      const upgsHtml = summary.length > 0
+        ? `<div class="tbr-upgrades">${summary.map(c =>
+            `<span class="tbr-upg-chip" style="border-color:${c.color}40;color:${c.color}">${c.label}</span>`
+          ).join('')}</div>`
+        : '';
+
       bestEl.innerHTML = `
-        <div class="tbr-label">Mejor run</div>
-        <div class="tbr-floor">Piso ${bestFloor}</div>
-        ${bestChar ? `<div class="tbr-detail">${bestChar}</div>` : ''}
+        <div class="tbr-top">
+          <div class="tbr-label">Mejor run</div>
+          <div class="tbr-floor">Piso ${bestFloor}</div>
+        </div>
+        ${charHtml}
+        ${upgsHtml}
       `;
       bestEl.classList.remove("hidden");
     } else {
