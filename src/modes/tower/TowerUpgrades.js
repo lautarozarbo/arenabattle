@@ -76,45 +76,97 @@ const ZONE_DUR = [
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
+const _ALL = [...UNIVERSAL, ...DAMAGE, ...COOLDOWN, ...PROJECTILE, ...PLACEMENT, ...ZONE_DUR];
+const _BY_ID = Object.fromEntries(_ALL.map(u => [u.id, u]));
+
+export function getUpgradeLabel(id) {
+  return _BY_ID[id]?.label ?? id;
+}
+
+export function getUpgradeColor(id) {
+  return _BY_ID[id]?.color ?? '#fff';
+}
+
+// ── Probabilidades ────────────────────────────────────────────────────────────
+//
+// Peso de cada GRUPO (cuántas veces más probable que aparezca ese tipo):
+//   damage   20  — mejora de poder, siempre relevante
+//   hp       17  — vida extra, universal
+//   cooldown 15  — recarga, muy útil cuando aplica
+//   contact  12  — choque, buen complemento
+//   proj     12  — proyectil extra, fuerte cuando aplica
+//   speed    10  — velocidad, útil pero moderado
+//   regen     9  — regen, más situacional
+//   place     8  — placement, nicho
+//   zone      7  — zona, el más nicho
+//
+// Peso dentro de cada grupo con 2 opciones (menor vs mayor):
+//   hp:       +5 HP (55) vs +10 HP (45)
+//   contact:  +1 (50) vs +2 (50)
+//   damage:   +1 (50) vs +2 (50)
+//   cooldown: -5% (55) vs -10% (45)
+
+const GROUP_WEIGHTS = {
+  damage:   20,
+  hp:       17,
+  cooldown: 15,
+  contact:  12,
+  proj:     12,
+  speed:    10,
+  regen:     9,
+  place:     8,
+  zone:      7,
+};
+
+// Upgrades por grupo con sus pesos individuales
+const GROUP_POOLS = {
+  hp:       [{ u: _ALL.find(u => u.id === 'hp_up'),           w: 55 },
+             { u: _ALL.find(u => u.id === 'hp_up_big'),        w: 45 }],
+  regen:    [{ u: _ALL.find(u => u.id === 'regen_small'),      w: 100 }],
+  speed:    [{ u: _ALL.find(u => u.id === 'speed_up'),         w: 100 }],
+  contact:  [{ u: _ALL.find(u => u.id === 'contact_dmg'),      w: 50 },
+             { u: _ALL.find(u => u.id === 'contact_dmg_big'),  w: 50 }],
+  damage:   [{ u: _ALL.find(u => u.id === 'dmg_up'),           w: 50 },
+             { u: _ALL.find(u => u.id === 'dmg_up_big'),       w: 50 }],
+  cooldown: [{ u: _ALL.find(u => u.id === 'cd_reduce'),        w: 55 },
+             { u: _ALL.find(u => u.id === 'cd_reduce_big'),    w: 45 }],
+  proj:     [{ u: _ALL.find(u => u.id === 'extra_proj'),       w: 100 }],
+  place:    [{ u: _ALL.find(u => u.id === 'extra_placement'),  w: 100 }],
+  zone:     [{ u: _ALL.find(u => u.id === 'zone_duration'),    w: 100 }],
+};
+
 export function getUpgradeChoices(run, count = 3) {
   const powerId = run.powerMeta?.id ?? '';
 
-  const specific = [...DAMAGE];
-  if (POWERS_WITH_COOLDOWN.has(powerId))   specific.push(...COOLDOWN);
-  if (POWERS_WITH_PROJECTILE.has(powerId)) specific.push(...PROJECTILE);
-  if (POWERS_WITH_PLACEMENT.has(powerId))  specific.push(...PLACEMENT);
-  if (POWERS_WITH_ZONE_DUR.has(powerId))   specific.push(...ZONE_DUR);
+  // Grupos disponibles para este poder
+  const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage'];
+  if (POWERS_WITH_COOLDOWN.has(powerId))   availableGroups.push('cooldown');
+  if (POWERS_WITH_PROJECTILE.has(powerId)) availableGroups.push('proj');
+  if (POWERS_WITH_PLACEMENT.has(powerId))  availableGroups.push('place');
+  if (POWERS_WITH_ZONE_DUR.has(powerId))   availableGroups.push('zone');
 
-  _shuffle(specific);
-  const univ = [...UNIVERSAL];
-  _shuffle(univ);
+  // Selección ponderada de grupos (sin repetir)
+  const pickedGroups = [];
+  const remaining = [...availableGroups];
 
-  const pool = [...specific.slice(0, 2), ...univ];
-  _shuffle(pool);
-
-  const usedGroups = new Set();
-  const usedIds    = new Set();
-  const result     = [];
-
-  for (const u of pool) {
-    if (usedIds.has(u.id) || usedGroups.has(u.group)) continue;
-    usedIds.add(u.id);
-    usedGroups.add(u.group);
-    result.push(u);
-    if (result.length >= count) break;
+  while (pickedGroups.length < count && remaining.length > 0) {
+    const group = _weightedPick(remaining.map(g => ({ item: g, w: GROUP_WEIGHTS[g] ?? 1 })));
+    pickedGroups.push(group);
+    remaining.splice(remaining.indexOf(group), 1);
   }
 
-  if (result.length < count) {
-    const allPool = [...pool, ...univ];
-    for (const u of allPool) {
-      if (usedIds.has(u.id)) continue;
-      usedIds.add(u.id);
-      result.push(u);
-      if (result.length >= count) break;
-    }
-  }
+  // Dentro de cada grupo, selección ponderada de la mejora concreta
+  return pickedGroups.map(group => _weightedPick(GROUP_POOLS[group]));
+}
 
-  return result;
+function _weightedPick(entries) {
+  const total = entries.reduce((s, e) => s + (e.w ?? 1), 0);
+  let r = Math.random() * total;
+  for (const e of entries) {
+    r -= e.w ?? 1;
+    if (r <= 0) return e.item ?? e.u;
+  }
+  return (entries[entries.length - 1].item ?? entries[entries.length - 1].u);
 }
 
 function _shuffle(arr) {
