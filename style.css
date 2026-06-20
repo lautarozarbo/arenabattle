@@ -222,6 +222,9 @@ html, body {
 .select-footer {
   padding: 12px 24px 28px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* ── Buttons ────────────────────────────────────────── */
@@ -1865,6 +1868,34 @@ html, body {
   padding: 4px 4px;
   line-height: 1.5;
   text-align: center;
+}
+.tower-best-run {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tower-best-run.hidden { display: none; }
+.tbr-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.tbr-floor {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+}
+.tbr-detail {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
 }
 
 /* ── Header title group (title + badge together) ────── */
@@ -4455,13 +4486,15 @@ td.rank {
 }
 
 .tt-plate-floor {
-  font-size: 1.55rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.02em;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 4px;
 }
 .tt-plate-status {
   font-size: 0.7rem;
@@ -4471,34 +4504,55 @@ td.rank {
   color: rgba(255,255,255,0.35);
 }
 
+/* Real arena canvas preview */
+.tt-arena-cvs {
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  display: block;
+  margin: 6px auto 2px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.09), 0 4px 18px rgba(0,0,0,0.5);
+}
+.tt-arena-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.34);
+  text-align: center;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
 /* Enemy info card inside the new floor plate */
 .tt-enemy-card {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
-.tt-enemy-row {
+.tt-stat-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 8px;
 }
-.tt-label {
-  font-size: 0.68rem;
+.tt-stat-label {
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
 }
-.tt-val {
-  font-size: 0.88rem;
+.tt-stat-val {
+  font-size: 0.85rem;
   font-weight: 700;
   color: #e8e8f0;
 }
 .tt-val--hp { color: #f87171; }
 .tt-boss-badge {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.16em;
   padding: 2px 7px;
@@ -4512,19 +4566,24 @@ td.rank {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .tt-char-dot {
   flex-shrink: 0;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  box-shadow: 0 0 6px currentColor;
 }
 .tt-char-name {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1.1rem;
+  font-weight: 900;
   letter-spacing: 0.01em;
+}
+.tt-arena-tag {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.02em;
 }
 .tt-boss-desc {
   font-size: 0.72rem;

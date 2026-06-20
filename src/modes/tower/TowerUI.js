@@ -1,3 +1,5 @@
+import { drawArenaBg, drawArenaObstacle } from '../../skins/arenaSkins.js';
+
 /**
  * TowerUI — all DOM for the infinite tower mode.
  *
@@ -38,6 +40,10 @@ export class TowerUI {
     // Fill floor plates
     plateOld.innerHTML = _plateContent(fromFloor, null, false);
     plateNew.innerHTML = _plateContent(toFloor, enemyInfo, enemyInfo?.isBoss ?? false);
+
+    // Draw real arena preview canvas
+    const cvs = plateNew.querySelector('.tt-arena-cvs');
+    if (cvs && enemyInfo) _renderArenaPreview(cvs, enemyInfo.arenaSkinId ?? 'default', enemyInfo.arenaObstacles ?? []);
 
     // Reset animation state
     el.classList.remove('tt--hidden');
@@ -268,35 +274,50 @@ function _plateContent(floor, enemyInfo, isBoss) {
 
   const color   = enemyInfo.color ?? '#e74c3c';
   const bossTag = isBoss ? `<span class="tt-boss-badge">JEFE</span>` : '';
-
   const countLine = enemyInfo.count > 1
-    ? `<div class="tt-enemy-row"><span class="tt-label">Enemigos</span><span class="tt-val">${enemyInfo.count}</span></div>`
+    ? `<div class="tt-stat-row"><span class="tt-stat-label">Enemigos</span><span class="tt-stat-val">${enemyInfo.count}</span></div>`
     : '';
-
   const descLine = isBoss && enemyInfo.bossDesc
     ? `<div class="tt-boss-desc">${enemyInfo.bossDesc}</div>`
     : '';
 
-  // For normal floors, label and powerName are the same character name — show once
-  const showPowerRow = isBoss && enemyInfo.powerName && enemyInfo.powerName !== enemyInfo.label;
-  const powerRow = showPowerRow
-    ? `<div class="tt-enemy-row"><span class="tt-label">Poder</span><span class="tt-val">${enemyInfo.powerName}</span></div>`
-    : '';
-
   return `
     <div class="tt-plate-floor">${bossTag} Piso ${floor}</div>
+
+    <canvas class="tt-arena-cvs" width="140" height="140"></canvas>
+
+    <div class="tt-arena-label">
+      ${enemyInfo.arenaName ?? ''}${enemyInfo.arenaSkin ? ` · ${enemyInfo.arenaSkin}` : ''}
+    </div>
+
     <div class="tt-enemy-card">
       <div class="tt-char-header">
-        <span class="tt-char-dot" style="background:${color}"></span>
+        <span class="tt-char-dot" style="background:${color};box-shadow:0 0 7px ${color}88"></span>
         <span class="tt-char-name" style="color:${color}">${enemyInfo.label}</span>
       </div>
-      ${powerRow}
-      ${countLine}
-      <div class="tt-enemy-row">
-        <span class="tt-label">HP</span>
-        <span class="tt-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ' c/u' : ''}</span>
+      <div class="tt-stat-row">
+        <span class="tt-stat-label">HP</span>
+        <span class="tt-stat-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ' c/u' : ''}</span>
       </div>
+      ${countLine}
       ${descLine}
     </div>
   `;
+}
+
+function _renderArenaPreview(cvs, skinId, obstacles) {
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const pad = 5;
+  ctx.clearRect(0, 0, W, H);
+  drawArenaBg(ctx, pad, pad, W - pad * 2, H - pad * 2, skinId);
+  for (const o of obstacles) {
+    drawArenaObstacle(
+      ctx,
+      pad + o.x * (W - pad * 2),
+      pad + o.y * (H - pad * 2),
+      o.r * Math.min(W - pad * 2, H - pad * 2),
+      skinId,
+    );
+  }
 }

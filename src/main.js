@@ -104,6 +104,13 @@ import {
   updateTagBtn,
   updateTagHudLive,
 } from "./ui/tagHud.js";
+import {
+  saveTowerRun,
+  loadTowerRun,
+  clearTowerRun,
+  maybeSaveBestRun,
+  getBestTowerRun,
+} from "./persistence/towerSave.js";
 
 const canvas = document.getElementById("game-canvas");
 canvas.width = canvas.height = 420;
@@ -807,16 +814,25 @@ document.getElementById("btn-tournament").addEventListener("click", () => {
 document.getElementById("btn-tower").addEventListener("click", () => {
   sfx.uiClick();
   gameMode = "tower";
+  _refreshTowerSetupScreen();
   showScreen("screen-tower-setup");
 });
 
 document.getElementById("btn-tower-go").addEventListener("click", () => {
   sfx.uiClick();
-  // Reuse the existing character select screen; when confirmed it calls _onP1Confirm
-  // We store that we're in tower mode so _onP1Confirm knows what to do
   document.querySelector("#screen-select-p1 h2").textContent = "Elegí tu personaje";
   showScreen("screen-select-p1");
   carousels.p1.reset();
+});
+
+document.getElementById("btn-tower-continue")?.addEventListener("click", () => {
+  sfx.uiClick();
+  const saved = loadTowerRun();
+  if (!saved) return;
+  const allMetas = getAllPowerMetas();
+  const meta = allMetas.find(m => m.id === saved.powerMetaId);
+  if (!meta) return;
+  _startTowerRun(meta, saved);
 });
 
 document.getElementById("nav-tab-inicio").addEventListener("click", () => {
@@ -1996,34 +2012,78 @@ let _pendingWinnerSide = -1;
 
 // ── Infinite Tower ────────────────────────────────────────────────────────────
 
-function _startTowerRun(powerMeta) {
+function _refreshTowerSetupScreen() {
+  const best   = getBestTowerRun();
+  const saved  = loadTowerRun();
+  const allMetas = getAllPowerMetas();
+
+  // Best run stats
+  const bestEl = document.getElementById("tower-best-run");
+  if (bestEl) {
+    if (best) {
+      const d = new Date(best.date);
+      const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+      bestEl.innerHTML = `
+        <div class="tbr-label">Mejor run</div>
+        <div class="tbr-floor">Piso ${best.floor}</div>
+        <div class="tbr-detail">${best.powerName} · ${best.upgradeCount} mejora${best.upgradeCount !== 1 ? 's' : ''} · ${dateStr}</div>
+      `;
+      bestEl.classList.remove("hidden");
+    } else {
+      bestEl.classList.add("hidden");
+    }
+  }
+
+  // Continue button
+  const contBtn = document.getElementById("btn-tower-continue");
+  if (contBtn) {
+    if (saved) {
+      const meta = allMetas.find(m => m.id === saved.powerMetaId);
+      contBtn.textContent = `Continuar — Piso ${saved.floor} (${meta?.name ?? saved.powerMetaId})`;
+      contBtn.classList.remove("hidden");
+    } else {
+      contBtn.classList.add("hidden");
+    }
+  }
+}
+
+function _startTowerRun(powerMeta, savedState = null) {
   const allMetas = getAllPowerMetas();
   const charMeta = allMetas.find(m => m.id === powerMeta.id);
   const category = charMeta?.category ?? "Cuerpo a cuerpo";
   const nameMap  = Object.fromEntries(allMetas.map(m => [m.id, m.name]));
+
+  // Compute unlocked arena skins once for the whole run
+  const _unlockedArenaSkins = ARENA_SKINS.filter(s => isArenaSkinUnlocked(s.id));
 
   _tower = new InfiniteTower({
     startFightFn: (cfgs, _ignored, arenaOpts) => {
       document.getElementById("fight-context-label").textContent =
         arenaOpts?.fightContextLabel ?? "";
       document.getElementById("btn-restart").textContent = "Abandonar run";
-      _startFightWithCfgs(cfgs, null, { ...getQuickArenaOpts(), ...arenaOpts });
+      _startFightWithCfgs(cfgs, null, arenaOpts);
     },
     onRunEnd: (_floor) => {
-      _tower    = null;
-      gameMode  = "quickmatch";
+      clearTowerRun();
+      _tower   = null;
+      gameMode = "quickmatch";
       game.stop();
       stopHudLoop();
+      _refreshTowerSetupScreen();
       showScreen("screen-tower-setup");
     },
-    getArenaOpts: getQuickArenaOpts,
+    onSave:    (run) => saveTowerRun(run),
+    onRunOver: (run) => { maybeSaveBestRun(run); clearTowerRun(); },
+    getArenaOpts: () => {
+      const layout = ARENA_LAYOUTS[Math.floor(Math.random() * ARENA_LAYOUTS.length)];
+      const skin   = _unlockedArenaSkins[Math.floor(Math.random() * _unlockedArenaSkins.length)] ?? ARENA_SKINS[0];
+      return { canvasSize: 420, obstacles: layout.obstacles, skinId: skin.id, _layoutName: layout.name, _skinName: skin.name };
+    },
     applySkinnedMeta,
     getPowerName: (id) => nameMap[id] ?? id,
     getPowerMeta: (id) => allMetas.find(m => m.id === id) ?? null,
   });
 
-  // Show fight screen immediately so tower overlays (appended to #screen-fight)
-  // are visible right away — otherwise they'd mount on a hidden element
   document.getElementById("gameover-bar").classList.add("hidden");
   document.getElementById("fight-tag-area").classList.add("hidden");
   document.getElementById("fight-context-label").textContent = "";
@@ -2031,7 +2091,7 @@ function _startTowerRun(powerMeta) {
   showScreen("screen-fight");
 
   _pendingCharUseId = powerMeta.id;
-  _tower.startRun(powerMeta, category);
+  _tower.startRun(powerMeta, category, savedState);
 }
 
 function handleGameOver(winner, winnerSide) {

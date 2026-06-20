@@ -32,7 +32,7 @@ export function getNormalEnemyConfig(floor) {
   const hp     = BASE_HP + HP_PER_FLOOR * (floor - 1);
   const speed  = BASE_SPEED + SPEED_PER_10 * Math.floor((floor - 1) / 10);
   const radius = Math.min(BASE_RADIUS + Math.floor((floor - 1) / 15), RADIUS_CAP);
-  const powerId = _pickEnemyPower(floor);
+  const powerId = _pickEnemyPower();
   return { hp, speed, radius, powerId };
 }
 
@@ -53,9 +53,6 @@ export function getBossBaseHp(floor) {
 
 // ── Internals ────────────────────────────────────────────────────────────────
 
-function _pickEnemyPower(floor) {
-  // Unlock more powers as floors progress so early floors feel simpler
-  const unlocked = Math.min(NORMAL_ENEMY_POWERS.length, 4 + Math.floor(floor / 3));
-  const pool = NORMAL_ENEMY_POWERS.slice(0, unlocked);
-  return pool[Math.floor(Math.random() * pool.length)];
+function _pickEnemyPower() {
+  return NORMAL_ENEMY_POWERS[Math.floor(Math.random() * NORMAL_ENEMY_POWERS.length)];
 }

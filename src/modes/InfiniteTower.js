@@ -25,13 +25,15 @@ export class InfiniteTower {
    * @param {Function} deps.getPowerName    — (powerId) => display name string
    * @param {Function} deps.getPowerMeta    — (powerId) => full meta object | null
    */
-  constructor({ startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta, getPowerName, getPowerMeta }) {
+  constructor({ startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta, getPowerName, getPowerMeta, onSave, onRunOver }) {
     this._startFightFn     = startFightFn;
     this._onRunEnd         = onRunEnd;
     this._getArenaOpts     = getArenaOpts;
     this._applySkinnedMeta = applySkinnedMeta;
     this._getPowerName     = getPowerName ?? (id => id);
     this._getPowerMeta     = getPowerMeta ?? (() => null);
+    this._onSave           = onSave   ?? (() => {});
+    this._onRunOver        = onRunOver ?? (() => {});
 
     this._run  = null;
     this._ui   = new TowerUI({
@@ -42,8 +44,16 @@ export class InfiniteTower {
 
   // ── Public ────────────────────────────────────────────────────────────────
 
-  startRun(powerMeta, category) {
-    this._run = new TowerRun(powerMeta, category);
+  startRun(powerMeta, category, savedState = null) {
+    if (savedState) {
+      this._run = new TowerRun(powerMeta, savedState.category ?? category);
+      this._run.floor       = savedState.floor       ?? 0;
+      this._run.upgrades    = savedState.upgrades     ? [...savedState.upgrades] : [];
+      this._run.playerMods  = savedState.playerMods   ? { ...savedState.playerMods } : this._run.playerMods;
+      this._run.powerMods   = savedState.powerMods    ? { ...savedState.powerMods  } : this._run.powerMods;
+    } else {
+      this._run = new TowerRun(powerMeta, category);
+    }
     this._ui.reset();
     this._advanceFloor();
   }
@@ -62,21 +72,22 @@ export class InfiniteTower {
     const fromFloor = this._run.floor;
     const toFloor   = fromFloor + 1;
 
-    // Generate enemy config ONCE here — reused for both preview and fight
+    // Generate ONCE — reused for both preview and the actual fight
     const boss        = isBossFloor(toFloor) ? generateBoss(toFloor) : null;
     const enemyConfig = boss ? null : getNormalEnemyConfig(toFloor);
-    const enemyInfo   = this._buildEnemyInfo(toFloor, boss, enemyConfig);
+    const arenaOpts   = this._getArenaOpts(); // random skin + layout for this floor
+    const enemyInfo   = this._buildEnemyInfo(toFloor, boss, enemyConfig, arenaOpts);
 
     this._ui.showFloorTransition(fromFloor, toFloor, enemyInfo, () => {
       this._run.nextFloor();
-      this._launchFight(toFloor, boss, enemyConfig);
+      this._launchFight(toFloor, boss, enemyConfig, arenaOpts);
     });
   }
 
-  _launchFight(floor, boss, enemyConfig) {
+  _launchFight(floor, boss, enemyConfig, arenaOpts) {
     const playerCfg = this._buildPlayerCfg();
-    const arenaOpts = {
-      ...this._getArenaOpts(),
+    const opts = {
+      ...arenaOpts,
       fightContextLabel: boss
         ? `Piso ${floor} — JEFE: ${boss.label}`
         : `Piso ${floor}`,
@@ -94,7 +105,7 @@ export class InfiniteTower {
       enemyCfgs = [this._buildEnemyCfg(enemyConfig)];
     }
 
-    this._startFightFn([playerCfg, ...enemyCfgs], null, arenaOpts);
+    this._startFightFn([playerCfg, ...enemyCfgs], null, opts);
     this._ui.showInFightStats(this._run);
   }
 
@@ -106,11 +117,13 @@ export class InfiniteTower {
   _onUpgradeChosen(upgrade) {
     upgrade.apply(this._run);
     this._run.applyUpgrade(upgrade.id);
+    this._onSave(this._run); // persist after each upgrade
     this._ui.hideUpgradePicker();
     this._advanceFloor();
   }
 
   _onRunFailed() {
+    this._onRunOver(this._run); // record best run
     this._ui.showRunOver(this._run.floor, this._run.upgrades);
   }
 
@@ -146,31 +159,33 @@ export class InfiniteTower {
   }
 
   /** Build a plain-data summary for the UI floor-transition preview. */
-  _buildEnemyInfo(floor, boss, enemyConfig) {
+  _buildEnemyInfo(floor, boss, enemyConfig, arenaOpts) {
+    const arenaName      = arenaOpts?._layoutName ?? null;
+    const arenaSkin      = arenaOpts?._skinName   ?? null;
+    const arenaSkinId    = arenaOpts?.skinId       ?? 'default';
+    const arenaObstacles = arenaOpts?.obstacles    ?? [];
+
     if (boss) {
       const fighters = boss.fight.fighters;
       const firstMeta = this._getPowerMeta(fighters[0]?.powerId);
       return {
-        isBoss:    true,
-        label:     boss.label,
-        bossDesc:  boss.description,
-        count:     fighters.length,
-        hp:        fighters[0]?.hp ?? 100,
-        color:     fighters[0]?.color ?? '#e74c3c',
-        powerId:   fighters[0]?.powerId ?? 'none',
+        isBoss: true, label: boss.label, bossDesc: boss.description,
+        count: fighters.length, hp: fighters[0]?.hp ?? 100,
+        color: fighters[0]?.color ?? '#e74c3c',
+        powerId: fighters[0]?.powerId ?? 'none',
         powerName: fighters[0]?.label ?? firstMeta?.name ?? 'Jefe',
+        arenaName, arenaSkin, arenaSkinId, arenaObstacles,
       };
     }
-    // Normal floor — enemyConfig was already generated, read from it
     const meta = this._getPowerMeta(enemyConfig.powerId);
     return {
-      isBoss:    false,
+      isBoss: false,
       label:     meta?.name  ?? enemyConfig.powerId,
       color:     meta?.color ?? '#e74c3c',
-      count:     1,
-      hp:        enemyConfig.hp,
-      powerId:   enemyConfig.powerId,
-      powerName: meta?.name  ?? enemyConfig.powerId,
+      count: 1, hp: enemyConfig.hp,
+      powerId: enemyConfig.powerId,
+      powerName: meta?.name ?? enemyConfig.powerId,
+      arenaName, arenaSkin, arenaSkinId, arenaObstacles,
     };
   }
 }

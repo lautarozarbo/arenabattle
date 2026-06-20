@@ -39,6 +39,7 @@ export function showScreen(id) {
   const gameMode = _getGameMode();
   const selectTab = gameMode === 'league'      ? "btn-league"
                   : gameMode === 'tournament'  ? "btn-tournament"
+                  : gameMode === 'tower'       ? "btn-tower"
                   : "nav-tab-play";
   const navMap = {
     "screen-main-menu":           ["nav-tab-inicio", true],
