@@ -197,8 +197,8 @@ export class TowerUI {
       </div>
       <div class="tt-shaft-wrap">
         <div class="tt-shaft">
-          <div class="tt-plate tt-plate-old"></div>
           <div class="tt-plate tt-plate-new"></div>
+          <div class="tt-plate tt-plate-old"></div>
         </div>
       </div>
       <div class="tt-tap-hint tt-tap-hint--hidden">Toca para continuar</div>

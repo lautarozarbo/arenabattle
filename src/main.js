@@ -2010,7 +2010,11 @@ function _startTowerRun(powerMeta) {
       _startFightWithCfgs(cfgs, null, { ...getQuickArenaOpts(), ...arenaOpts });
     },
     onRunEnd: (_floor) => {
-      // TowerUI's run-over button calls this; btn-restart also cleans up
+      _tower    = null;
+      gameMode  = "quickmatch";
+      game.stop();
+      stopHudLoop();
+      showScreen("screen-tower-setup");
     },
     getArenaOpts: getQuickArenaOpts,
     applySkinnedMeta,

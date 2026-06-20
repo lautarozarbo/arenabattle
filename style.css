@@ -4420,20 +4420,22 @@ td.rank {
   position: relative;
 }
 
-/* The shaft holds two plates stacked: old (top) + new (bottom) = 440px */
+/* Plate order: new (top = floor above) + old (bottom = floor below) = 440px */
 .tt-shaft {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 440px;   /* 2 × plate height — needed so -50% = exactly 220px */
-  transform: translateY(0);
+  height: 440px;
+  /* Default: offset so old plate (bottom) is visible */
+  transform: translateY(-50%);
 }
 .tt-shaft.tt-animate {
   animation: tt-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes tt-rise {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-50%); }
+  /* Old plate exits going down, new plate descends into view from above */
+  from { transform: translateY(-50%); }
+  to   { transform: translateY(0); }
 }
 
 /* Each floor plate */
@@ -4538,7 +4540,9 @@ td.rank {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.86);
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 90;
 }
 .tp-box {
@@ -4661,21 +4665,23 @@ td.rank {
 /* ── In-fight stats bar ─────────────────────────────────────────────────────── */
 .tower-stats-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap;          /* fills rows left→right, then starts new row */
   justify-content: center;
-  gap: 5px;
-  padding: 6px 12px 5px;
-  background: rgba(0,0,0,0.38);
-  border-top: 1px solid rgba(255,255,255,0.05);
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 7px;
+  background: rgba(8, 8, 18, 0.82);
+  border-top: 1px solid rgba(255,255,255,0.07);
 }
 .tsb-chip {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 2px 7px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.13);
+  color: rgba(255,255,255,0.78);
   white-space: nowrap;
 }
 .confirm-btn--danger:hover { background: #dc2626; }
