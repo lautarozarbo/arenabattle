@@ -136,7 +136,7 @@ export class TowerUI {
     setTimeout(() => {
       this._picker.classList.add('tt--hidden');
       this._onUpgradeChosen(upg);
-    }, 280);
+    }, 120);
   }
 
   hideUpgradePicker() {
@@ -173,22 +173,24 @@ export class TowerUI {
     const pmods = run.powerMods;
 
     const chips = [];
-    if (mods.dmgAdd        > 0)  chips.push(`⚔ +${mods.dmgAdd} daño`);
-    if (mods.speedMult     > 1)  chips.push(`⚡ +${Math.round((mods.speedMult - 1) * 100)}% vel`);
-    if (mods.regenPerSec   > 0)  chips.push(`❤ +${mods.regenPerSec}/s`);
-    if (mods.contactDmgAdd > 0)  chips.push(`+${mods.contactDmgAdd} choque`);
-    if (mods.hpBonus       > 0)  chips.push(`+${mods.hpBonus} HP`);
-    if (pmods.cdMult       < 1)  chips.push(`⏱ -${Math.round((1 - pmods.cdMult) * 100)}% CD`);
-    if (pmods.extraProjectile > 0) chips.push(`+${pmods.extraProjectile} proy`);
-    if (pmods.extraPlacement  > 0) chips.push(`+${pmods.extraPlacement} elem`);
-    if (pmods.zoneDurationMult > 1) chips.push(`⧖ +${Math.round((pmods.zoneDurationMult - 1) * 100)}% zona`);
+    if (mods.dmgAdd        > 0)  chips.push({ label: `⚔ +${mods.dmgAdd} daño`,                            color: '#a78bfa' });
+    if (mods.speedMult     > 1)  chips.push({ label: `⚡ +${Math.round((mods.speedMult - 1) * 100)}% vel`, color: '#22d3ee' });
+    if (mods.regenPerSec   > 0)  chips.push({ label: `❤ +${mods.regenPerSec}/s`,                          color: '#f472b6' });
+    if (mods.contactDmgAdd > 0)  chips.push({ label: `+${mods.contactDmgAdd} choque`,                     color: '#fb923c' });
+    if (mods.hpBonus       > 0)  chips.push({ label: `+${mods.hpBonus} HP`,                               color: '#f87171' });
+    if (pmods.cdMult       < 1)  chips.push({ label: `⏱ -${Math.round((1 - pmods.cdMult) * 100)}% CD`,   color: '#60a5fa' });
+    if (pmods.extraProjectile > 0) chips.push({ label: `+${pmods.extraProjectile} proy`,                  color: '#facc15' });
+    if (pmods.extraPlacement  > 0) chips.push({ label: `+${pmods.extraPlacement} elem`,                   color: '#4ade80' });
+    if (pmods.zoneDurationMult > 1) chips.push({ label: `⧖ +${Math.round((pmods.zoneDurationMult - 1) * 100)}% zona`, color: '#2dd4bf' });
 
     if (chips.length === 0) {
       bar.classList.add('tt--hidden');
       return;
     }
 
-    bar.innerHTML = chips.map(c => `<span class="tsb-chip">${c}</span>`).join('');
+    bar.innerHTML = chips.map(c =>
+      `<span class="tsb-chip" style="color:${c.color};border-color:${c.color}33;background:${c.color}18">${c.label}</span>`
+    ).join('');
     bar.classList.remove('tt--hidden');
   }
 

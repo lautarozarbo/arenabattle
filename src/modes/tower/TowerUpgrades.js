@@ -116,8 +116,8 @@ export function summarizeUpgrades(ids) {
 // ── Probabilidades ────────────────────────────────────────────────────────────
 //
 // Peso de cada GRUPO (cuántas veces más probable que aparezca ese tipo):
-//   damage   20  — mejora de poder, siempre relevante
-//   hp       17  — vida extra, universal
+//   damage   22  — mejora de poder, siempre relevante
+//   hp       16  — vida extra, universal
 //   cooldown 15  — recarga, muy útil cuando aplica
 //   contact  12  — choque, buen complemento
 //   proj     12  — proyectil extra, fuerte cuando aplica
@@ -133,8 +133,8 @@ export function summarizeUpgrades(ids) {
 //   cooldown: -5% (55) vs -10% (45)
 
 const GROUP_WEIGHTS = {
-  damage:   17,
-  hp:       20,
+  damage:   22,
+  hp:       16,
   cooldown: 15,
   contact:  12,
   proj:     12,
