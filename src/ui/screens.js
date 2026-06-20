@@ -53,6 +53,7 @@ export function showScreen(id) {
     "screen-tournament-bracket":  ["btn-tournament", false],
     "screen-participant-pick":    ["btn-tournament", false],
     "screen-tournament-champion": ["btn-tournament", false],
+    "screen-tower-setup":         ["btn-tower",      false],
   };
   const mapped = navMap[id];
   if (mapped) {

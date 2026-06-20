@@ -4371,4 +4371,153 @@ td.rank {
   background: #ef4444;
   color: #fff;
 }
+
+/* ── Infinite Tower ──────────────────────────────────────────────────────────*/
+
+/* Floor banner — brief full-screen overlay before each fight */
+.tower-banner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.72);
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.tower-banner--show { opacity: 1; }
+.tower-banner--hide { opacity: 0; }
+.tower-banner-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tower-banner-floor {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.tower-banner-sub {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+}
+.tower-banner--boss .tower-banner-floor { color: #e74c3c; }
+.tower-banner--boss .tower-banner-sub   { color: #e74c3c; opacity: 0.85; }
+
+/* Upgrade picker — shown between floors */
+.tower-upgrade-picker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.82);
+  z-index: 90;
+}
+.tower-upgrade-picker.hidden { display: none; }
+.tower-picker-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 20px 24px;
+  width: min(360px, 92vw);
+}
+.tower-picker-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.tower-picker-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.tower-picker-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.tower-upgrade-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  color: var(--text, #fff);
+}
+.tower-upgrade-card:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.22);
+  transform: translateY(-1px);
+}
+.tower-upgrade-card:active { transform: translateY(0); }
+.tower-card-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+.tower-card-desc {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.4;
+}
+
+/* Run over screen */
+.tower-runover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.85);
+  z-index: 95;
+}
+.tower-runover.hidden { display: none; }
+.tower-runover-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 24px 28px;
+  width: min(320px, 90vw);
+  text-align: center;
+}
+.tower-runover-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.tower-runover-floor {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+}
+.tower-runover-upgrades {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+}
+.tower-runover-btn {
+  margin-top: 8px;
+  width: 100%;
+  max-width: 240px;
+}
 .confirm-btn--danger:hover { background: #dc2626; }

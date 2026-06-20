@@ -10,6 +10,7 @@ import {
 import { Game } from "./game/game.js";
 import { getAllPowerMetas } from "./powers/registry.js";
 import { TagTeamMatch } from "./modes/TagTeam.js";
+import { InfiniteTower } from "./modes/InfiniteTower.js";
 import { sfx, music } from "./audio/index.js";
 import { t, getLang, setLang } from "./i18n.js";
 import { NEWS } from "./news.js";
@@ -143,9 +144,12 @@ document.getElementById("btn-speed").addEventListener("click", () => {
 });
 
 // ── Mode state ────────────────────────────────────────────────────────────────
-let gameMode = "quickmatch"; // 'quickmatch' | 'league' | 'tournament' | 'custom' | 'tag2v2' | 'sim2v2'
+let gameMode = "quickmatch"; // 'quickmatch' | 'league' | 'tournament' | 'custom' | 'tag2v2' | 'sim2v2' | 'tower'
 let matchResultCallback = null; // (winnerSide: 0|1|-1) => void
 let _pendingCharUseId = null; // charId to record when match actually ends
+
+// ── Infinite Tower ────────────────────────────────────────────────────────────
+let _tower = null; // InfiniteTower instance, live during a tower run
 let _confettiRaf = null;
 
 // ── Active abilities ──────────────────────────────────────────────────────────
@@ -800,6 +804,21 @@ document.getElementById("btn-tournament").addEventListener("click", () => {
   }
 });
 
+document.getElementById("btn-tower").addEventListener("click", () => {
+  sfx.uiClick();
+  gameMode = "tower";
+  showScreen("screen-tower-setup");
+});
+
+document.getElementById("btn-tower-go").addEventListener("click", () => {
+  sfx.uiClick();
+  // Reuse the existing character select screen; when confirmed it calls _onP1Confirm
+  // We store that we're in tower mode so _onP1Confirm knows what to do
+  document.querySelector("#screen-select-p1 h2").textContent = "Elegí tu personaje";
+  showScreen("screen-select-p1");
+  carousels.p1.reset();
+});
+
 document.getElementById("nav-tab-inicio").addEventListener("click", () => {
   sfx.uiClick();
   if (currentScreen !== "screen-main-menu") showScreen("screen-main-menu");
@@ -1329,6 +1348,8 @@ document.getElementById("btn-confirm-p1").addEventListener("click", () => {
     } else {
       _goToBattleSlot(_battleSlot + 1);
     }
+  } else if (gameMode === "tower") {
+    _startTowerRun(selected);
   } else if (gameMode === "league") {
     if (isLeagueRandomMode()) startLeague();
     else showParticipantPicker("league");
@@ -1973,10 +1994,41 @@ function _startBattleHudLoop() {
 // ── Game over ─────────────────────────────────────────────────────────────────
 let _pendingWinnerSide = -1;
 
+// ── Infinite Tower ────────────────────────────────────────────────────────────
+
+function _startTowerRun(powerMeta) {
+  const allMetas = getAllPowerMetas();
+  const charMeta = allMetas.find(m => m.id === powerMeta.id);
+  const category = charMeta?.category ?? "Cuerpo a cuerpo";
+
+  _tower = new InfiniteTower({
+    game,
+    startFightFn: (cfgs, _ignored, arenaOpts) => {
+      document.getElementById("fight-context-label").textContent =
+        arenaOpts?.fightContextLabel ?? "";
+      document.getElementById("btn-restart").textContent = "Abandonar run";
+      _startFightWithCfgs(cfgs, null, { ...getQuickArenaOpts(), ...arenaOpts });
+    },
+    onRunEnd: (_floor) => {
+      // btn-restart handler shows the run-over screen; nothing extra needed here
+    },
+    getArenaOpts: getQuickArenaOpts,
+    applySkinnedMeta,
+  });
+
+  _pendingCharUseId = powerMeta.id;
+  _tower.startRun(powerMeta, category);
+}
+
 function handleGameOver(winner, winnerSide) {
   stopHudLoop();
   _stopAbilitiesLoop();
   music.setMode("menu");
+
+  if (gameMode === "tower" && _tower) {
+    _tower.handleGameOver(winner, winnerSide);
+    return;
+  }
 
   if (gameMode === "tag2v2") {
     if (_ttMatch) {
@@ -2113,6 +2165,13 @@ document.getElementById("btn-restart").addEventListener("click", () => {
     recordCharUse(_pendingCharUseId);
     refreshMasteryBadges();
     _pendingCharUseId = null;
+  }
+
+  if (gameMode === "tower") {
+    _tower = null;
+    gameMode = "quickmatch";
+    showScreen("screen-tower-setup");
+    return;
   }
 
   if (gameMode === "tag2v2") {

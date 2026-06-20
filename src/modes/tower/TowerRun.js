@@ -1,0 +1,46 @@
+/**
+ * TowerRun — immutable-ish state of a single infinite-tower run.
+ * Everything that needs to persist across floors lives here.
+ * No DOM or game references; pure data.
+ */
+export class TowerRun {
+  /**
+   * @param {object} powerMeta  — the full meta object of the chosen power
+   * @param {string} category   — "Cuerpo a cuerpo" | "Proyectiles" | "Control de zona" | "Invocación"
+   */
+  constructor(powerMeta, category) {
+    this.powerMeta  = powerMeta;
+    this.category   = category;
+    this.floor      = 0;          // incremented BEFORE each fight
+    this.upgrades   = [];         // list of applied upgrade ids (for history/display)
+
+    // Accumulated stat multipliers applied to the player circle each fight
+    this.playerMods = {
+      hpBonus:        0,    // flat HP added to base 100
+      dmgMult:        1.0,  // multiplier on all damage dealt
+      speedMult:      1.0,  // multiplier on base speed
+      regenPerSec:    0,    // HP regen per second during fight
+      contactDmgAdd:  0,    // added to getHitDamage() result
+    };
+
+    // Power-specific mods — read by powers that support them via this.owner
+    this.powerMods  = {
+      cdMult:         1.0,  // cooldown multiplier (<1 = faster)
+      extraProjectile:0,    // extra bullets/arrows per volley
+      invocationCap:  0,    // extra simultaneous invocations
+    };
+  }
+
+  get isAlive() { return true; }
+
+  /** Advance to the next floor. Returns the new floor number. */
+  nextFloor() {
+    this.floor++;
+    return this.floor;
+  }
+
+  /** Record a chosen upgrade id for history. */
+  applyUpgrade(upgradeId) {
+    this.upgrades.push(upgradeId);
+  }
+}

@@ -42,8 +42,8 @@ export class Game {
     this._impacts = [];
     const a = this.arena;
 
-    const cpad  = (cfgs[0].radius ?? 28) + 14;
-    const speed = 310;
+    const cpad        = (cfgs[0].radius ?? 28) + 14;
+    const defaultSpeed = 310;
 
     // For 4-player FFA (no teams), start in 2×2 quadrant positions instead of a horizontal strip
     const ffa4 = N === 4 && cfgs.every(c => c.teamId == null);
@@ -60,8 +60,9 @@ export class Game {
         x = a.left + sliceW * i + cpad + Math.random() * Math.max(0, sliceW - cpad * 2);
         y = a.top + cpad + Math.random() * (a.height - cpad * 2);
       }
+      const spd = cfg.enemySpeed ?? defaultSpeed;
       const ang = Math.random() * Math.PI * 2;
-      return new Circle({ x, y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, ...cfg });
+      return new Circle({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, ...cfg });
     });
 
     for (const c of this.circles) {
@@ -69,6 +70,21 @@ export class Game {
       c.power._spawnImpact = (x, y, intensity = 0.8) => {
         this._impacts.push({ x, y, t: 0, maxT: 0.28 + intensity * 0.15, intensity, seed: Math.random() * 1000 | 0 });
       };
+
+      // Apply tower run mods to the player circle (towerMods is set by InfiniteTower)
+      const tm = c.towerMods;
+      if (tm) {
+        if (tm.dmgMult  && tm.dmgMult  !== 1) c._dmgBuffMult = tm.dmgMult;
+        if (tm.speedMult && tm.speedMult !== 1) {
+          const newSpeed = c.baseSpeed * tm.speedMult;
+          c.baseSpeed = newSpeed;
+          const mag = Math.sqrt(c.vx * c.vx + c.vy * c.vy) || 1;
+          c.vx = (c.vx / mag) * newSpeed;
+          c.vy = (c.vy / mag) * newSpeed;
+        }
+        if (tm.contactDmgAdd) c._contactDmgAdd = tm.contactDmgAdd;
+        if (tm.regenPerSec)   c.applyHeal(tm.regenPerSec, Infinity);
+      }
     }
 
     // Init AI ability timers for enemy circles
@@ -234,8 +250,8 @@ export class Game {
         const c1Hit = c1._hitCooldown <= 0;
         const c2Hit = c2._hitCooldown <= 0;
         if (c1Hit && c2Hit) {
-          c2.takeDamage(c1.power.getHitDamage() * c1._dmgBuffMult); c2._hitCooldown = 1.0;
-          c1.takeDamage(c2.power.getHitDamage() * c2._dmgBuffMult); c1._hitCooldown = 1.0;
+          c2.takeDamage((c1.power.getHitDamage() + (c1._contactDmgAdd ?? 0)) * c1._dmgBuffMult); c2._hitCooldown = 1.0;
+          c1.takeDamage((c2.power.getHitDamage() + (c2._contactDmgAdd ?? 0)) * c2._dmgBuffMult); c1._hitCooldown = 1.0;
           c1.power.onCollide(c2);
           c2.power.onCollide(c1);
           sfx.collide();

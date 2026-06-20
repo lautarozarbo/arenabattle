@@ -518,6 +518,31 @@
         ></button>
       </div>
 
+      <!-- ── Screen: Infinite Tower Setup ─────────────── -->
+      <div id="screen-tower-setup" class="screen hidden">
+        <div class="setup-header">
+          <div class="select-header-top">
+            <h2>Torre Infinita</h2>
+          </div>
+        </div>
+        <div class="setup-body">
+          <div class="setup-section">
+            <div class="setup-label">Modo roguelike</div>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.45);line-height:1.5;margin:0">
+              Avanzá piso a piso contra enemigos cada vez más difíciles.
+              Después de cada pelea elegí una mejora para tu personaje.
+              Cada 10 pisos enfrentás un jefe especial.
+            </p>
+          </div>
+          <div class="setup-info-box" id="tower-setup-info">
+            Elegí tu personaje y empezá el ascenso
+          </div>
+        </div>
+        <div class="select-footer">
+          <button class="btn-primary" id="btn-tower-go">Elegir personaje</button>
+        </div>
+      </div>
+
       <!-- ── Screen: Fight ────────────────────────────── -->
       <div id="screen-fight" class="screen hidden">
         <div id="fight-topbar">
@@ -958,6 +983,14 @@
             <path d="M12 12h4" />
           </svg>
           <span class="nav-label" data-i18n="tournament.title">Torneo</span>
+        </button>
+        <button class="nav-tab" id="btn-tower">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V7l7-4 7 4v14"/>
+            <path d="M9 21v-6h6v6"/>
+          </svg>
+          <span class="nav-label">Torre</span>
         </button>
       </nav>
 
