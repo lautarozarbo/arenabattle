@@ -40,7 +40,7 @@ function _startAnim() {
   function tick() {
     document.querySelectorAll('.wardrobe-skin-canvas[data-animated]').forEach(cvs => {
       const meta = _metas.find(m => m.id === cvs.dataset.charid);
-      if (meta) drawCharPreview(cvs, meta, cvs.dataset.skinid, { rScale: 0.18, yScale: 0.44 });
+      if (meta) drawCharPreview(cvs, meta, cvs.dataset.skinid, { rScale: 0.28, yScale: 0.5 });
     });
     _rafId = requestAnimationFrame(tick);
   }
@@ -83,7 +83,7 @@ function _renderChars(container) {
       card.className = 'wardrobe-skin-card' + (owned ? '' : ' locked');
 
       const cvs = document.createElement('canvas');
-      cvs.width  = 200;
+      cvs.width  = 120;
       cvs.height = 120;
       cvs.className = 'wardrobe-skin-canvas wardrobe-skin-canvas--char';
 
@@ -93,7 +93,7 @@ function _renderChars(container) {
         cvs.dataset.skinid   = skin.id;
       }
 
-      drawCharPreview(cvs, meta, skin.id, { rScale: 0.18, yScale: 0.44 });
+      drawCharPreview(cvs, meta, skin.id, { rScale: 0.28, yScale: 0.5 });
       card.appendChild(cvs);
 
       if (!owned) {
