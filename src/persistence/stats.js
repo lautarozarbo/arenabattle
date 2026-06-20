@@ -4,8 +4,8 @@ let _cache = null;
 
 function _defaults() {
   return {
-    wins:          { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
-    losses:        { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
+    wins:          { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0, tower: 0 },
+    losses:        { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0, tower: 0 },
     draws:         { quick1v1: 0, quick2v2: 0, sim2v2: 0, battle: 0, league: 0, tournament: 0 },
     championships: { league: 0, tournament: 0 },
     charUses:      {},
@@ -78,6 +78,7 @@ function _key(mode) {
   if (mode === 'battle')      return 'battle';
   if (mode === 'league')      return 'league';
   if (mode === 'tournament')  return 'tournament';
+  if (mode === 'tower')       return 'tower';
   return null;
 }
 

@@ -2144,6 +2144,13 @@ function handleGameOver(winner, winnerSide) {
   music.setMode("menu");
 
   if (gameMode === "tower" && _tower) {
+    const playerWon = winnerSide === 0;
+    if (playerWon) recordWin("tower");
+    else           recordLoss("tower");
+    if (_pendingCharUseId) {
+      recordCharUse(_pendingCharUseId);
+      refreshMasteryBadges();
+    }
     _tower.handleGameOver(winner, winnerSide);
     return;
   }
