@@ -690,7 +690,14 @@ function _buildTowerSection(s, bestTower, allMetas) {
         <span class="pstat-lbl">Mejor personaje</span>
       </div>`;
 
-  return `<div class="pstat-tower-row">${floorCard}${charCard}</div>`;
+  const wins = s.wins?.tower ?? 0;
+  const winsCard = `
+    <div class="pstat-card pstat-card--wide">
+      <span class="pstat-val">${wins}</span>
+      <span class="pstat-lbl">Victorias</span>
+    </div>`;
+
+  return `<div class="pstat-tower-row">${floorCard}${charCard}${winsCard}</div>`;
 }
 
 function _closeProfile() {

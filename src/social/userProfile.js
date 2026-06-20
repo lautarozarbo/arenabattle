@@ -102,7 +102,7 @@ export async function openUserProfile(userId) {
     </div>
 
     <div class="up-section-label">Torre Infinita</div>
-    ${_towerSection(towerFloor, towerChar, metas)}
+    ${_towerSection(towerFloor, towerChar, metas, wins.tower ?? 0)}
 
     <div class="up-section-label">Personaje más usado</div>
     ${favHtml}
@@ -234,7 +234,7 @@ function _esc(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function _towerSection(floor, charId, metas) {
+function _towerSection(floor, charId, metas, wins = 0) {
   // charId may be an ID (new) or a display name (old saves) — try both
   const meta = charId
     ? (metas.find(m => m.id === charId) ?? metas.find(m => m.name === charId) ?? null)
@@ -259,5 +259,11 @@ function _towerSection(floor, charId, metas) {
         <span class="up-lbl">Mejor personaje</span>
       </div>`;
 
-  return `<div class="up-tower-row">${floorHtml}${charHtml}</div>`;
+  const winsHtml = `
+    <div class="up-card">
+      <span class="up-val">${wins}</span>
+      <span class="up-lbl">Victorias</span>
+    </div>`;
+
+  return `<div class="up-tower-row">${floorHtml}${charHtml}${winsHtml}</div>`;
 }

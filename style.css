@@ -1893,14 +1893,18 @@ html, body {
 .tower-best-run {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 12px;
-  padding: 12px 16px;
-  text-align: center;
+  border-radius: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 10px;
 }
 .tower-best-run.hidden { display: none; }
+.tbr-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .tbr-label {
   font-size: 0.6rem;
   font-weight: 700;
@@ -1909,14 +1913,39 @@ html, body {
   color: rgba(255,255,255,0.3);
 }
 .tbr-floor {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 900;
   color: #fff;
-  line-height: 1.1;
+  line-height: 1;
 }
-.tbr-detail {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.45);
+.tbr-char {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tbr-char-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.tbr-char-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.tbr-upgrades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tbr-upg-chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
 }
 
 /* ── Header title group (title + badge together) ────── */
@@ -3610,15 +3639,19 @@ td.rank {
   align-items: stretch;
   margin-bottom: 8px;
 }
-.up-tower-row .up-card { flex: 0 0 auto; width: 50%; }
+.up-tower-row .up-card { flex: 1; min-width: 0; }
+.up-tower-char .up-fav-info { min-width: 0; }
+.up-tower-char .up-fav-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .up-tower-char {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255,255,255,0.05);
   border-radius: 12px;
   padding: 10px 12px;
+  overflow: hidden;
 }
 .pstat-tower-row {
   display: flex;
@@ -3626,16 +3659,18 @@ td.rank {
   align-items: stretch;
   margin-bottom: 8px;
 }
-.pstat-tower-row .pstat-card { flex: 0 0 auto; width: 50%; }
+.pstat-tower-row .pstat-card { flex: 1; }
 .pstat-tower-char {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
+  overflow: hidden;
 }
 .pstat-tower-circle {
   width: 36px; height: 36px;
@@ -3643,8 +3678,8 @@ td.rank {
   display: flex; align-items: center; justify-content: center;
   font-size: 1.1rem; flex-shrink: 0;
 }
-.pstat-tower-info { display: flex; flex-direction: column; gap: 2px; }
-.pstat-tower-name { font-size: 0.82rem; font-weight: 700; }
+.pstat-tower-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pstat-tower-name { font-size: 0.82rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pstat-tower-sub  { font-size: 0.68rem; color: rgba(255,255,255,0.35); }
 
 .up-fav-card {
