@@ -257,16 +257,14 @@ export class TowerUI {
 
 function _plateContent(floor, enemyInfo, isBoss) {
   if (!enemyInfo) {
-    // "From" plate — just show the floor we're leaving
     return `
       <div class="tt-plate-floor">${floor === 0 ? 'Inicio' : `Piso ${floor}`}</div>
       <div class="tt-plate-status">${floor === 0 ? 'Torre Infinita' : '✓ Superado'}</div>
     `;
   }
 
-  const bossTag = isBoss
-    ? `<span class="tt-boss-badge">JEFE</span>`
-    : '';
+  const color   = enemyInfo.color ?? '#e74c3c';
+  const bossTag = isBoss ? `<span class="tt-boss-badge">JEFE</span>` : '';
 
   const countLine = enemyInfo.count > 1
     ? `<div class="tt-enemy-row"><span class="tt-label">Enemigos</span><span class="tt-val">${enemyInfo.count}</span></div>`
@@ -276,21 +274,24 @@ function _plateContent(floor, enemyInfo, isBoss) {
     ? `<div class="tt-boss-desc">${enemyInfo.bossDesc}</div>`
     : '';
 
+  // For normal floors, label and powerName are the same character name — show once
+  const showPowerRow = isBoss && enemyInfo.powerName && enemyInfo.powerName !== enemyInfo.label;
+  const powerRow = showPowerRow
+    ? `<div class="tt-enemy-row"><span class="tt-label">Poder</span><span class="tt-val">${enemyInfo.powerName}</span></div>`
+    : '';
+
   return `
     <div class="tt-plate-floor">${bossTag} Piso ${floor}</div>
     <div class="tt-enemy-card">
-      <div class="tt-enemy-row">
-        <span class="tt-label">Enemigo</span>
-        <span class="tt-val">${enemyInfo.label}</span>
+      <div class="tt-char-header">
+        <span class="tt-char-dot" style="background:${color}"></span>
+        <span class="tt-char-name" style="color:${color}">${enemyInfo.label}</span>
       </div>
-      <div class="tt-enemy-row">
-        <span class="tt-label">Poder</span>
-        <span class="tt-val">${enemyInfo.powerName ?? enemyInfo.powerId}</span>
-      </div>
+      ${powerRow}
       ${countLine}
       <div class="tt-enemy-row">
         <span class="tt-label">HP</span>
-        <span class="tt-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ` c/u` : ''}</span>
+        <span class="tt-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ' c/u' : ''}</span>
       </div>
       ${descLine}
     </div>

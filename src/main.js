@@ -2019,6 +2019,7 @@ function _startTowerRun(powerMeta) {
     getArenaOpts: getQuickArenaOpts,
     applySkinnedMeta,
     getPowerName: (id) => nameMap[id] ?? id,
+    getPowerMeta: (id) => allMetas.find(m => m.id === id) ?? null,
   });
 
   // Show fight screen immediately so tower overlays (appended to #screen-fight)
