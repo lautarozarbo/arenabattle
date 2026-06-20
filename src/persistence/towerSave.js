@@ -87,11 +87,10 @@ export function maybeSaveBestRun(run) {
   const best = getBestTowerRun();
   if (best && best.floor >= run.floor) return;
   const record = {
-    floor:        run.floor,
-    powerMetaId:  run.powerMeta.id,
-    powerName:    run.powerMeta.name,
-    upgradeCount: run.upgrades.length,
-    date:         Date.now(),
+    floor:       run.floor,
+    powerMetaId: run.powerMeta.id,
+    upgrades:    [...run.upgrades],
+    date:        Date.now(),
   };
   try { localStorage.setItem(LS_BEST, JSON.stringify(record)); } catch {}
 }
