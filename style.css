@@ -4420,20 +4420,20 @@ td.rank {
   position: relative;
 }
 
-/* The shaft holds two plates stacked: old (top) + new (bottom) */
+/* The shaft holds two plates stacked: old (top) + new (bottom) = 440px */
 .tt-shaft {
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* Default: parked so new plate is visible (no animation) */
-  transform: translateY(-50%);
+  height: 440px;   /* 2 × plate height — needed so -50% = exactly 220px */
+  transform: translateY(0);
 }
 .tt-shaft.tt-animate {
   animation: tt-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes tt-rise {
-  from { transform: translateY(-50%); }
-  to   { transform: translateY(-100%); }
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
 }
 
 /* Each floor plate */
@@ -4662,10 +4662,11 @@ td.rank {
 .tower-stats-bar {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 5px;
-  padding: 5px 12px 4px;
-  background: rgba(0,0,0,0.35);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 6px 12px 5px;
+  background: rgba(0,0,0,0.38);
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 .tsb-chip {
   font-size: 0.65rem;

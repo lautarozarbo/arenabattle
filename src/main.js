@@ -2017,6 +2017,14 @@ function _startTowerRun(powerMeta) {
     getPowerName: (id) => nameMap[id] ?? id,
   });
 
+  // Show fight screen immediately so tower overlays (appended to #screen-fight)
+  // are visible right away — otherwise they'd mount on a hidden element
+  document.getElementById("gameover-bar").classList.add("hidden");
+  document.getElementById("fight-tag-area").classList.add("hidden");
+  document.getElementById("fight-context-label").textContent = "";
+  document.getElementById("btn-restart").textContent = "Abandonar run";
+  showScreen("screen-fight");
+
   _pendingCharUseId = powerMeta.id;
   _tower.startRun(powerMeta, category);
 }

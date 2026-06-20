@@ -246,9 +246,9 @@ export class TowerUI {
     if (this._statsBar) return;
     const el = document.createElement('div');
     el.className = 'tower-stats-bar tt--hidden';
-    // Insert right after fight-topbar
-    const topbar = document.getElementById('fight-topbar');
-    topbar.insertAdjacentElement('afterend', el);
+    // Insert after arena-container so it appears below the canvas
+    const arena = document.getElementById('arena-container');
+    arena.insertAdjacentElement('afterend', el);
     this._statsBar = el;
   }
 }
