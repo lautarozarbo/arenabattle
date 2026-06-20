@@ -1,9 +1,8 @@
 /**
  * TowerUpgrades — upgrade catalog for the infinite tower.
  *
- * Each upgrade has a `group` that prevents two upgrades of the same type
- * from appearing together (e.g. no hp_up + hp_up_big in the same pick).
- * Also has a `color` used to tint the card border.
+ * Each upgrade has a `group` (prevents two of the same type in one pick)
+ * and a `color` (used to tint the card border).
  *
  * Group colors:
  *   hp       — red
@@ -45,18 +44,18 @@ const POWERS_WITH_ZONE_DUR = new Set([
 // ── Upgrade catalog ──────────────────────────────────────────────────────────
 
 const UNIVERSAL = [
-  { id: 'hp_up',          group: 'hp',      color: '#f87171', label: '+20 HP máx.',          description: 'Tu HP máximo aumenta en 20.',                             apply(r) { r.playerMods.hpBonus      += 20;   } },
-  { id: 'hp_up_big',      group: 'hp',      color: '#f87171', label: '+35 HP máx.',          description: 'Tu HP máximo aumenta en 35.',                             apply(r) { r.playerMods.hpBonus      += 35;   } },
-  { id: 'regen_small',    group: 'regen',   color: '#f472b6', label: 'Regen +1 HP/s',        description: 'Recuperás 1 HP por segundo durante la pelea.',            apply(r) { r.playerMods.regenPerSec  += 1;    } },
-  { id: 'regen_med',      group: 'regen',   color: '#f472b6', label: 'Regen +2.5 HP/s',      description: 'Recuperás 2.5 HP por segundo durante la pelea.',          apply(r) { r.playerMods.regenPerSec  += 2.5;  } },
-  { id: 'speed_up',       group: 'speed',   color: '#22d3ee', label: 'Velocidad +12%',       description: 'Te movés un 12% más rápido.',                             apply(r) { r.playerMods.speedMult    *= 1.12; } },
-  { id: 'contact_dmg',    group: 'contact', color: '#fb923c', label: '+2 daño por choque',   description: 'Cada choque de cuerpo hace 2 de daño extra.',              apply(r) { r.playerMods.contactDmgAdd += 2;  } },
-  { id: 'contact_dmg_big',group: 'contact', color: '#fb923c', label: '+4 daño por choque',   description: 'Cada choque de cuerpo hace 4 de daño extra.',              apply(r) { r.playerMods.contactDmgAdd += 4;  } },
+  { id: 'hp_up',           group: 'hp',      color: '#f87171', label: '+20 HP máx.',        description: 'Tu HP máximo aumenta en 20.',                        apply(r) { r.playerMods.hpBonus       += 20; } },
+  { id: 'hp_up_big',       group: 'hp',      color: '#f87171', label: '+35 HP máx.',        description: 'Tu HP máximo aumenta en 35.',                        apply(r) { r.playerMods.hpBonus       += 35; } },
+  { id: 'regen_small',     group: 'regen',   color: '#f472b6', label: 'Regen +1 HP/s',      description: 'Recuperás 1 HP por segundo durante la pelea.',       apply(r) { r.playerMods.regenPerSec   += 1;  } },
+  { id: 'regen_med',       group: 'regen',   color: '#f472b6', label: 'Regen +3 HP/s',      description: 'Recuperás 3 HP por segundo durante la pelea.',       apply(r) { r.playerMods.regenPerSec   += 3;  } },
+  { id: 'speed_up',        group: 'speed',   color: '#22d3ee', label: 'Velocidad +10%',     description: 'Te movés un 10% más rápido.',                        apply(r) { r.playerMods.speedMult     *= 1.10; } },
+  { id: 'contact_dmg',     group: 'contact', color: '#fb923c', label: '+2 daño por choque', description: 'Cada choque de cuerpo hace 2 de daño extra.',         apply(r) { r.playerMods.contactDmgAdd += 2;  } },
+  { id: 'contact_dmg_big', group: 'contact', color: '#fb923c', label: '+4 daño por choque', description: 'Cada choque de cuerpo hace 4 de daño extra.',         apply(r) { r.playerMods.contactDmgAdd += 4;  } },
 ];
 
 const DAMAGE = [
-  { id: 'dmg_up',     group: 'damage', color: '#a78bfa', label: 'Daño +15%', description: 'Todo el daño que hacés aumenta un 15%.',  apply(r) { r.playerMods.dmgMult *= 1.15; } },
-  { id: 'dmg_up_big', group: 'damage', color: '#a78bfa', label: 'Daño +28%', description: 'Todo el daño que hacés aumenta un 28%.', apply(r) { r.playerMods.dmgMult *= 1.28; } },
+  { id: 'dmg_up',     group: 'damage', color: '#a78bfa', label: '+5 daño de poder',  description: 'Tus habilidades hacen 5 de daño extra.',  apply(r) { r.playerMods.dmgAdd += 5;  } },
+  { id: 'dmg_up_big', group: 'damage', color: '#a78bfa', label: '+10 daño de poder', description: 'Tus habilidades hacen 10 de daño extra.', apply(r) { r.playerMods.dmgAdd += 10; } },
 ];
 
 const COOLDOWN = [
@@ -78,13 +77,9 @@ const ZONE_DUR = [
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
-/**
- * Get `count` upgrades ensuring no two share the same group.
- */
 export function getUpgradeChoices(run, count = 3) {
   const powerId = run.powerMeta?.id ?? '';
 
-  // Build specific pool for this power
   const specific = [...DAMAGE];
   if (POWERS_WITH_COOLDOWN.has(powerId))   specific.push(...COOLDOWN);
   if (POWERS_WITH_PROJECTILE.has(powerId)) specific.push(...PROJECTILE);
@@ -95,11 +90,9 @@ export function getUpgradeChoices(run, count = 3) {
   const univ = [...UNIVERSAL];
   _shuffle(univ);
 
-  // Combine: up to 2 specific + universal, then reshuffle
   const pool = [...specific.slice(0, 2), ...univ];
   _shuffle(pool);
 
-  // Pick count upgrades — no two from the same group
   const usedGroups = new Set();
   const usedIds    = new Set();
   const result     = [];
@@ -112,7 +105,6 @@ export function getUpgradeChoices(run, count = 3) {
     if (result.length >= count) break;
   }
 
-  // Safety fill: if still short, allow duplicate groups (but not duplicate ids)
   if (result.length < count) {
     const allPool = [...pool, ...univ];
     for (const u of allPool) {

@@ -74,7 +74,6 @@ export class Game {
       // Apply tower run mods to the player circle (towerMods is set by InfiniteTower)
       const tm = c.towerMods;
       if (tm) {
-        if (tm.dmgMult  && tm.dmgMult  !== 1) c._dmgBuffMult = tm.dmgMult;
         if (tm.speedMult && tm.speedMult !== 1) {
           const newSpeed = c.baseSpeed * tm.speedMult;
           c.baseSpeed = newSpeed;

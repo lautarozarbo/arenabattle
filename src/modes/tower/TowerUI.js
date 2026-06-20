@@ -126,7 +126,6 @@ export class TowerUI {
   }
 
   _selectUpgrade(upg, cardEl) {
-    // Disable all cards immediately
     this._picker.querySelectorAll('.tp-card').forEach(c => {
       c.disabled = true;
       if (c !== cardEl) c.classList.add('tp-card--dim');
@@ -136,7 +135,7 @@ export class TowerUI {
     setTimeout(() => {
       this._picker.classList.add('tt--hidden');
       this._onUpgradeChosen(upg);
-    }, 620);
+    }, 280);
   }
 
   hideUpgradePicker() {
@@ -173,15 +172,15 @@ export class TowerUI {
     const pmods = run.powerMods;
 
     const chips = [];
-    if (mods.dmgMult      > 1)   chips.push(`⚔ Daño ×${mods.dmgMult.toFixed(2)}`);
-    if (mods.speedMult    > 1)   chips.push(`⚡ Vel ×${mods.speedMult.toFixed(2)}`);
-    if (mods.regenPerSec  > 0)   chips.push(`❤ ${mods.regenPerSec.toFixed(1)}/s`);
+    if (mods.dmgAdd        > 0)  chips.push(`⚔ +${mods.dmgAdd} daño`);
+    if (mods.speedMult     > 1)  chips.push(`⚡ +${Math.round((mods.speedMult - 1) * 100)}% vel`);
+    if (mods.regenPerSec   > 0)  chips.push(`❤ +${mods.regenPerSec}/s`);
     if (mods.contactDmgAdd > 0)  chips.push(`+${mods.contactDmgAdd} choque`);
-    if (mods.hpBonus      > 0)   chips.push(`+${mods.hpBonus} HP`);
-    if (pmods.cdMult      < 1)   chips.push(`⏱ CD ×${pmods.cdMult.toFixed(2)}`);
-    if (pmods.extraProjectile > 0) chips.push(`+${pmods.extraProjectile} proyectil`);
-    if (pmods.extraPlacement  > 0) chips.push(`+${pmods.extraPlacement} elem.`);
-    if (pmods.zoneDurationMult > 1) chips.push(`⧖ Zona ×${pmods.zoneDurationMult.toFixed(1)}`);
+    if (mods.hpBonus       > 0)  chips.push(`+${mods.hpBonus} HP`);
+    if (pmods.cdMult       < 1)  chips.push(`⏱ -${Math.round((1 - pmods.cdMult) * 100)}% CD`);
+    if (pmods.extraProjectile > 0) chips.push(`+${pmods.extraProjectile} proy`);
+    if (pmods.extraPlacement  > 0) chips.push(`+${pmods.extraPlacement} elem`);
+    if (pmods.zoneDurationMult > 1) chips.push(`⧖ +${Math.round((pmods.zoneDurationMult - 1) * 100)}% zona`);
 
     if (chips.length === 0) {
       bar.classList.add('tt--hidden');

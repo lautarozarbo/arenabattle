@@ -31,6 +31,8 @@ export async function openUserProfile(userId) {
   const draws  = s.draws         ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
   const champs = s.championships ?? { league: 0, tournament: 0 };
   const charUses = s.char_uses   ?? {};
+  const towerFloor = s.tower_max_floor ?? 0;
+  const towerChar  = s.tower_best_char ?? null;
 
   const totalW = Object.values(wins).reduce((a, b) => a + b, 0);
   const totalL = Object.values(losses).reduce((a, b) => a + b, 0);
@@ -96,6 +98,18 @@ export async function openUserProfile(userId) {
           <span class="up-champ-val">${champs.tournament}</span>
           <span class="up-champ-lbl">Torneos ganados</span>
         </div>
+      </div>
+    </div>
+
+    <div class="up-section-label">Torre Infinita</div>
+    <div class="up-grid up-grid--2">
+      <div class="up-card">
+        <span class="up-val">${towerFloor > 0 ? towerFloor : '—'}</span>
+        <span class="up-lbl">Piso más alto</span>
+      </div>
+      <div class="up-card">
+        <span class="up-val up-val--tower">${towerChar ?? '—'}</span>
+        <span class="up-lbl">Mejor personaje</span>
       </div>
     </div>
 

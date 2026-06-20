@@ -29,7 +29,7 @@ export class BasePower {
 
   // Convenience: deal damage to a target applying the owner's active damage buff.
   _dealDmg(target, amount) {
-    target.takeDamage(amount * (this.owner._dmgBuffMult ?? 1));
+    target.takeDamage((amount + (this.owner?.towerMods?.dmgAdd ?? 0)) * (this.owner._dmgBuffMult ?? 1));
   }
 
   // Flat damage dealt to the enemy on each physical hit/bounce.

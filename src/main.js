@@ -656,8 +656,6 @@ function _buildProfileStats() {
         </div>
       </div>
     </div>
-    <div class="pstat-section-label">Personaje favorito</div>
-    ${favHtml}
     <div class="pstat-section-label">Torre Infinita</div>
     <div class="pstat-grid">
       <div class="pstat-card pstat-card--wide">
@@ -669,6 +667,8 @@ function _buildProfileStats() {
         <span class="pstat-lbl">Mejor personaje</span>
       </div>
     </div>
+    <div class="pstat-section-label">Personaje favorito</div>
+    ${favHtml}
   `;
 }
 
@@ -846,6 +846,7 @@ document.getElementById("btn-tower-continue")?.addEventListener("click", () => {
   const allMetas = getAllPowerMetas();
   const meta = allMetas.find(m => m.id === saved.powerMetaId);
   if (!meta) return;
+  gameMode = "tower";
   _startTowerRun(meta, saved);
 });
 

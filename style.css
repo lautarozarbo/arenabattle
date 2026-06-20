@@ -1348,8 +1348,10 @@ html, body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-dim);
+  margin-top: 18px;
   margin-bottom: 8px;
 }
+.pstat-section-label:first-child { margin-top: 0; }
 .pstat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3552,6 +3554,7 @@ td.rank {
   gap: 6px;
   margin-bottom: 4px;
 }
+.up-grid--2 { grid-template-columns: repeat(2, 1fr); }
 .up-card {
   background: rgba(255,255,255,0.05);
   border-radius: 10px;
@@ -3566,8 +3569,9 @@ td.rank {
   font-weight: 700;
   color: #fff;
 }
-.up-val--win  { color: #6ee87a; }
-.up-val--loss { color: #ff7070; }
+.up-val--win   { color: #6ee87a; }
+.up-val--loss  { color: #ff7070; }
+.up-val--tower { font-size: 0.78rem; font-weight: 700; }
 .up-lbl {
   font-size: 0.68rem;
   color: rgba(255,255,255,0.4);

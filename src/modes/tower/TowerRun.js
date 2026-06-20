@@ -16,11 +16,11 @@ export class TowerRun {
 
     // Accumulated stat multipliers applied to the player circle each fight
     this.playerMods = {
-      hpBonus:        0,    // flat HP added to base 100
-      dmgMult:        1.0,  // multiplier on all damage dealt
-      speedMult:      1.0,  // multiplier on base speed
-      regenPerSec:    0,    // HP regen per second during fight
-      contactDmgAdd:  0,    // added to getHitDamage() result
+      hpBonus:        0,   // flat HP added to base 100
+      dmgAdd:         0,   // flat bonus added to all power ability damage
+      speedMult:      1.0, // multiplier on base speed
+      regenPerSec:    0,   // HP regen per second during fight
+      contactDmgAdd:  0,   // added to body-collision hit damage
     };
 
     // Power-specific mods — read by powers that support them via this.owner
