@@ -657,19 +657,39 @@ function _buildProfileStats() {
       </div>
     </div>
     <div class="pstat-section-label">Torre Infinita</div>
-    <div class="pstat-grid">
-      <div class="pstat-card pstat-card--wide">
-        <span class="pstat-val">${s.towerMaxFloor > 0 ? s.towerMaxFloor : (bestTower?.floor ?? '—')}</span>
-        <span class="pstat-lbl">Piso más alto</span>
-      </div>
-      <div class="pstat-card pstat-card--wide">
-        <span class="pstat-val">${s.towerBestChar ?? bestTower?.powerName ?? '—'}</span>
-        <span class="pstat-lbl">Mejor personaje</span>
-      </div>
-    </div>
+    ${_buildTowerSection(s, bestTower, metas)}
     <div class="pstat-section-label">Personaje favorito</div>
     ${favHtml}
   `;
+}
+
+function _buildTowerSection(s, bestTower, allMetas) {
+  const floor  = s.towerMaxFloor > 0 ? s.towerMaxFloor : (bestTower?.floor ?? 0);
+  const charId = s.towerBestChar ?? bestTower?.powerMetaId ?? null;
+  const meta   = charId
+    ? (allMetas.find(m => m.id === charId) ?? allMetas.find(m => m.name === charId) ?? null)
+    : null;
+
+  const floorCard = `
+    <div class="pstat-card pstat-card--wide">
+      <span class="pstat-val">${floor > 0 ? floor : '—'}</span>
+      <span class="pstat-lbl">Piso más alto</span>
+    </div>`;
+
+  const charCard = meta
+    ? `<div class="pstat-tower-char">
+        <div class="pstat-tower-circle" style="background:${meta.color}">${meta.icon}</div>
+        <div class="pstat-tower-info">
+          <span class="pstat-tower-name" style="color:${meta.color}">${meta.name}</span>
+          <span class="pstat-tower-sub">Mejor run</span>
+        </div>
+      </div>`
+    : `<div class="pstat-card pstat-card--wide">
+        <span class="pstat-val">—</span>
+        <span class="pstat-lbl">Mejor personaje</span>
+      </div>`;
+
+  return `<div class="pstat-tower-row">${floorCard}${charCard}</div>`;
 }
 
 function _closeProfile() {

@@ -102,16 +102,7 @@ export async function openUserProfile(userId) {
     </div>
 
     <div class="up-section-label">Torre Infinita</div>
-    <div class="up-grid up-grid--2">
-      <div class="up-card">
-        <span class="up-val">${towerFloor > 0 ? towerFloor : '—'}</span>
-        <span class="up-lbl">Piso más alto</span>
-      </div>
-      <div class="up-card">
-        <span class="up-val up-val--tower">${towerChar ?? '—'}</span>
-        <span class="up-lbl">Mejor personaje</span>
-      </div>
-    </div>
+    ${_towerSection(towerFloor, towerChar, metas)}
 
     <div class="up-section-label">Personaje más usado</div>
     ${favHtml}
@@ -241,4 +232,32 @@ function _formatLastSeen(lastSeenStr) {
 
 function _esc(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function _towerSection(floor, charId, metas) {
+  // charId may be an ID (new) or a display name (old saves) — try both
+  const meta = charId
+    ? (metas.find(m => m.id === charId) ?? metas.find(m => m.name === charId) ?? null)
+    : null;
+
+  const floorHtml = `
+    <div class="up-card">
+      <span class="up-val">${floor > 0 ? floor : '—'}</span>
+      <span class="up-lbl">Piso más alto</span>
+    </div>`;
+
+  const charHtml = meta
+    ? `<div class="up-fav-card up-tower-char">
+        <div class="up-fav-circle" style="background:${meta.color}">${meta.icon}</div>
+        <div class="up-fav-info">
+          <span class="up-fav-name" style="color:${meta.color}">${meta.name}</span>
+          <span class="up-fav-sub">Mejor run</span>
+        </div>
+      </div>`
+    : `<div class="up-card">
+        <span class="up-val">—</span>
+        <span class="up-lbl">Mejor personaje</span>
+      </div>`;
+
+  return `<div class="up-tower-row">${floorHtml}${charHtml}</div>`;
 }

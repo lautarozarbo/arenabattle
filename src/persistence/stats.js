@@ -125,7 +125,7 @@ export function recordTowerRun(run) {
   const s = _get();
   if (run.floor > (s.towerMaxFloor ?? 0)) {
     s.towerMaxFloor = run.floor;
-    s.towerBestChar = run.powerMeta?.name ?? null;
+    s.towerBestChar = run.powerMeta?.id ?? null;
     _persist(s);
   }
 }
