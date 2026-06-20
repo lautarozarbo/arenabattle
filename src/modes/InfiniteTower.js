@@ -47,15 +47,27 @@ export class InfiniteTower {
   startRun(powerMeta, category, savedState = null) {
     if (savedState) {
       this._run = new TowerRun(powerMeta, savedState.category ?? category);
-      this._run.floor       = savedState.floor       ?? 0;
-      this._run.upgrades    = savedState.upgrades     ? [...savedState.upgrades] : [];
-      this._run.playerMods  = savedState.playerMods   ? { ...savedState.playerMods } : this._run.playerMods;
-      this._run.powerMods   = savedState.powerMods    ? { ...savedState.powerMods  } : this._run.powerMods;
+      this._run.floor      = savedState.floor      ?? 0;
+      this._run.upgrades   = savedState.upgrades   ? [...savedState.upgrades]  : [];
+      this._run.playerMods = savedState.playerMods ? { ...savedState.playerMods } : this._run.playerMods;
+      this._run.powerMods  = savedState.powerMods  ? { ...savedState.powerMods  } : this._run.powerMods;
     } else {
       this._run = new TowerRun(powerMeta, category);
     }
     this._ui.reset();
-    this._advanceFloor();
+
+    const pf = savedState?.pendingFloor;
+    if (pf) {
+      // Restore exact pending floor — avoids re-randomizing enemy/arena on continue
+      const toFloor  = this._run.floor + 1;
+      const enemyInfo = this._buildEnemyInfo(toFloor, pf.boss, pf.enemyConfig, pf.arenaOpts);
+      this._ui.showFloorTransition(this._run.floor, toFloor, enemyInfo, () => {
+        this._run.nextFloor();
+        this._launchFight(toFloor, pf.boss, pf.enemyConfig, pf.arenaOpts);
+      });
+    } else {
+      this._advanceFloor();
+    }
   }
 
   handleGameOver(winner, winnerSide) {
@@ -72,12 +84,14 @@ export class InfiniteTower {
     const fromFloor = this._run.floor;
     const toFloor   = fromFloor + 1;
 
-    // Generate ONCE — reused for both preview and the actual fight
     const boss        = isBossFloor(toFloor) ? generateBoss(toFloor) : null;
     const enemyConfig = boss ? null : getNormalEnemyConfig(toFloor);
-    const arenaOpts   = this._getArenaOpts(); // random skin + layout for this floor
-    const enemyInfo   = this._buildEnemyInfo(toFloor, boss, enemyConfig, arenaOpts);
+    const arenaOpts   = this._getArenaOpts();
 
+    // Save with pending floor so continue always uses the same enemy+arena
+    this._onSave(this._run, { boss, enemyConfig, arenaOpts });
+
+    const enemyInfo = this._buildEnemyInfo(toFloor, boss, enemyConfig, arenaOpts);
     this._ui.showFloorTransition(fromFloor, toFloor, enemyInfo, () => {
       this._run.nextFloor();
       this._launchFight(toFloor, boss, enemyConfig, arenaOpts);
@@ -117,9 +131,8 @@ export class InfiniteTower {
   _onUpgradeChosen(upgrade) {
     upgrade.apply(this._run);
     this._run.applyUpgrade(upgrade.id);
-    this._onSave(this._run); // persist after each upgrade
     this._ui.hideUpgradePicker();
-    this._advanceFloor();
+    this._advanceFloor(); // _advanceFloor saves with pending floor
   }
 
   _onRunFailed() {

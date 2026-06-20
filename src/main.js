@@ -20,6 +20,7 @@ import {
   recordLoss,
   recordDraw,
   recordCharUse,
+  recordTowerRun,
   getMostUsedChar,
   syncStatsFromCloud,
 } from "./persistence/stats.js";
@@ -107,6 +108,7 @@ import {
 import {
   saveTowerRun,
   loadTowerRun,
+  loadTowerRunCloud,
   clearTowerRun,
   maybeSaveBestRun,
   getBestTowerRun,
@@ -566,6 +568,7 @@ function _confirmProfileName() {
 
 function _buildProfileStats() {
   const s = getStats();
+  const bestTower = getBestTowerRun();
   const favResult = getMostUsedChar(metas);
   const mostUsed = favResult?.meta ?? null;
   const favCount = favResult?.count ?? 0;
@@ -655,6 +658,17 @@ function _buildProfileStats() {
     </div>
     <div class="pstat-section-label">Personaje favorito</div>
     ${favHtml}
+    <div class="pstat-section-label">Torre Infinita</div>
+    <div class="pstat-grid">
+      <div class="pstat-card pstat-card--wide">
+        <span class="pstat-val">${s.towerMaxFloor > 0 ? s.towerMaxFloor : (bestTower?.floor ?? '—')}</span>
+        <span class="pstat-lbl">Piso más alto</span>
+      </div>
+      <div class="pstat-card pstat-card--wide">
+        <span class="pstat-val">${s.towerBestChar ?? bestTower?.powerName ?? '—'}</span>
+        <span class="pstat-lbl">Mejor personaje</span>
+      </div>
+    </div>
   `;
 }
 
@@ -889,6 +903,19 @@ document.getElementById("btn-p2-back").addEventListener("click", () => {
 });
 
 document.getElementById("btn-fight-back").addEventListener("click", () => {
+  if (gameMode === "tower") {
+    // Progress is auto-saved; skip confirm and return to tower setup
+    game.stop();
+    stopHudLoop();
+    _stopAbilitiesLoop();
+    document.getElementById("gameover-bar").classList.add("hidden");
+    document.getElementById("fight-tag-area").classList.add("hidden");
+    _tower = null;
+    gameMode = "quickmatch";
+    _refreshTowerSetupScreen();
+    showScreen("screen-tower-setup");
+    return;
+  }
   showConfirm(() => {
     game.stop();
     stopHudLoop();
@@ -2012,21 +2039,26 @@ let _pendingWinnerSide = -1;
 
 // ── Infinite Tower ────────────────────────────────────────────────────────────
 
-function _refreshTowerSetupScreen() {
-  const best   = getBestTowerRun();
-  const saved  = loadTowerRun();
+async function _refreshTowerSetupScreen() {
   const allMetas = getAllPowerMetas();
 
-  // Best run stats
+  // Best run: prefer cloud stats (synced), fall back to localStorage
+  const cloudStats = getStats();
+  let bestFloor = cloudStats.towerMaxFloor ?? 0;
+  let bestChar  = cloudStats.towerBestChar ?? null;
+  if (!bestFloor) {
+    const localBest = getBestTowerRun();
+    bestFloor = localBest?.floor ?? 0;
+    bestChar  = localBest?.powerName ?? null;
+  }
+
   const bestEl = document.getElementById("tower-best-run");
   if (bestEl) {
-    if (best) {
-      const d = new Date(best.date);
-      const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+    if (bestFloor > 0) {
       bestEl.innerHTML = `
         <div class="tbr-label">Mejor run</div>
-        <div class="tbr-floor">Piso ${best.floor}</div>
-        <div class="tbr-detail">${best.powerName} · ${best.upgradeCount} mejora${best.upgradeCount !== 1 ? 's' : ''} · ${dateStr}</div>
+        <div class="tbr-floor">Piso ${bestFloor}</div>
+        ${bestChar ? `<div class="tbr-detail">${bestChar}</div>` : ''}
       `;
       bestEl.classList.remove("hidden");
     } else {
@@ -2034,12 +2066,21 @@ function _refreshTowerSetupScreen() {
     }
   }
 
-  // Continue button
+  // Continue button: local first, then cloud fallback
+  let saved = loadTowerRun();
+  if (!saved) {
+    saved = await loadTowerRunCloud();
+    if (saved) {
+      // Cache it locally so next open is instant
+      try { localStorage.setItem('tower_saved_run', JSON.stringify(saved)); } catch {}
+    }
+  }
+
   const contBtn = document.getElementById("btn-tower-continue");
   if (contBtn) {
     if (saved) {
       const meta = allMetas.find(m => m.id === saved.powerMetaId);
-      contBtn.textContent = `Continuar — Piso ${saved.floor} (${meta?.name ?? saved.powerMetaId})`;
+      contBtn.textContent = `Continuar — Piso ${saved.floor + 1} (${meta?.name ?? saved.powerMetaId})`;
       contBtn.classList.remove("hidden");
     } else {
       contBtn.classList.add("hidden");
@@ -2072,8 +2113,8 @@ function _startTowerRun(powerMeta, savedState = null) {
       _refreshTowerSetupScreen();
       showScreen("screen-tower-setup");
     },
-    onSave:    (run) => saveTowerRun(run),
-    onRunOver: (run) => { maybeSaveBestRun(run); clearTowerRun(); },
+    onSave:    (run, pendingFloor) => saveTowerRun(run, pendingFloor),
+    onRunOver: (run) => { maybeSaveBestRun(run); recordTowerRun(run); clearTowerRun(); },
     getArenaOpts: () => {
       const layout = ARENA_LAYOUTS[Math.floor(Math.random() * ARENA_LAYOUTS.length)];
       const skin   = _unlockedArenaSkins[Math.floor(Math.random() * _unlockedArenaSkins.length)] ?? ARENA_SKINS[0];
@@ -2244,6 +2285,7 @@ document.getElementById("btn-restart").addEventListener("click", () => {
   if (gameMode === "tower") {
     _tower = null;
     gameMode = "quickmatch";
+    _refreshTowerSetupScreen();
     showScreen("screen-tower-setup");
     return;
   }

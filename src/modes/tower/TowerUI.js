@@ -37,29 +37,16 @@ export class TowerUI {
     const plateOld = el.querySelector('.tt-plate-old');
     const plateNew = el.querySelector('.tt-plate-new');
 
-    // Fill floor plates
-    plateOld.innerHTML = _plateContent(fromFloor, null, false);
-    plateNew.innerHTML = _plateContent(toFloor, enemyInfo, enemyInfo?.isBoss ?? false);
+    const isBoss = enemyInfo?.isBoss ?? false;
+    plateNew.innerHTML = _plateContent(toFloor, enemyInfo, isBoss);
 
-    // Draw real arena preview canvas
     const cvs = plateNew.querySelector('.tt-arena-cvs');
     if (cvs && enemyInfo) _renderArenaPreview(cvs, enemyInfo.arenaSkinId ?? 'default', enemyInfo.arenaObstacles ?? []);
 
-    // Reset animation state
     el.classList.remove('tt--hidden');
-    shaft.classList.remove('tt-animate');
-    void shaft.offsetWidth; // reflow to restart animation
+    el.querySelector('.tt-tap-hint').classList.add('tt-tap-hint--hidden');
 
-    // Start ascent after a tiny delay so the user sees "piso X" before moving
-    setTimeout(() => shaft.classList.add('tt-animate'), 180);
-
-    // After animation settles, show the "tap to fight" hint
-    const ANIM_MS = 1100;
-    setTimeout(() => {
-      el.querySelector('.tt-tap-hint').classList.remove('tt-tap-hint--hidden');
-    }, ANIM_MS + 200);
-
-    // Auto-advance or tap to continue
+    let autoTimer;
     const advance = () => {
       el.removeEventListener('click', advance);
       clearTimeout(autoTimer);
@@ -67,8 +54,29 @@ export class TowerUI {
       onComplete();
     };
 
+    if (fromFloor === 0) {
+      plateOld.innerHTML = '';
+      shaft.classList.remove('tt-animate');
+      shaft.style.transform = 'translateY(0)'; // show new plate directly, no animation
+      el.addEventListener('click', advance, { once: true });
+      autoTimer = setTimeout(advance, 3000);
+      setTimeout(() => el.querySelector('.tt-tap-hint').classList.remove('tt-tap-hint--hidden'), 400);
+      return;
+    }
+
+    plateOld.innerHTML = _plateContent(fromFloor, null, false);
+    shaft.style.transform = ''; // restore CSS default -50% (shows old plate first)
+    shaft.classList.remove('tt-animate');
+    void shaft.offsetWidth;
+    setTimeout(() => shaft.classList.add('tt-animate'), 180);
+
+    const ANIM_MS = 1100;
+    setTimeout(() => {
+      el.querySelector('.tt-tap-hint').classList.remove('tt-tap-hint--hidden');
+    }, ANIM_MS + 200);
+
     el.addEventListener('click', advance, { once: true });
-    const autoTimer = setTimeout(advance, ANIM_MS + 2400);
+    autoTimer = setTimeout(advance, ANIM_MS + 2400);
   }
 
   hideTransition() {
@@ -95,6 +103,10 @@ export class TowerUI {
       const card = document.createElement('button');
       card.className = 'tp-card';
       card.dataset.id = upg.id;
+      if (upg.color) {
+        card.style.borderColor = upg.color + '55';
+        card.style.setProperty('--upg-color', upg.color);
+      }
       card.innerHTML = `
         <span class="tp-card-label">${upg.label}</span>
         <span class="tp-card-desc">${upg.description}</span>
@@ -197,6 +209,8 @@ export class TowerUI {
 
   _ensureTransition() {
     if (this._transition) return;
+    this._transition = document.querySelector('#screen-fight .tower-transition');
+    if (this._transition) return;
     const el = document.createElement('div');
     el.className = 'tower-transition tt--hidden';
     el.innerHTML = `
@@ -218,6 +232,8 @@ export class TowerUI {
 
   _ensurePicker() {
     if (this._picker) return;
+    this._picker = document.querySelector('#screen-fight .tower-picker');
+    if (this._picker) return;
     const el = document.createElement('div');
     el.className = 'tower-picker tt--hidden';
     el.innerHTML = `
@@ -233,6 +249,16 @@ export class TowerUI {
 
   _ensureRunOver() {
     if (this._runOver) return;
+    // Reuse existing element but replace button to rebind handler for this instance
+    const existing = document.querySelector('#screen-fight .tower-runover');
+    if (existing) {
+      const oldBtn = existing.querySelector('.tro-btn');
+      const newBtn = oldBtn.cloneNode(true);
+      oldBtn.replaceWith(newBtn);
+      newBtn.addEventListener('click', () => { this.hideRunOver(); this._onRunOverClose?.(); });
+      this._runOver = existing;
+      return;
+    }
     const el = document.createElement('div');
     el.className = 'tower-runover tt--hidden';
     el.innerHTML = `
@@ -253,9 +279,10 @@ export class TowerUI {
 
   _ensureStatsBar() {
     if (this._statsBar) return;
+    this._statsBar = document.querySelector('.tower-stats-bar');
+    if (this._statsBar) return;
     const el = document.createElement('div');
     el.className = 'tower-stats-bar tt--hidden';
-    // Insert after arena-container so it appears below the canvas
     const arena = document.getElementById('arena-container');
     arena.insertAdjacentElement('afterend', el);
     this._statsBar = el;
@@ -282,9 +309,12 @@ function _plateContent(floor, enemyInfo, isBoss) {
     : '';
 
   return `
-    <div class="tt-plate-floor">${bossTag} Piso ${floor}</div>
+    <div class="tt-plate-header">
+      <span class="tt-plate-floor-num">Piso ${floor}</span>
+      ${bossTag}
+    </div>
 
-    <canvas class="tt-arena-cvs" width="140" height="140"></canvas>
+    <canvas class="tt-arena-cvs" width="130" height="130"></canvas>
 
     <div class="tt-arena-label">
       ${enemyInfo.arenaName ?? ''}${enemyInfo.arenaSkin ? ` · ${enemyInfo.arenaSkin}` : ''}
@@ -292,7 +322,7 @@ function _plateContent(floor, enemyInfo, isBoss) {
 
     <div class="tt-enemy-card">
       <div class="tt-char-header">
-        <span class="tt-char-dot" style="background:${color};box-shadow:0 0 7px ${color}88"></span>
+        <span class="tt-char-dot" style="background:${color};box-shadow:0 0 8px ${color}99"></span>
         <span class="tt-char-name" style="color:${color}">${enemyInfo.label}</span>
       </div>
       <div class="tt-stat-row">

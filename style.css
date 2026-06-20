@@ -1365,6 +1365,16 @@ html, body {
   flex-direction: column;
   gap: 4px;
 }
+.pstat-card--wide {
+  flex: 1;
+  min-width: 0;
+}
+.pstat-card--wide .pstat-val {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .pstat-val {
   font-size: 1.5rem;
   font-weight: 800;
@@ -4446,25 +4456,23 @@ td.rank {
 /* Sliding shaft container — clips the plates */
 .tt-shaft-wrap {
   width: min(300px, 82vw);
-  height: 220px;
+  height: 340px;
   overflow: hidden;
   position: relative;
 }
 
-/* Plate order: new (top = floor above) + old (bottom = floor below) = 440px */
+/* Plate order: new (top) + old (bottom) = 2 × plate height */
 .tt-shaft {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 440px;
-  /* Default: offset so old plate (bottom) is visible */
+  /* Default: offset so old plate (bottom half) is visible */
   transform: translateY(-50%);
 }
 .tt-shaft.tt-animate {
   animation: tt-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes tt-rise {
-  /* Old plate exits going down, new plate descends into view from above */
   from { transform: translateY(-50%); }
   to   { transform: translateY(0); }
 }
@@ -4472,45 +4480,56 @@ td.rank {
 /* Each floor plate */
 .tt-plate {
   flex-shrink: 0;
-  height: 220px;
+  height: 340px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 20px 22px;
+  gap: 8px;
+  padding: 16px 20px;
   box-sizing: border-box;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
   background: rgba(255,255,255,0.03);
+  overflow: hidden;
 }
 
-.tt-plate-floor {
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.42);
+.tt-plate-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 4px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.tt-plate-floor-num {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.tt-plate-floor {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: -0.01em;
 }
 .tt-plate-status {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
 }
 
 /* Real arena canvas preview */
 .tt-arena-cvs {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
+  width: 110px;
+  height: 110px;
+  border-radius: 8px;
   display: block;
-  margin: 6px auto 2px;
+  margin: 0 auto;
   box-shadow: 0 0 0 2px rgba(255,255,255,0.09), 0 4px 18px rgba(0,0,0,0.5);
 }
 .tt-arena-label {
@@ -4534,9 +4553,9 @@ td.rank {
 }
 .tt-stat-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
 }
 .tt-stat-label {
   font-size: 0.65rem;
@@ -4652,19 +4671,20 @@ td.rank {
 
 /* Individual upgrade card */
 .tp-card {
+  --upg-color: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 14px 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid color-mix(in srgb, var(--upg-color) 35%, transparent);
   border-radius: 14px;
   text-align: left;
   cursor: pointer;
   color: #fff;
   opacity: 0;
   transform: translateY(12px);
-  transition: background 0.15s, border-color 0.15s, transform 0.12s, opacity 0.12s;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s, opacity 0.12s, box-shadow 0.15s;
 }
 .tp-card--enter {
   animation: tp-card-in 0.32s cubic-bezier(0.22,1,0.36,1) forwards;
@@ -4673,28 +4693,30 @@ td.rank {
   to { opacity: 1; transform: translateY(0); }
 }
 .tp-card:not(:disabled):hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.22);
+  background: color-mix(in srgb, var(--upg-color) 10%, transparent);
+  border-color: color-mix(in srgb, var(--upg-color) 55%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--upg-color) 20%, transparent);
   transform: translateY(-2px);
-}
-.tp-card--dim    { opacity: 0.2 !important; }
-.tp-card--chosen {
-  border-color: rgba(120,200,255,0.7) !important;
-  background: rgba(120,200,255,0.12) !important;
-  animation: tp-chosen-flash 0.55s ease forwards;
-}
-@keyframes tp-chosen-flash {
-  0%   { box-shadow: 0 0 0   0   rgba(120,200,255,0); }
-  40%  { box-shadow: 0 0 18px 4px rgba(120,200,255,0.5); }
-  100% { box-shadow: 0 0 0   0   rgba(120,200,255,0); }
 }
 .tp-card-label {
   font-size: 0.95rem;
   font-weight: 800;
+  color: var(--upg-color);
+}
+.tp-card--dim    { opacity: 0.15 !important; }
+.tp-card--chosen {
+  border-color: color-mix(in srgb, var(--upg-color) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--upg-color) 14%, transparent) !important;
+  animation: tp-chosen-flash 0.55s ease forwards;
+}
+@keyframes tp-chosen-flash {
+  0%   { box-shadow: 0 0 0   0   transparent; }
+  40%  { box-shadow: 0 0 22px 5px color-mix(in srgb, var(--upg-color) 45%, transparent); }
+  100% { box-shadow: 0 0 0   0   transparent; }
 }
 .tp-card-desc {
   font-size: 0.74rem;
-  color: rgba(255,255,255,0.48);
+  color: rgba(255,255,255,0.45);
   line-height: 1.4;
 }
 

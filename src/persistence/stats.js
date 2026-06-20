@@ -10,6 +10,8 @@ function _defaults() {
     championships: { league: 0, tournament: 0 },
     charUses:      {},
     favorites:     [],
+    towerMaxFloor: 0,
+    towerBestChar: null,
   };
 }
 
@@ -28,14 +30,16 @@ async function _persist(s) {
   const uid = await _getUID();
   if (!uid) return;
   supabase.from('user_stats').upsert({
-    user_id:       uid,
-    wins:          s.wins,
-    losses:        s.losses,
-    draws:         s.draws,
-    championships: s.championships,
-    char_uses:     s.charUses,
-    favorites:     s.favorites,
-    updated_at:    new Date().toISOString(),
+    user_id:          uid,
+    wins:             s.wins,
+    losses:           s.losses,
+    draws:            s.draws,
+    championships:    s.championships,
+    char_uses:        s.charUses,
+    favorites:        s.favorites,
+    tower_max_floor:  s.towerMaxFloor ?? 0,
+    tower_best_char:  s.towerBestChar ?? null,
+    updated_at:       new Date().toISOString(),
   }).then(() => {});
 }
 
@@ -59,6 +63,8 @@ export async function syncStatsFromCloud() {
       championships: { ...def.championships, ...(data.championships ?? {}) },
       charUses:      data.char_uses ?? {},
       favorites:     Array.isArray(data.favorites) ? data.favorites : [],
+      towerMaxFloor: data.tower_max_floor ?? 0,
+      towerBestChar: data.tower_best_char ?? null,
     };
   } else {
     _cache = _defaults();
@@ -111,6 +117,16 @@ export function recordCharUse(powerId) {
   const s = _get();
   s.charUses[powerId] = (s.charUses[powerId] || 0) + 1;
   _persist(s);
+}
+
+/** Called when a tower run ends. Updates best floor+char if improved. */
+export function recordTowerRun(run) {
+  const s = _get();
+  if (run.floor > (s.towerMaxFloor ?? 0)) {
+    s.towerMaxFloor = run.floor;
+    s.towerBestChar = run.powerMeta?.name ?? null;
+    _persist(s);
+  }
 }
 
 export function getMostUsedChar(metas) {
