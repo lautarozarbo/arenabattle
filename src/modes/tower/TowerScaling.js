@@ -14,11 +14,16 @@ const RADIUS_CAP     = 36;    // enemy never grows past this
 
 const BOSS_FLOOR_INTERVAL = 10;
 
-// Pool of random powers the enemy can have, weighted by floor
+// All playable powers (excludes 'none' — no power is boring as enemy)
 const NORMAL_ENEMY_POWERS = [
-  'rocket', 'saw', 'spider', 'electric', 'laser', 'archer',
-  'vampire', 'venom', 'momentum', 'ninja', 'turret', 'assassin',
-  'bloodshard', 'crystalbeam', 'reflectshield', 'caballero', 'revolver',
+  'saw', 'assassin', 'momentum', 'electric', 'vampire', 'venom',
+  'parasite', 'hotpotato', 'tortuga', 'reflectshield', 'karma', 'diminuto', 'caballero',
+  'rocket', 'bloodshard', 'clusterbomb', 'fenix', 'crystalbeam', 'volcano',
+  'ninja', 'angel', 'archer', 'boomerang', 'revolver',
+  'spider', 'territory', 'spike', 'grid', 'chromatic', 'toxictrail',
+  'glass', 'aura', 'earthquake', 'cursedwall', 'portal', 'domainexpansion', 'laser',
+  'cactus', 'duo', 'chess', 'turret', 'alien', 'bomb', 'mage',
+  'pulsar', 'apostador', 'clock', 'serpiente',
 ];
 
 // ── Public API ───────────────────────────────────────────────────────────────
@@ -50,7 +55,7 @@ export function isBossFloor(floor) {
  * Base HP for boss floors (extra on top of normal scaling).
  */
 export function getBossBaseHp(floor) {
-  return getNormalEnemyConfig(floor).hp * 1.6;
+  return getNormalEnemyConfig(floor).hp * 2;
 }
 
 // ── Internals ────────────────────────────────────────────────────────────────
