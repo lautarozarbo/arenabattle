@@ -1082,9 +1082,10 @@ html, body {
   margin-bottom: 7px;
 }
 .wardrobe-skins-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 .wardrobe-skin-card {
   display: flex;
@@ -1092,6 +1093,7 @@ html, body {
   align-items: center;
   gap: 5px;
   position: relative;
+  width: calc((100% - 16px) / 3);
 }
 .wardrobe-skin-canvas {
   display: block;
