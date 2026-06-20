@@ -27,8 +27,9 @@ export class InfiniteTower {
       this._run = new TowerRun(powerMeta, savedState.category ?? category);
       this._run.floor      = savedState.floor      ?? 0;
       this._run.upgrades   = savedState.upgrades   ? [...savedState.upgrades]    : [];
-      this._run.playerMods = savedState.playerMods ? { ...savedState.playerMods } : this._run.playerMods;
-      this._run.powerMods  = savedState.powerMods  ? { ...savedState.powerMods  } : this._run.powerMods;
+      // Merge onto constructor defaults so missing fields in old saves don't produce NaN/undefined
+      if (savedState.playerMods) this._run.playerMods = { ...this._run.playerMods, ...savedState.playerMods };
+      if (savedState.powerMods)  this._run.powerMods  = { ...this._run.powerMods,  ...savedState.powerMods  };
     } else {
       this._run = new TowerRun(powerMeta, category);
     }
