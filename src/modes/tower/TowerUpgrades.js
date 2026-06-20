@@ -46,7 +46,7 @@ const POWERS_WITH_ZONE_DUR = new Set([
 const UNIVERSAL = [
   { id: 'hp_up',       group: 'hp',      color: '#f87171', label: '+5 HP máx.',         description: 'Tu HP máximo aumenta en 5.',                      apply(r) { r.playerMods.hpBonus       += 5;  } },
   { id: 'hp_up_big',   group: 'hp',      color: '#f87171', label: '+10 HP máx.',        description: 'Tu HP máximo aumenta en 10.',                     apply(r) { r.playerMods.hpBonus       += 10; } },
-  { id: 'regen_small', group: 'regen',   color: '#f472b6', label: 'Regen +1 HP/s',      description: 'Recuperás 1 HP por segundo durante la pelea.',    apply(r) { r.playerMods.regenPerSec   += 1;  } },
+  { id: 'regen_small', group: 'regen',   color: '#f472b6', label: 'Regen +0.5 HP/s',    description: 'Recuperás 0.5 HP por segundo durante la pelea.',  apply(r) { r.playerMods.regenPerSec   += 0.5; } },
   { id: 'speed_up',    group: 'speed',   color: '#22d3ee', label: 'Velocidad +5%',      description: 'Te movés un 5% más rápido.',                      apply(r) { r.playerMods.speedMult     *= 1.05; } },
   { id: 'contact_dmg', group: 'contact', color: '#fb923c', label: '+1 daño por choque', description: 'Cada choque de cuerpo hace 1 de daño extra.',     apply(r) { r.playerMods.contactDmgAdd += 1;  } },
   { id: 'contact_dmg_big', group: 'contact', color: '#fb923c', label: '+2 daño por choque', description: 'Cada choque de cuerpo hace 2 de daño extra.', apply(r) { r.playerMods.contactDmgAdd += 2;  } },
@@ -103,7 +103,7 @@ export function summarizeUpgrades(ids) {
   const chips = [];
   if (pm.dmgAdd        > 0) chips.push({ label: `+${pm.dmgAdd} daño poder`,                color: '#a78bfa' });
   if (pm.hpBonus       > 0) chips.push({ label: `+${pm.hpBonus} HP`,                       color: '#f87171' });
-  if (pm.regenPerSec   > 0) chips.push({ label: `Regen +${pm.regenPerSec} HP/s`,           color: '#f472b6' });
+  if (pm.regenPerSec   > 0) chips.push({ label: `Regen +${+pm.regenPerSec.toFixed(1)} HP/s`, color: '#f472b6' });
   if (pm.speedMult     > 1) chips.push({ label: `Vel +${Math.round((pm.speedMult-1)*100)}%`, color: '#22d3ee' });
   if (pm.contactDmgAdd > 0) chips.push({ label: `+${pm.contactDmgAdd} choque`,             color: '#fb923c' });
   if (pw.cdMult        < 1) chips.push({ label: `CD -${Math.round((1-pw.cdMult)*100)}%`,   color: '#60a5fa' });
@@ -133,8 +133,8 @@ export function summarizeUpgrades(ids) {
 //   cooldown: -5% (55) vs -10% (45)
 
 const GROUP_WEIGHTS = {
-  damage:   20,
-  hp:       17,
+  damage:   17,
+  hp:       20,
   cooldown: 15,
   contact:  12,
   proj:     12,
