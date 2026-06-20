@@ -834,6 +834,7 @@ document.getElementById("btn-tower").addEventListener("click", () => {
 
 document.getElementById("btn-tower-go").addEventListener("click", () => {
   sfx.uiClick();
+  gameMode = "tower";
   document.querySelector("#screen-select-p1 h2").textContent = "Elegí tu personaje";
   showScreen("screen-select-p1");
   carousels.p1.reset();
