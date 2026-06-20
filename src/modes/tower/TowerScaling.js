@@ -6,7 +6,7 @@
 // ── Tuning knobs ────────────────────────────────────────────────────────────
 
 const BASE_HP        = 100;
-const HP_PER_FLOOR   = 5;     // +5 HP each floor (floor 20 = 200 HP)
+const HP_GROWTH      = 1.09;  // ×1.09 per floor (exponential)
 const BASE_SPEED     = 290;
 const SPEED_PER_10   = 0;     // speed stays flat; difficulty comes from HP scaling
 const BASE_RADIUS    = 28;
@@ -36,7 +36,7 @@ const NORMAL_ENEMY_POWERS = [
 export { BASE_SPEED };
 
 export function getNormalEnemyConfig(floor) {
-  const hp     = BASE_HP + HP_PER_FLOOR * (floor - 1);
+  const hp     = Math.round(BASE_HP * Math.pow(HP_GROWTH, floor - 1));
   const speed  = BASE_SPEED + SPEED_PER_10 * Math.floor((floor - 1) / 10);
   const radius = Math.min(BASE_RADIUS + Math.floor((floor - 1) / 15), RADIUS_CAP);
   const powerId = _pickEnemyPower();
