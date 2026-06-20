@@ -173,15 +173,15 @@ export class TowerUI {
     const pmods = run.powerMods;
 
     const chips = [];
-    if (mods.dmgAdd        > 0)  chips.push({ label: `⚔ +${mods.dmgAdd} daño`,                            color: '#a78bfa' });
-    if (mods.speedMult     > 1)  chips.push({ label: `⚡ +${Math.round((mods.speedMult - 1) * 100)}% vel`, color: '#22d3ee' });
-    if (mods.regenPerSec   > 0)  chips.push({ label: `❤ +${mods.regenPerSec}/s`,                          color: '#f472b6' });
-    if (mods.contactDmgAdd > 0)  chips.push({ label: `+${mods.contactDmgAdd} choque`,                     color: '#fb923c' });
-    if (mods.hpBonus       > 0)  chips.push({ label: `+${mods.hpBonus} HP`,                               color: '#f87171' });
-    if (pmods.cdMult       < 1)  chips.push({ label: `⏱ -${Math.round((1 - pmods.cdMult) * 100)}% CD`,   color: '#60a5fa' });
-    if (pmods.extraProjectile > 0) chips.push({ label: `+${pmods.extraProjectile} proy`,                  color: '#facc15' });
-    if (pmods.extraPlacement  > 0) chips.push({ label: `+${pmods.extraPlacement} elem`,                   color: '#4ade80' });
-    if (pmods.zoneDurationMult > 1) chips.push({ label: `⧖ +${Math.round((pmods.zoneDurationMult - 1) * 100)}% zona`, color: '#2dd4bf' });
+    if (mods.dmgAdd        > 0)  chips.push({ label: `+${mods.dmgAdd} daño poder`,                              color: '#a78bfa' });
+    if (mods.speedMult     > 1)  chips.push({ label: `Vel +${Math.round((mods.speedMult - 1) * 100)}%`,         color: '#22d3ee' });
+    if (mods.regenPerSec   > 0)  chips.push({ label: `Regen +${mods.regenPerSec} HP/s`,                        color: '#f472b6' });
+    if (mods.contactDmgAdd > 0)  chips.push({ label: `+${mods.contactDmgAdd} choque`,                          color: '#fb923c' });
+    if (mods.hpBonus       > 0)  chips.push({ label: `+${mods.hpBonus} HP`,                                    color: '#f87171' });
+    if (pmods.cdMult       < 1)  chips.push({ label: `CD -${Math.round((1 - pmods.cdMult) * 100)}%`,           color: '#60a5fa' });
+    if (pmods.extraProjectile > 0) chips.push({ label: `+${pmods.extraProjectile} proyectil`,                  color: '#facc15' });
+    if (pmods.extraPlacement  > 0) chips.push({ label: `+${pmods.extraPlacement} elemento`,                    color: '#4ade80' });
+    if (pmods.zoneDurationMult > 1) chips.push({ label: `Zona +${Math.round((pmods.zoneDurationMult - 1) * 100)}%`, color: '#2dd4bf' });
 
     if (chips.length === 0) {
       bar.classList.add('tt--hidden');
