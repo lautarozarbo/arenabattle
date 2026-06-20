@@ -55,10 +55,12 @@ export class CactusPower extends BasePower {
         Math.hypot(x - this.owner.x, y - this.owner.y) <
           r + this.owner.radius + 25
       );
+      const maxLife = this.CACTUS_LIFE * this._zoneDurMult();
       this._cacti.push({
         x,
         y,
-        life: this.CACTUS_LIFE * this._zoneDurMult(),
+        life: maxLife,
+        maxLife,
         hitCooldown: 0,
         compHitCooldown: 0,
       });
@@ -110,7 +112,7 @@ export class CactusPower extends BasePower {
 
   renderBelow(ctx) {
     for (const c of this._cacti) {
-      const fade = c.life / this.CACTUS_LIFE;
+      const fade = c.life / c.maxLife;
       ctx.save();
 
       // Body

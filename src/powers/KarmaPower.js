@@ -108,7 +108,7 @@ export class KarmaPower extends BasePower {
       ctx.stroke();
       ctx.restore();
       if (this._stored >= 1)
-        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2), "#c084fc");
+        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2 + (this.owner?.towerMods?.dmgAdd ?? 0)), "#c084fc");
       return;
     }
 
@@ -125,7 +125,7 @@ export class KarmaPower extends BasePower {
       ctx.stroke();
       ctx.restore();
       if (this._stored >= 1)
-        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2), "#f97316");
+        _drawLabel(ctx, x, y, r, Math.ceil(this._stored * 2 + (this.owner?.towerMods?.dmgAdd ?? 0)), "#f97316");
     }
   }
 
