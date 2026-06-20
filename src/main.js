@@ -905,16 +905,17 @@ document.getElementById("btn-p2-back").addEventListener("click", () => {
 
 document.getElementById("btn-fight-back").addEventListener("click", () => {
   if (gameMode === "tower") {
-    // Progress is auto-saved; skip confirm and return to tower setup
-    game.stop();
-    stopHudLoop();
-    _stopAbilitiesLoop();
-    document.getElementById("gameover-bar").classList.add("hidden");
-    document.getElementById("fight-tag-area").classList.add("hidden");
-    _tower = null;
-    gameMode = "quickmatch";
-    _refreshTowerSetupScreen();
-    showScreen("screen-tower-setup");
+    showConfirm(() => {
+      game.stop();
+      stopHudLoop();
+      _stopAbilitiesLoop();
+      document.getElementById("gameover-bar").classList.add("hidden");
+      document.getElementById("fight-tag-area").classList.add("hidden");
+      _tower = null;
+      gameMode = "quickmatch";
+      _refreshTowerSetupScreen();
+      showScreen("screen-tower-setup");
+    }, "¿Volver al menú?", " ", "Volver");
     return;
   }
   showConfirm(() => {
