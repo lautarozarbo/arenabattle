@@ -7,7 +7,7 @@
 
 const BASE_HP        = 100;
 const HP_PER_FLOOR   = 5;     // +5 HP each floor (floor 20 = 200 HP)
-const BASE_SPEED     = 200;
+const BASE_SPEED     = 290;
 const SPEED_PER_10   = 0;     // speed stays flat; difficulty comes from HP scaling
 const BASE_RADIUS    = 28;
 const RADIUS_CAP     = 36;    // enemy never grows past this
