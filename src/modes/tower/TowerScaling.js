@@ -28,6 +28,8 @@ const NORMAL_ENEMY_POWERS = [
  * @param {number} floor  1-indexed current floor
  * @returns {{ hp, speed, radius, powerId }}
  */
+export { BASE_SPEED };
+
 export function getNormalEnemyConfig(floor) {
   const hp     = BASE_HP + HP_PER_FLOOR * (floor - 1);
   const speed  = BASE_SPEED + SPEED_PER_10 * Math.floor((floor - 1) / 10);

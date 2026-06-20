@@ -1,5 +1,5 @@
 import { TowerRun }          from './tower/TowerRun.js';
-import { getNormalEnemyConfig, isBossFloor } from './tower/TowerScaling.js';
+import { getNormalEnemyConfig, isBossFloor, BASE_SPEED } from './tower/TowerScaling.js';
 import { generateBoss }      from './tower/TowerBoss.js';
 import { getUpgradeChoices } from './tower/TowerUpgrades.js';
 import { TowerUI }           from './tower/TowerUI.js';
@@ -110,6 +110,7 @@ export class InfiniteTower {
       powerId:    meta.id,
       hp:         100 + mods.hpBonus,
       skinId:     skinned.skinId,
+      enemySpeed: BASE_SPEED, // player moves at same base speed as enemies
       towerMods:  { ...mods, ...this._run.powerMods },
     };
   }
