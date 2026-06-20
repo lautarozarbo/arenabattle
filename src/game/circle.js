@@ -51,6 +51,7 @@ export class Circle {
     this._healHot         = 0;   // seconds remaining for heal-over-time
     this._healHotAccum    = 0;   // accumulator for per-second ticks
     this._healHotRate     = 5;   // HP per second
+    this.towerMods        = cfg.towerMods ?? null;
   }
 
   clampToBaseSpeed() {
