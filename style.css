@@ -4514,7 +4514,7 @@ td.rank {
 .tower-transition {
   position: absolute;
   inset: 0;
-  background: #0a0a12;
+  background: radial-gradient(ellipse at 50% 100%, rgba(30,20,60,1) 0%, #07070f 60%);
   z-index: 88;
   overflow: hidden;
   display: flex;
@@ -4522,6 +4522,21 @@ td.rank {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+/* Rising sparkle particles */
+.tt-spark {
+  position: absolute;
+  bottom: -6px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0.5px);
+  animation: tt-spark-rise linear infinite;
+}
+@keyframes tt-spark-rise {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: var(--start-op, 0.5); }
+  80%  { opacity: var(--start-op, 0.5); }
+  100% { transform: translateY(-110vh) translateX(var(--drift, 0px)) scale(0.2); opacity: 0; }
 }
 
 /* Side track lines simulating a tower shaft */
@@ -4533,17 +4548,17 @@ td.rank {
 .tt-track {
   position: absolute;
   top: 0; bottom: 0;
-  width: 2px;
+  width: 1px;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255,255,255,0.08) 0px,
-    rgba(255,255,255,0.08) 12px,
-    transparent 12px,
-    transparent 24px
+    rgba(255,255,255,0.06) 0px,
+    rgba(255,255,255,0.06) 10px,
+    transparent 10px,
+    transparent 22px
   );
 }
-.tt-track--left  { left:  18%; }
-.tt-track--right { right: 18%; }
+.tt-track--left  { left:  12%; }
+.tt-track--right { right: 12%; }
 
 /* Sliding shaft container — clips the plates */
 .tt-shaft-wrap {
@@ -4577,29 +4592,37 @@ td.rank {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 20px;
+  gap: 10px;
+  padding: 18px 22px;
   box-sizing: border-box;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(22,20,40,0.97) 0%, rgba(10,9,20,0.97) 100%);
+  box-shadow: 0 8px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
   overflow: hidden;
 }
 
 .tt-plate-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 0;
   width: 100%;
-  margin-bottom: 6px;
 }
-.tt-plate-floor-num {
-  font-size: 1.4rem;
+.tt-floor-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  line-height: 1;
+}
+.tt-floor-num {
+  font-size: 2.4rem;
   font-weight: 900;
   color: #fff;
-  letter-spacing: -0.01em;
-  line-height: 1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 .tt-plate-floor {
   font-size: 1.2rem;
@@ -4617,23 +4640,31 @@ td.rank {
 
 /* Real arena canvas preview */
 .tt-arena-cvs {
-  width: 110px;
-  height: 110px;
-  border-radius: 8px;
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
   display: block;
   margin: 0 auto;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.09), 0 4px 18px rgba(0,0,0,0.5);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 6px 24px rgba(0,0,0,0.6);
 }
 .tt-arena-label {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.34);
+  color: rgba(255,255,255,0.28);
   text-align: center;
-  margin-bottom: 8px;
+  margin-top: -4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 160px;
+}
+
+/* Divider between arena and enemy */
+.tt-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 2px 0;
 }
 
 /* Enemy info card inside the new floor plate */
@@ -4641,7 +4672,7 @@ td.rank {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 .tt-stat-row {
   display: flex;
@@ -4650,51 +4681,46 @@ td.rank {
   gap: 6px;
 }
 .tt-stat-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.28);
 }
 .tt-stat-val {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #e8e8f0;
 }
 .tt-val--hp { color: #f87171; }
 .tt-boss-badge {
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   font-weight: 800;
-  letter-spacing: 0.16em;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: #e74c3c;
+  letter-spacing: 0.18em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 0 12px rgba(231,76,60,0.5);
   color: #fff;
   text-transform: uppercase;
-  vertical-align: middle;
+  margin-top: 4px;
 }
 .tt-char-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 9px;
+  margin-bottom: 2px;
 }
 .tt-char-dot {
   flex-shrink: 0;
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
 }
 .tt-char-name {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 900;
   letter-spacing: 0.01em;
-}
-.tt-arena-tag {
-  margin-top: 6px;
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.38);
-  letter-spacing: 0.02em;
 }
 .tt-boss-desc {
   font-size: 0.72rem;

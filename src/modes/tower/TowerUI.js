@@ -45,6 +45,7 @@ export class TowerUI {
 
     el.classList.remove('tt--hidden');
     el.querySelector('.tt-tap-hint').classList.add('tt-tap-hint--hidden');
+    _spawnParticles(el, enemyInfo?.color ?? '#ffffff');
 
     let autoTimer;
     const advance = () => {
@@ -300,38 +301,54 @@ function _plateContent(floor, enemyInfo, isBoss) {
 
   const color   = enemyInfo.color ?? '#e74c3c';
   const bossTag = isBoss ? `<span class="tt-boss-badge">JEFE</span>` : '';
-  const countLine = enemyInfo.count > 1
-    ? `<div class="tt-stat-row"><span class="tt-stat-label">Enemigos</span><span class="tt-stat-val">${enemyInfo.count}</span></div>`
-    : '';
-  const descLine = isBoss && enemyInfo.bossDesc
-    ? `<div class="tt-boss-desc">${enemyInfo.bossDesc}</div>`
-    : '';
 
   return `
     <div class="tt-plate-header">
-      <span class="tt-plate-floor-num">Piso ${floor}</span>
+      <div class="tt-floor-label">PISO</div>
+      <div class="tt-floor-num">${floor}</div>
       ${bossTag}
     </div>
 
-    <canvas class="tt-arena-cvs" width="130" height="130"></canvas>
+    <canvas class="tt-arena-cvs" width="140" height="140"></canvas>
 
     <div class="tt-arena-label">
       ${enemyInfo.arenaName ?? ''}${enemyInfo.arenaSkin ? ` · ${enemyInfo.arenaSkin}` : ''}
     </div>
 
+    <div class="tt-divider"></div>
+
     <div class="tt-enemy-card">
       <div class="tt-char-header">
-        <span class="tt-char-dot" style="background:${color};box-shadow:0 0 8px ${color}99"></span>
-        <span class="tt-char-name" style="color:${color}">${enemyInfo.label}</span>
+        <span class="tt-char-dot" style="background:${color};box-shadow:0 0 10px ${color}bb"></span>
+        <span class="tt-char-name" style="color:${color};text-shadow:0 0 20px ${color}66">${enemyInfo.label}</span>
       </div>
       <div class="tt-stat-row">
         <span class="tt-stat-label">HP</span>
-        <span class="tt-stat-val tt-val--hp">${Math.round(enemyInfo.hp)}${enemyInfo.count > 1 ? ' c/u' : ''}</span>
+        <span class="tt-stat-val tt-val--hp">${Math.round(enemyInfo.hp)}</span>
       </div>
-      ${countLine}
-      ${descLine}
     </div>
   `;
+}
+
+function _spawnParticles(container, color) {
+  container.querySelectorAll('.tt-spark').forEach(p => p.remove());
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'tt-spark';
+    const size  = (2 + Math.random() * 3).toFixed(1);
+    const op    = (0.25 + Math.random() * 0.55).toFixed(2);
+    const drift = ((Math.random() - 0.5) * 70).toFixed(1);
+    p.style.cssText = [
+      `left:${(Math.random() * 100).toFixed(1)}%`,
+      `width:${size}px`, `height:${size}px`,
+      `background:${Math.random() > 0.4 ? color : '#ffffff'}`,
+      `animation-delay:${(Math.random() * 4).toFixed(2)}s`,
+      `animation-duration:${(3 + Math.random() * 4).toFixed(2)}s`,
+    ].join(';');
+    p.style.setProperty('--start-op', op);
+    p.style.setProperty('--drift', `${drift}px`);
+    container.appendChild(p);
+  }
 }
 
 function _renderArenaPreview(cvs, skinId, obstacles) {
