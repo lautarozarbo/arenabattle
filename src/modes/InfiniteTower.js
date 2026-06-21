@@ -134,16 +134,18 @@ export class InfiniteTower {
 
   _buildEnemyInfo(floor, isBoss, enemyConfig, arenaOpts) {
     const meta = this._getPowerMeta(enemyConfig?.powerId);
+    const tier = Math.floor(floor / 10);
     return {
       isBoss,
-      label:         meta?.name  ?? enemyConfig?.powerId ?? 'Enemigo',
-      color:         meta?.color ?? '#e74c3c',
-      hp:            enemyConfig?.hp ?? 100,
-      count:         1,
-      arenaName:     arenaOpts?._layoutName ?? null,
-      arenaSkin:     arenaOpts?._skinName   ?? null,
-      arenaSkinId:   arenaOpts?.skinId       ?? 'default',
-      arenaObstacles: arenaOpts?.obstacles   ?? [],
+      label:          meta?.name  ?? enemyConfig?.powerId ?? 'Enemigo',
+      color:          meta?.color ?? '#e74c3c',
+      hp:             enemyConfig?.hp ?? 100,
+      contactDmgAdd:  tier * (tier + 1) / 2,
+      count:          1,
+      arenaName:      arenaOpts?._layoutName ?? null,
+      arenaSkin:      arenaOpts?._skinName   ?? null,
+      arenaSkinId:    arenaOpts?.skinId       ?? 'default',
+      arenaObstacles: arenaOpts?.obstacles    ?? [],
     };
   }
 }

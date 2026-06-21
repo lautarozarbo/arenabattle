@@ -4696,7 +4696,8 @@ td.rank {
   font-weight: 700;
   color: #e8e8f0;
 }
-.tt-val--hp { color: #f87171; }
+.tt-val--hp  { color: #f87171; }
+.tt-val--dmg { color: #fb923c; }
 .tt-boss-badge {
   font-size: 0.55rem;
   font-weight: 800;

@@ -332,6 +332,11 @@ function _plateContent(floor, enemyInfo, isBoss) {
         <span class="tt-stat-label">HP</span>
         <span class="tt-stat-val tt-val--hp">${Math.round(enemyInfo.hp)}</span>
       </div>
+      ${(enemyInfo.contactDmgAdd ?? 0) > 0 ? `
+      <div class="tt-stat-row">
+        <span class="tt-stat-label">Daño de choque</span>
+        <span class="tt-stat-val tt-val--dmg">+${enemyInfo.contactDmgAdd}</span>
+      </div>` : ''}
     </div>
   `;
 }

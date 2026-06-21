@@ -52,6 +52,7 @@ export class Circle {
     this._healHotAccum    = 0;   // accumulator for per-second ticks
     this._healHotRate     = 5;   // HP per second
     this.towerMods        = cfg.towerMods ?? null;
+    if (cfg.contactDmgAdd) this._contactDmgAdd = cfg.contactDmgAdd;
   }
 
   clampToBaseSpeed() {
@@ -189,6 +190,7 @@ export class Circle {
     this._bleedAccum = 0;
   }
 
+
   // Called by SpikePower (and any future poison power)
   applyVenom(slowDuration, poisonDuration, poisonDPS, slowFactor) {
     if (this._slowTimer <= 0) {
@@ -207,7 +209,7 @@ export class Circle {
 
   takeDamage(amount) {
     if (this._invulnerable) return;
-    if (amount > 0.5) {
+    if (amount >= 0.5) {
       this._flashTimer = 0.08;
       this._dmgNums.push({
         x:   this.x + (Math.random() * 16 - 8),
