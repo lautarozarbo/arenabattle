@@ -26,6 +26,7 @@ import {
 } from "./persistence/stats.js";
 import {
   ANIMATED_SKIN_IDS,
+  CHAR_SKINS,
   applySkinnedMeta,
   drawCharPreview,
 } from "./skins/index.js";
@@ -34,6 +35,7 @@ import {
   getXP,
   getChests,
   isArenaSkinUnlocked,
+  isSkinUnlocked,
   addPoints,
   openChest,
   syncRewardsFromCloud,
@@ -984,11 +986,13 @@ document.getElementById("btn-tag-switch").addEventListener("click", () => {
   _ttMatch.doTag(0, saveHp0);
   const incoming = _ttMatch.getActive(0);
   const inHp0 = incoming._duoOwnerHp ?? incoming.hp;
+  const inSkin0 = _fighterSkin(incoming);
   game.swapFighter(0, {
-    color: incoming.meta.color,
+    color: inSkin0.color,
     label: incoming.meta.name,
     powerId: incoming.meta.id,
     hp: inHp0,
+    skinId: inSkin0.skinId,
     _duoCompHp: incoming._duoCompHp,
   });
   _ttPrevHp[0] = inHp0;
@@ -1659,6 +1663,24 @@ const _sharedDeps = {
 initLeagueUI(_sharedDeps);
 initTournamentUI(_sharedDeps);
 
+// ── Skin helpers ──────────────────────────────────────────────────────────────
+// Picks a random unlocked skin for an AI character (equal chance per option incl. default).
+function _randomAiSkinMeta(meta) {
+  const skins = CHAR_SKINS[meta.id];
+  if (!skins) return { ...meta, skinId: 'default' };
+  const available = skins.filter(s => s.id === 'default' || isSkinUnlocked(meta.id, s.id));
+  const pick = available[Math.floor(Math.random() * available.length)];
+  return { ...meta, color: pick.color ?? meta.color, labelColor: pick.labelColor ?? null, skinId: pick.id };
+}
+
+// Returns skin info for a tag-team fighter; falls back to applySkinnedMeta if no skin stored yet.
+function _fighterSkin(fighter) {
+  if (fighter.skinId !== undefined) {
+    return { color: fighter.skinColor ?? fighter.meta.color, labelColor: null, skinId: fighter.skinId };
+  }
+  return applySkinnedMeta(fighter.meta);
+}
+
 // ── Fight ─────────────────────────────────────────────────────────────────────
 function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
   const { canvasSize = 420 } = arenaOpts;
@@ -1669,7 +1691,7 @@ function startFight(p1meta, p2meta, onResult, arenaOpts = {}) {
   }
   _pendingCharUseId = p1meta.id;
   const sp1 = applySkinnedMeta(p1meta);
-  const sp2 = applySkinnedMeta(p2meta);
+  const sp2 = _randomAiSkinMeta(p2meta);
   _startFightWithCfgs(
     [
       {
@@ -1719,6 +1741,16 @@ function startTagTeamFight() {
   const { my, partner, e1, e2 } = _ttCfg;
   _pendingCharUseId = my?.meta?.id;
   _ttMatch = new TagTeamMatch([my, partner], [e1, e2]);
+  // Assign skins up-front so swaps preserve them across the whole match.
+  const _assignSkin = (fighter, fn) => {
+    const s = fn(fighter.meta);
+    fighter.skinId    = s.skinId;
+    fighter.skinColor = s.color;
+  };
+  _assignSkin(_ttMatch.teams[0][0], applySkinnedMeta);
+  _assignSkin(_ttMatch.teams[0][1], applySkinnedMeta);
+  _assignSkin(_ttMatch.teams[1][0], _randomAiSkinMeta);
+  _assignSkin(_ttMatch.teams[1][1], _randomAiSkinMeta);
   _ttArenaOpts = getQuickArenaOpts();
   canvas.width = canvas.height = _ttArenaOpts.canvasSize;
   document.getElementById("fight-context-label").textContent = "2 vs 2";
@@ -1730,8 +1762,8 @@ function startTagTeamFight() {
 function _ttRunRound() {
   const a0 = _ttMatch.getActive(0);
   const a1 = _ttMatch.getActive(1);
-  const sm0 = applySkinnedMeta(a0.meta);
-  const sm1 = applySkinnedMeta(a1.meta);
+  const sm0 = _fighterSkin(a0);
+  const sm1 = _fighterSkin(a1);
   const cfgs = [
     {
       color: sm0.color,
@@ -1788,11 +1820,13 @@ function _ttStartHudLoop() {
       _ttMatch.doTag(1, saveHp1);
       const incoming = _ttMatch.getActive(1);
       const inHp1 = incoming._duoOwnerHp ?? incoming.hp;
+      const inSkin1 = _fighterSkin(incoming);
       game.swapFighter(1, {
-        color: incoming.meta.color,
+        color: inSkin1.color,
         label: incoming.meta.name,
         powerId: incoming.meta.id,
         hp: inHp1,
+        skinId: inSkin1.skinId,
         _duoCompHp: incoming._duoCompHp,
       });
       _ttPrevHp[1] = inHp1;
@@ -1836,8 +1870,8 @@ function _ttHandleKnockout(winnerSide) {
   } else {
     const a0 = _ttMatch.getActive(0);
     const a1 = _ttMatch.getActive(1);
-    const sk0 = applySkinnedMeta(a0.meta);
-    const sk1 = applySkinnedMeta(a1.meta);
+    const sk0 = _fighterSkin(a0);
+    const sk1 = _fighterSkin(a1);
     const cfgs = [
       {
         color: sk0.color,
@@ -2192,6 +2226,7 @@ function _startTowerRun(powerMeta, savedState = null) {
       return { canvasSize: 420, obstacles: layout.obstacles, skinId: skin.id, _layoutName: layout.name, _skinName: skin.name };
     },
     applySkinnedMeta,
+    aiSkinFn: _randomAiSkinMeta,
     getPowerName: (id) => nameMap[id] ?? id,
     getPowerMeta: (id) => allMetas.find(m => m.id === id) ?? null,
   });

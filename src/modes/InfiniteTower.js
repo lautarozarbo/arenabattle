@@ -5,11 +5,12 @@ import { getUpgradeChoices } from './tower/TowerUpgrades.js';
 import { TowerUI }           from './tower/TowerUI.js';
 
 export class InfiniteTower {
-  constructor({ startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta, getPowerName, getPowerMeta, onSave, onRunOver }) {
+  constructor({ startFightFn, onRunEnd, getArenaOpts, applySkinnedMeta, aiSkinFn, getPowerName, getPowerMeta, onSave, onRunOver }) {
     this._startFightFn     = startFightFn;
     this._onRunEnd         = onRunEnd;
     this._getArenaOpts     = getArenaOpts;
     this._applySkinnedMeta = applySkinnedMeta;
+    this._aiSkinFn         = aiSkinFn ?? applySkinnedMeta;
     this._getPowerName     = getPowerName ?? (id => id);
     this._getPowerMeta     = getPowerMeta ?? (() => null);
     this._onSave           = onSave   ?? (() => {});
@@ -119,12 +120,14 @@ export class InfiniteTower {
   }
 
   _buildEnemyCfg({ hp, radius, speed, powerId, contactDmgAdd }) {
-    const meta = this._getPowerMeta(powerId ?? 'none');
+    const meta   = this._getPowerMeta(powerId ?? 'none');
+    const skinned = meta ? this._aiSkinFn(meta) : null;
     return {
-      color:         meta?.color ?? '#e74c3c',
-      labelColor:    meta?.color ?? '#e74c3c',
-      label:         meta?.name  ?? powerId ?? 'Enemigo',
+      color:         skinned?.color    ?? meta?.color ?? '#e74c3c',
+      labelColor:    skinned?.color    ?? meta?.color ?? '#e74c3c',
+      label:         meta?.name        ?? powerId ?? 'Enemigo',
       powerId:       powerId ?? 'none',
+      skinId:        skinned?.skinId   ?? 'default',
       hp:            hp      ?? 100,
       radius:        radius  ?? 28,
       enemySpeed:    speed   ?? 200,
