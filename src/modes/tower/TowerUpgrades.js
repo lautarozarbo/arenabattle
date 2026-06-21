@@ -34,7 +34,7 @@ const POWERS_WITH_PROJECTILE = new Set([
 ]);
 
 const POWERS_WITH_PLACEMENT = new Set([
-  'spider', 'glass', 'laser', 'spike', 'territory',
+  'spider', 'glass', 'laser', 'spike', 'territory', 'turret',
 ]);
 
 const POWERS_WITH_ZONE_DUR = new Set([
