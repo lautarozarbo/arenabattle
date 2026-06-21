@@ -74,9 +74,19 @@ const ZONE_DUR = [
   { id: 'zone_duration', group: 'zone', color: '#2dd4bf', label: 'Zonas duran +10%', description: 'Tus zonas, trampas y efectos del mapa duran un 10% más.', apply(r) { r.powerMods.zoneDurationMult *= 1.10; } },
 ];
 
+const BLEED = [
+  { id: 'bleed_unlock', group: 'bleed', color: '#ef4444', label: 'Sangrado al chocar',    description: 'Al chocar aplicás 0.5 HP/s de sangrado al enemigo (3s).', apply(r) { r.playerMods.bleedPerSec += 0.5; } },
+  { id: 'bleed_up',     group: 'bleed', color: '#ef4444', label: '+0.5 daño de sangrado', description: 'El sangrado que aplicás aumenta en 0.5 HP/s.',            apply(r) { r.playerMods.bleedPerSec += 0.5; } },
+];
+
+const SLOW = [
+  { id: 'slow_unlock', group: 'slow', color: '#818cf8', label: 'Ralentizar al chocar', description: 'Al chocar ralentizás al enemigo un 10% por 2s.',     apply(r) { r.playerMods.contactSlow += 0.10; } },
+  { id: 'slow_up',     group: 'slow', color: '#818cf8', label: '+2% ralentización',    description: 'La ralentización al chocar aumenta un 2% más.',      apply(r) { r.playerMods.contactSlow += 0.02; } },
+];
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
-const _ALL = [...UNIVERSAL, ...DAMAGE, ...COOLDOWN, ...PROJECTILE, ...PLACEMENT, ...ZONE_DUR];
+const _ALL = [...UNIVERSAL, ...DAMAGE, ...COOLDOWN, ...PROJECTILE, ...PLACEMENT, ...ZONE_DUR, ...BLEED, ...SLOW];
 const _BY_ID = Object.fromEntries(_ALL.map(u => [u.id, u]));
 
 export function getUpgradeLabel(id) {
@@ -106,6 +116,8 @@ export function summarizeUpgrades(ids) {
   if (pm.regenPerSec   > 0) chips.push({ label: `Regen +${+pm.regenPerSec.toFixed(1)} HP/s`, color: '#f472b6' });
   if (pm.speedMult     > 1) chips.push({ label: `Vel +${Math.round((pm.speedMult-1)*100)}%`, color: '#22d3ee' });
   if (pm.contactDmgAdd > 0) chips.push({ label: `+${pm.contactDmgAdd} choque`,             color: '#fb923c' });
+  if (pm.bleedPerSec   > 0) chips.push({ label: `Sangrado ${+pm.bleedPerSec.toFixed(1)}/s`, color: '#ef4444' });
+  if (pm.contactSlow   > 0) chips.push({ label: `Lentitud ${Math.round(pm.contactSlow*100)}%`, color: '#818cf8' });
   if (pw.cdMult        < 1) chips.push({ label: `CD -${Math.round((1-pw.cdMult)*100)}%`,   color: '#60a5fa' });
   if (pw.extraProjectile>0) chips.push({ label: `+${pw.extraProjectile} proyectil`,        color: '#facc15' });
   if (pw.extraPlacement >0) chips.push({ label: `+${pw.extraPlacement} elemento`,          color: '#4ade80' });
@@ -138,7 +150,9 @@ const GROUP_WEIGHTS = {
   cooldown: 15,
   contact:  12,
   proj:     12,
+  bleed:    11,
   speed:    10,
+  slow:     10,
   regen:     9,
   place:     8,
   zone:      7,
@@ -159,13 +173,14 @@ const GROUP_POOLS = {
   proj:     [{ u: _ALL.find(u => u.id === 'extra_proj'),       w: 100 }],
   place:    [{ u: _ALL.find(u => u.id === 'extra_placement'),  w: 100 }],
   zone:     [{ u: _ALL.find(u => u.id === 'zone_duration'),    w: 100 }],
+  // bleed y slow son dinámicos — se construyen en _getPool() según el estado del run
 };
 
 export function getUpgradeChoices(run, count = 3) {
   const powerId = run.powerMeta?.id ?? '';
 
   // Grupos disponibles para este poder
-  const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage'];
+  const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage', 'bleed', 'slow'];
   if (POWERS_WITH_COOLDOWN.has(powerId))   availableGroups.push('cooldown');
   if (POWERS_WITH_PROJECTILE.has(powerId)) availableGroups.push('proj');
   const placeCap = powerId === 'turret' ? 2 : Infinity;
@@ -182,8 +197,20 @@ export function getUpgradeChoices(run, count = 3) {
     remaining.splice(remaining.indexOf(group), 1);
   }
 
-  // Dentro de cada grupo, selección ponderada de la mejora concreta
-  return pickedGroups.map(group => _weightedPick(GROUP_POOLS[group]));
+  // Dentro de cada grupo, selección ponderada (bleed/slow son dinámicos)
+  return pickedGroups.map(group => _weightedPick(_getPool(group, run)));
+}
+
+function _getPool(group, run) {
+  if (group === 'bleed') {
+    const unlocked = (run.playerMods?.bleedPerSec ?? 0) > 0;
+    return [{ u: _BY_ID[unlocked ? 'bleed_up' : 'bleed_unlock'], w: 100 }];
+  }
+  if (group === 'slow') {
+    const unlocked = (run.playerMods?.contactSlow ?? 0) > 0;
+    return [{ u: _BY_ID[unlocked ? 'slow_up' : 'slow_unlock'], w: 100 }];
+  }
+  return GROUP_POOLS[group];
 }
 
 function _weightedPick(entries) {

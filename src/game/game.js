@@ -81,7 +81,9 @@ export class Game {
           c.vx = (c.vx / mag) * newSpeed;
           c.vy = (c.vy / mag) * newSpeed;
         }
-        if (tm.contactDmgAdd) c._contactDmgAdd = tm.contactDmgAdd;
+        if (tm.contactDmgAdd) c._contactDmgAdd      = tm.contactDmgAdd;
+        if (tm.bleedPerSec)   c._contactBleedDPS   = tm.bleedPerSec;
+        if (tm.contactSlow)   c._contactSlowFactor = tm.contactSlow;
         if (tm.regenPerSec)   c.applyHeal(tm.regenPerSec, Infinity);
       }
     }
@@ -251,6 +253,10 @@ export class Game {
         if (c1Hit && c2Hit) {
           c2.takeDamage((c1.power.getHitDamage() + (c1._contactDmgAdd ?? 0)) * c1._dmgBuffMult); c2._hitCooldown = 1.0;
           c1.takeDamage((c2.power.getHitDamage() + (c2._contactDmgAdd ?? 0)) * c2._dmgBuffMult); c1._hitCooldown = 1.0;
+          if ((c1._contactBleedDPS   ?? 0) > 0) c2.applyBleed(3, c1._contactBleedDPS);
+          if ((c1._contactSlowFactor ?? 0) > 0) c2.applyContactSlow(c1._contactSlowFactor, 2);
+          if ((c2._contactBleedDPS   ?? 0) > 0) c1.applyBleed(3, c2._contactBleedDPS);
+          if ((c2._contactSlowFactor ?? 0) > 0) c1.applyContactSlow(c2._contactSlowFactor, 2);
           c1.power.onCollide(c2);
           c2.power.onCollide(c1);
           sfx.collide();
