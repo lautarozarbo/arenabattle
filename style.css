@@ -5064,41 +5064,90 @@ td.rank {
 
 .badge--none { /* no style */ }
 
+/* ── Bronce ×5 — cobre cálido */
 .badge--bronce {
   border: 1.5px solid #cd7f32;
   color: #e8a96a;
+  animation: neon-bronce 2.5s ease-in-out infinite alternate;
 }
+@keyframes neon-bronce {
+  from { box-shadow: 0 0 4px #cd7f3255, 0 0 8px #cd7f3218; }
+  to   { box-shadow: 0 0 10px #cd7f32aa, 0 0 20px #cd7f3240; }
+}
+
+/* ── Plata ×10 — plata con sweep */
 .badge--plata {
-  border: 1.5px solid #c0c0c0;
-  color: #e0e0e0;
-  box-shadow: 0 0 4px rgba(200,200,200,0.25);
+  border: 1.5px solid #bbb;
+  color: #e8e8e8;
+  animation: neon-plata 2s ease-in-out infinite alternate;
 }
+@keyframes neon-plata {
+  from { box-shadow: 0 0 4px #bbbbbb55, 0 0 8px #bbbbbb18; border-color: #888; color: #bbb; }
+  to   { box-shadow: 0 0 12px #ffffffcc, 0 0 22px #ffffff44; border-color: #fff; color: #fff; }
+}
+
+/* ── Esmeralda ×15 — verde neon */
+.badge--esmeralda {
+  border: 1.5px solid #2ecc71;
+  color: #55e890;
+  animation: neon-esmeralda 2.2s ease-in-out infinite alternate;
+}
+@keyframes neon-esmeralda {
+  from { box-shadow: 0 0 5px #2ecc7155, 0 0 10px #2ecc7118; }
+  to   { box-shadow: 0 0 12px #2ecc71cc, 0 0 24px #2ecc7150; }
+}
+
+/* ── Oro ×20 — dorado intenso */
 .badge--oro {
   border: 1.5px solid #ffd700;
-  color: #ffd700;
-  box-shadow: 0 0 8px rgba(255,215,0,0.45);
-  animation: badge-glow-oro 2s ease-in-out infinite alternate;
+  color: #ffe750;
+  animation: neon-oro 1.8s ease-in-out infinite alternate;
 }
-@keyframes badge-glow-oro {
-  from { box-shadow: 0 0 5px rgba(255,215,0,0.30); }
-  to   { box-shadow: 0 0 14px rgba(255,215,0,0.70); }
+@keyframes neon-oro {
+  from { box-shadow: 0 0 5px #ffd70055, 0 0 10px #ffd70018; }
+  to   { box-shadow: 0 0 14px #ffd700dd, 0 0 28px #ffd70055; }
 }
+
+/* ── Zafiro ×25 — azul real */
+.badge--zafiro {
+  border: 1.5px solid #4f9dff;
+  color: #7eb8ff;
+  animation: neon-zafiro 2s ease-in-out infinite alternate;
+}
+@keyframes neon-zafiro {
+  from { box-shadow: 0 0 5px #4f9dff55, 0 0 10px #4f9dff18; }
+  to   { box-shadow: 0 0 12px #4f9dffcc, 0 0 24px #4f9dff50; }
+}
+
+/* ── Diamante ×30 — cian frío parpadeante */
 .badge--diamante {
   border: 1.5px solid #b9f2ff;
-  color: #b9f2ff;
-  animation: badge-sparkle 1.8s ease-in-out infinite alternate;
+  color: #d8faff;
+  animation: neon-diamante 1.1s ease-in-out infinite alternate;
 }
-@keyframes badge-sparkle {
-  0%   { box-shadow: 0 0 6px rgba(100,230,255,0.35); border-color: #b9f2ff; }
-  50%  { box-shadow: 0 0 12px rgba(100,230,255,0.65); border-color: #80eeff; }
-  100% { box-shadow: 0 0 6px rgba(100,230,255,0.35); border-color: #ffffff; }
+@keyframes neon-diamante {
+  from { box-shadow: 0 0 6px #b9f2ff55, 0 0 12px #b9f2ff18; border-color: #70ddff; color: #b9f2ff; }
+  to   { box-shadow: 0 0 16px #b9f2ffee, 0 0 32px #b9f2ff60; border-color: #ffffff;  color: #ffffff;  }
 }
+
+/* ── Amatista ×40 — púrpura profundo */
+.badge--amatista {
+  border: 1.5px solid #c084fc;
+  color: #d8aaff;
+  animation: neon-amatista 2.3s ease-in-out infinite alternate;
+}
+@keyframes neon-amatista {
+  from { box-shadow: 0 0 5px #c084fc55, 0 0 10px #c084fc18; }
+  to   { box-shadow: 0 0 13px #c084fccc, 0 0 26px #c084fc50; }
+}
+
+/* ── Legendario ×50 — borde arcoíris giratorio */
 .badge--legendario {
   border: 1.5px solid transparent;
   position: relative;
   isolation: isolate;
   background: #0d0f1a;
-  animation: badge-rainbow 3s linear infinite;
+  animation: neon-legendario 3s linear infinite;
 }
 .badge--legendario::before {
   content: '';
@@ -5109,12 +5158,12 @@ td.rank {
   animation: badge-rainbow-bg 3s linear infinite;
   z-index: -1;
 }
-@keyframes badge-rainbow {
-  0%  { color: #ff8c9e; }
-  25% { color: #ffe490; }
-  50% { color: #90ffc8; }
-  75% { color: #90d8ff; }
-  100%{ color: #ff8c9e; }
+@keyframes neon-legendario {
+  0%   { color: #ff8c9e; text-shadow: 0 0 8px #ff0080aa; }
+  25%  { color: #ffe490; text-shadow: 0 0 8px #ff8c00aa; }
+  50%  { color: #90ffc8; text-shadow: 0 0 8px #00ff88aa; }
+  75%  { color: #90d8ff; text-shadow: 0 0 8px #00c8ffaa; }
+  100% { color: #ff8c9e; text-shadow: 0 0 8px #ff0080aa; }
 }
 @keyframes badge-rainbow-bg {
   0%   { background-position: 0% 50%; }

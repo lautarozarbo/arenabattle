@@ -26,13 +26,13 @@ export const CAT_LEVELS_COUNT = CAT_TARGETS.length;
 
 // Win streak milestones
 export const STREAK_MILESTONES = [
-  { target:  5, xp:   50, badge: 'badge_bronce' },
-  { target: 10, xp:  100, badge: 'badge_plata'  },
-  { target: 15, xp:  175, badge: null            },
-  { target: 20, xp:  250, badge: 'badge_oro'     },
-  { target: 25, xp:  350, badge: null            },
-  { target: 30, xp:  500, badge: 'badge_diamante'},
-  { target: 40, xp:  700, badge: null            },
+  { target:  5, xp:   50, badge: 'badge_bronce'     },
+  { target: 10, xp:  100, badge: 'badge_plata'      },
+  { target: 15, xp:  175, badge: 'badge_esmeralda'  },
+  { target: 20, xp:  250, badge: 'badge_oro'        },
+  { target: 25, xp:  350, badge: 'badge_zafiro'     },
+  { target: 30, xp:  500, badge: 'badge_diamante'   },
+  { target: 40, xp:  700, badge: 'badge_amatista'   },
   { target: 50, xp: 1000, badge: 'badge_legendario' },
 ];
 
@@ -40,8 +40,11 @@ export const STREAK_MILESTONES = [
 export const BADGES = {
   badge_bronce:     { name: 'Bronce',     cssClass: 'badge--bronce',     streakRequired:  5 },
   badge_plata:      { name: 'Plata',      cssClass: 'badge--plata',      streakRequired: 10 },
+  badge_esmeralda:  { name: 'Esmeralda',  cssClass: 'badge--esmeralda',  streakRequired: 15 },
   badge_oro:        { name: 'Oro',        cssClass: 'badge--oro',        streakRequired: 20 },
+  badge_zafiro:     { name: 'Zafiro',     cssClass: 'badge--zafiro',     streakRequired: 25 },
   badge_diamante:   { name: 'Diamante',   cssClass: 'badge--diamante',   streakRequired: 30 },
+  badge_amatista:   { name: 'Amatista',   cssClass: 'badge--amatista',   streakRequired: 40 },
   badge_legendario: { name: 'Legendario', cssClass: 'badge--legendario', streakRequired: 50 },
 };
 
