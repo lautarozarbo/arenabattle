@@ -4681,6 +4681,7 @@ td.rank {
 .tt-stat-row {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   align-items: baseline;
   gap: 6px;
 }
@@ -4698,6 +4699,7 @@ td.rank {
 }
 .tt-val--hp  { color: #f87171; }
 .tt-val--dmg { color: #fb923c; }
+.tt-stat-label--right { margin-left: auto; }
 .tt-boss-badge {
   font-size: 0.55rem;
   font-weight: 800;
