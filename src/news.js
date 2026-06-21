@@ -4,6 +4,7 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
+  { badge: "NUEVO", text: "Misiones y marcos de usuario" },
   { badge: "NUEVO", text: "Nuevo modo: Torre Infinita" },
   { badge: "NUEVO", text: "Nuevo personaje: Revolver" },
   { badge: "NUEVO", text: "Nuevo personaje: Caballero" },
