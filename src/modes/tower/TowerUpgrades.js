@@ -168,7 +168,8 @@ export function getUpgradeChoices(run, count = 3) {
   const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage'];
   if (POWERS_WITH_COOLDOWN.has(powerId))   availableGroups.push('cooldown');
   if (POWERS_WITH_PROJECTILE.has(powerId)) availableGroups.push('proj');
-  if (POWERS_WITH_PLACEMENT.has(powerId))  availableGroups.push('place');
+  const placeCap = powerId === 'turret' ? 2 : Infinity;
+  if (POWERS_WITH_PLACEMENT.has(powerId) && (run.powerMods?.extraPlacement ?? 0) < placeCap) availableGroups.push('place');
   if (POWERS_WITH_ZONE_DUR.has(powerId))   availableGroups.push('zone');
 
   // Selección ponderada de grupos (sin repetir)
