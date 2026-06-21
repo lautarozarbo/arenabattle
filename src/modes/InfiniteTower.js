@@ -74,7 +74,8 @@ export class InfiniteTower {
 
   _launchFight(floor, isBoss, enemyConfig, arenaOpts) {
     const playerCfg  = this._buildPlayerCfg();
-    const enemyCfg   = this._buildEnemyCfg(enemyConfig);
+    const tier       = Math.floor(floor / 10);
+    const enemyCfg   = this._buildEnemyCfg({ ...enemyConfig, contactDmgAdd: tier * (tier + 1) / 2 });
     const opts = {
       ...arenaOpts,
       fightContextLabel: `Piso ${floor}${isBoss ? ' — JEFE' : ''}`,

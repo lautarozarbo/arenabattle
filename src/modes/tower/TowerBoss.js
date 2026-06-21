@@ -8,9 +8,10 @@ import { getNormalEnemyConfig, getBossBaseHp } from './TowerScaling.js';
 export function generateBoss(floor) {
   const base = getNormalEnemyConfig(floor);
   return {
-    powerId: base.powerId,
-    hp:      Math.round(getBossBaseHp(floor)),
-    speed:   base.speed,
-    radius:  38,
+    powerId:      base.powerId,
+    hp:           Math.round(getBossBaseHp(floor)),
+    speed:        base.speed,
+    radius:       38,
+    contactDmgAdd: base.contactDmgAdd,
   };
 }
