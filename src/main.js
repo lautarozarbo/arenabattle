@@ -2123,14 +2123,15 @@ async function _refreshTowerSetupScreen() {
     }
   }
 
-  // Continue button: local first, then cloud fallback
-  let saved = loadTowerRun();
-  if (!saved) {
-    saved = await loadTowerRunCloud();
-    if (saved) {
-      // Cache it locally so next open is instant
-      try { localStorage.setItem('tower_saved_run', JSON.stringify(saved)); } catch {}
-    }
+  // Continue button: pick whichever save (local vs cloud) is more recent
+  const localSaved = loadTowerRun();
+  const cloudSaved = await loadTowerRunCloud();
+  let saved;
+  if (cloudSaved && (!localSaved || (cloudSaved.savedAt ?? 0) > (localSaved.savedAt ?? 0))) {
+    saved = cloudSaved;
+    try { localStorage.setItem('tower_saved_run', JSON.stringify(cloudSaved)); } catch {}
+  } else {
+    saved = localSaved;
   }
 
   const contBtn = document.getElementById("btn-tower-continue");
