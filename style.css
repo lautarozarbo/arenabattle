@@ -4950,7 +4950,7 @@ td.rank {
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 16px;
   width: 100%; max-width: 460px;
-  max-height: 88vh;
+  height: 88vh;
   display: flex; flex-direction: column;
   overflow: hidden;
 }
