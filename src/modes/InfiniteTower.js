@@ -117,16 +117,17 @@ export class InfiniteTower {
     };
   }
 
-  _buildEnemyCfg({ hp, radius, speed, powerId }) {
+  _buildEnemyCfg({ hp, radius, speed, powerId, contactDmgAdd }) {
     const meta = this._getPowerMeta(powerId ?? 'none');
     return {
-      color:      meta?.color ?? '#e74c3c',
-      labelColor: meta?.color ?? '#e74c3c',
-      label:      meta?.name  ?? powerId ?? 'Enemigo',
-      powerId:    powerId ?? 'none',
-      hp:         hp      ?? 100,
-      radius:     radius  ?? 28,
-      enemySpeed: speed   ?? 200,
+      color:         meta?.color ?? '#e74c3c',
+      labelColor:    meta?.color ?? '#e74c3c',
+      label:         meta?.name  ?? powerId ?? 'Enemigo',
+      powerId:       powerId ?? 'none',
+      hp:            hp      ?? 100,
+      radius:        radius  ?? 28,
+      enemySpeed:    speed   ?? 200,
+      contactDmgAdd: contactDmgAdd ?? 0,
     };
   }
 

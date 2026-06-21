@@ -36,11 +36,13 @@ const NORMAL_ENEMY_POWERS = [
 export { BASE_SPEED };
 
 export function getNormalEnemyConfig(floor) {
-  const hp     = Math.round(BASE_HP * Math.pow(HP_GROWTH, floor - 1));
-  const speed  = BASE_SPEED + SPEED_PER_10 * Math.floor((floor - 1) / 10);
-  const radius = Math.min(BASE_RADIUS + Math.floor((floor - 1) / 15), RADIUS_CAP);
-  const powerId = _pickEnemyPower();
-  return { hp, speed, radius, powerId };
+  const hp           = Math.round(BASE_HP * Math.pow(HP_GROWTH, floor - 1));
+  const speed        = BASE_SPEED + SPEED_PER_10 * Math.floor((floor - 1) / 10);
+  const radius       = Math.min(BASE_RADIUS + Math.floor((floor - 1) / 15), RADIUS_CAP);
+  const powerId      = _pickEnemyPower();
+  const tier          = Math.floor(floor / 10);
+  const contactDmgAdd = tier * (tier + 1) / 2;
+  return { hp, speed, radius, powerId, contactDmgAdd };
 }
 
 /**
