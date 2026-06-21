@@ -21,7 +21,7 @@ export class MomentumPower extends BasePower {
 
   getHitDamage() {
     this._lastStacks = this._stacks;
-    const dmg = Math.max(1, this._stacks);
+    const dmg = Math.max(1, this._stacks) + (this.owner?.towerMods?.dmgAdd ?? 0);
     this._stacks = 0;
     return dmg;
   }
