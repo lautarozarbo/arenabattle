@@ -80,15 +80,10 @@ const BLEED = [
   { id: 'bleed_dur',    group: 'bleed', color: '#ef4444', label: '+1s de sangrado',       description: 'El sangrado dura 1 segundo más.',                        apply(r) { r.playerMods.bleedDuration += 1; } },
 ];
 
-const SLOW = [
-  { id: 'slow_unlock', group: 'slow', color: '#818cf8', label: 'Ralentizar al chocar', description: 'Al chocar ralentizás al enemigo un 10% por 3s.',   apply(r) { r.playerMods.contactSlow += 0.10; } },
-  { id: 'slow_up',     group: 'slow', color: '#818cf8', label: '+2% ralentización',    description: 'La ralentización al chocar aumenta un 2% más.',    apply(r) { r.playerMods.contactSlow += 0.02; } },
-  { id: 'slow_dur',    group: 'slow', color: '#818cf8', label: '+1s de ralentización', description: 'La ralentización dura 1 segundo más.',             apply(r) { r.playerMods.slowDuration += 1; } },
-];
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
-const _ALL = [...UNIVERSAL, ...DAMAGE, ...COOLDOWN, ...PROJECTILE, ...PLACEMENT, ...ZONE_DUR, ...BLEED, ...SLOW];
+const _ALL = [...UNIVERSAL, ...DAMAGE, ...COOLDOWN, ...PROJECTILE, ...PLACEMENT, ...ZONE_DUR, ...BLEED];
 const _BY_ID = Object.fromEntries(_ALL.map(u => [u.id, u]));
 
 export function getUpgradeLabel(id) {
@@ -119,7 +114,6 @@ export function summarizeUpgrades(ids) {
   if (pm.speedMult     > 1) chips.push({ label: `Vel +${Math.round((pm.speedMult-1)*100)}%`, color: '#22d3ee' });
   if (pm.contactDmgAdd > 0) chips.push({ label: `+${pm.contactDmgAdd} choque`,             color: '#fb923c' });
   if (pm.bleedPerSec   > 0) chips.push({ label: `Sangrado ${+pm.bleedPerSec.toFixed(1)}/s ${pm.bleedDuration ?? 3}s`, color: '#ef4444' });
-  if (pm.contactSlow   > 0) chips.push({ label: `Lentitud ${Math.round(pm.contactSlow*100)}% ${pm.slowDuration ?? 3}s`, color: '#818cf8' });
   if (pw.cdMult        < 1) chips.push({ label: `CD -${Math.round((1-pw.cdMult)*100)}%`,   color: '#60a5fa' });
   if (pw.extraProjectile>0) chips.push({ label: `+${pw.extraProjectile} proyectil`,        color: '#facc15' });
   if (pw.extraPlacement >0) chips.push({ label: `+${pw.extraPlacement} elemento`,          color: '#4ade80' });
@@ -154,7 +148,6 @@ const GROUP_WEIGHTS = {
   proj:     12,
   bleed:    11,
   speed:    10,
-  slow:     10,
   regen:     9,
   place:     8,
   zone:      7,
@@ -182,7 +175,7 @@ export function getUpgradeChoices(run, count = 3) {
   const powerId = run.powerMeta?.id ?? '';
 
   // Grupos disponibles para este poder
-  const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage', 'bleed', 'slow'];
+  const availableGroups = ['hp', 'regen', 'speed', 'contact', 'damage', 'bleed'];
   if (POWERS_WITH_COOLDOWN.has(powerId))   availableGroups.push('cooldown');
   if (POWERS_WITH_PROJECTILE.has(powerId)) availableGroups.push('proj');
   const placeCap = powerId === 'turret' ? 2 : Infinity;
@@ -208,11 +201,6 @@ function _getPool(group, run) {
     if ((run.playerMods?.bleedPerSec ?? 0) === 0) return [{ u: _BY_ID['bleed_unlock'], w: 100 }];
     // Unlocked: +daño (60%) vs +duración (40%)
     return [{ u: _BY_ID['bleed_up'], w: 60 }, { u: _BY_ID['bleed_dur'], w: 40 }];
-  }
-  if (group === 'slow') {
-    if ((run.playerMods?.contactSlow ?? 0) === 0) return [{ u: _BY_ID['slow_unlock'], w: 100 }];
-    // Unlocked: +ralentización (60%) vs +duración (40%)
-    return [{ u: _BY_ID['slow_up'], w: 60 }, { u: _BY_ID['slow_dur'], w: 40 }];
   }
   return GROUP_POOLS[group];
 }
