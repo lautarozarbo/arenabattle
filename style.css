@@ -3581,6 +3581,8 @@ td.rank {
   color: #fff;
   text-align: center;
   margin-bottom: 20px;
+  padding-top: 8px;
+  overflow: visible;
 }
 .up-section-label {
   font-size: 0.7rem;
@@ -5063,113 +5065,230 @@ td.rank {
 .badge-wrap { display: inline-flex; align-items: center; }
 .badge-name { display: inline-block; border-radius: 5px; padding: 1px 6px; }
 
-.badge--none { /* no style */ }
+.badge--none {}
 
-/* ── Bronce ×5 — brasa lenta */
-.badge--bronce {
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BADGE PREVIEWS (solo borde + glow, sin fondo, para el panel de misiones)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.ms-badge-preview.badge--bronce   { border:1.5px solid #cd7f32; color:#f0a855; animation: prev-pulse 2.5s ease-in-out infinite alternate; --pc:#cd7f3288; --pc2:#ff950055; }
+.ms-badge-preview.badge--plata    { border:1.5px solid #bbb;    color:#ddd;    animation: prev-flash 2s ease-in-out infinite; --pc:#ffffff99; --pc2:#aaaaaa44; }
+.ms-badge-preview.badge--esmeralda{ border:1.5px solid #2ecc71; color:#55e890; animation: prev-pulse 2.8s ease-in-out infinite alternate; --pc:#2ecc71aa; --pc2:#2ecc7144; }
+.ms-badge-preview.badge--oro      { border:1.5px solid #ffd700; color:#ffe750; animation: prev-pulse 1.6s ease-in-out infinite alternate; --pc:#ffd700cc; --pc2:#ffd70055; }
+.ms-badge-preview.badge--zafiro   { border:1.5px solid #4f9dff; color:#7eb8ff; animation: prev-pulse 2s ease-in-out infinite alternate; --pc:#4f9dffaa; --pc2:#4f9dff44; }
+.ms-badge-preview.badge--diamante { border:1.5px solid #b9f2ff; color:#d8faff; animation: prev-pulse 0.9s ease-in-out infinite alternate; --pc:#ffffffcc; --pc2:#b9f2ff55; }
+.ms-badge-preview.badge--amatista { border:1.5px solid #c084fc; color:#d4aaff; animation: prev-pulse 3.5s ease-in-out infinite alternate; --pc:#c084fcaa; --pc2:#c084fc44; }
+.ms-badge-preview.badge--legendario { border:1.5px solid transparent; position:relative; isolation:isolate; background:#0d0f1a; animation:legendario-text 3s linear infinite; }
+.ms-badge-preview.badge--legendario::before { content:''; position:absolute; inset:-1.5px; border-radius:7px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080); background-size:300% 100%; animation:badge-rainbow-sweep 2s linear infinite; z-index:-1; }
+@keyframes prev-pulse { from { box-shadow:0 0 3px var(--pc,#fff5); } to { box-shadow:0 0 10px var(--pc,#fffa), 0 0 18px var(--pc2,#fff3); } }
+@keyframes prev-flash { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 10px var(--pc,#fffa);} }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   USERNAME BADGES (.badge-name.badge--X) — fondos, partículas, texto con color
+   Scopeados con .badge-name para no afectar previews del panel
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Base compartida: contexto de posición para pseudo-elementos */
+.badge-name { position: relative; isolation: isolate; }
+
+/* ── Bronce ×5 — forja de cobre, brasas flotantes ── */
+.badge-name.badge--bronce {
+  background: radial-gradient(ellipse at 50% 150%, #3d1500 0%, #110800 55%, #0c0e1b 100%);
   border: 2px solid #cd7f32;
-  color: #f0a855;
-  animation: bronce-ember 3s cubic-bezier(.45,0,.55,1) infinite alternate;
+  color: #ffd080;
+  animation: bronce-forge 2.5s ease-in-out infinite alternate;
 }
-@keyframes bronce-ember {
-  0%   { border-color: #6b3a10; color: #c07828; box-shadow: 0 0 3px #8B451310; text-shadow: none; }
-  70%  { border-color: #cd7f32; color: #f0a855; box-shadow: 0 0 8px #cd7f3288, 0 0 14px #cd7f3240; text-shadow: 0 0 6px #ffb34799; }
-  100% { border-color: #ffb347; color: #ffd080; box-shadow: 0 0 12px #ff9500cc, 0 0 20px #cd7f3255; text-shadow: 0 0 10px #ffb347cc; }
+.badge-name.badge--bronce::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 80%, #ff950030 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, #cd7f3228 0%, transparent 50%);
+  border-radius: inherit;
+  animation: bronce-embers 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes bronce-forge {
+  from { border-color: #8B4513; box-shadow: 0 0 6px #cd7f3266, inset 0 0 6px #3d150033; text-shadow: 0 0 6px #cd7f3299; }
+  to   { border-color: #ffb347; box-shadow: 0 0 14px #ff9500bb, inset 0 0 10px #8B451344; text-shadow: 0 0 12px #ffb347dd; }
+}
+@keyframes bronce-embers {
+  from { opacity: 0.4; transform: scaleY(0.9); }
+  to   { opacity: 1;   transform: scaleY(1.1); }
 }
 
-/* ── Plata ×10 — destello frío, relámpago */
-.badge--plata {
+/* ── Plata ×10 — acero líquido, destello cruzado ── */
+.badge-name.badge--plata {
+  background: linear-gradient(105deg, #0c0e1b 0%, #1a1e30 40%, #0c0e1b 100%);
   border: 2px solid #aaa;
-  color: #ccc;
-  animation: plata-flash 2.4s ease-in-out infinite;
+  color: #ffffff;
+  animation: plata-steel 2.2s ease-in-out infinite;
 }
-@keyframes plata-flash {
-  0%,100% { border-color: #444; color: #777; box-shadow: none; text-shadow: none; }
-  45%     { border-color: #bbb; color: #ddd; box-shadow: 0 0 5px #aaaaaa55; }
-  50%     { border-color: #fff; color: #fff; box-shadow: 0 0 12px #ffffffcc, 0 0 5px #fff; text-shadow: 0 0 8px #ffffffee; }
-  55%     { border-color: #bbb; color: #ddd; box-shadow: 0 0 5px #aaaaaa55; }
+.badge-name.badge--plata::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%);
+  background-size: 200% 100%;
+  border-radius: inherit;
+  animation: plata-sweep 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes plata-steel {
+  0%,100% { border-color: #555; box-shadow: 0 0 4px #88888855; text-shadow: none; color: #bbb; }
+  48%     { border-color: #ccc; box-shadow: 0 0 8px #aaaaaa77; text-shadow: none; color: #ddd; }
+  50%     { border-color: #fff; box-shadow: 0 0 16px #ffffffcc, 0 0 5px #fff; text-shadow: 0 0 10px #ffffffee; color: #fff; }
+  52%     { border-color: #ccc; box-shadow: 0 0 8px #aaaaaa77; text-shadow: none; color: #ddd; }
+}
+@keyframes plata-sweep {
+  0%,100% { background-position: -100% 0; opacity: 0; }
+  40%     { background-position: -100% 0; opacity: 0; }
+  50%     { background-position:  100% 0; opacity: 1; }
+  60%     { background-position:  200% 0; opacity: 0; }
 }
 
-/* ── Esmeralda ×15 — respiración orgánica */
-.badge--esmeralda {
+/* ── Esmeralda ×15 — selva bioluminiscente ── */
+.badge-name.badge--esmeralda {
+  background: radial-gradient(ellipse at 50% 150%, #0a3d1a 0%, #051a0c 50%, #0c0e1b 100%);
   border: 2px solid #2ecc71;
-  color: #55e890;
-  animation: esmeralda-breathe 2.8s cubic-bezier(.4,0,.2,1) infinite alternate;
+  color: #80ffbe;
+  animation: esmeralda-bio 2.8s ease-in-out infinite alternate;
 }
-@keyframes esmeralda-breathe {
-  from { border-color: #0a5c1e; color: #1a9950; box-shadow: 0 0 3px #2ecc7122; text-shadow: none; }
-  to   { border-color: #2ecc71; color: #80ffbe; box-shadow: 0 0 10px #2ecc71bb, 0 0 18px #2ecc7144; text-shadow: 0 0 8px #80ffbecc; }
+.badge-name.badge--esmeralda::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(circle at 25% 60%, #2ecc7128 0%, transparent 40%),
+              radial-gradient(circle at 75% 40%, #00ff8820 0%, transparent 35%);
+  animation: esmeralda-orbs 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes esmeralda-bio {
+  from { border-color: #0d5c2e; box-shadow: 0 0 6px #2ecc7155, inset 0 0 6px #0a3d1a44; text-shadow: 0 0 6px #2ecc7188; }
+  to   { border-color: #2ecc71; box-shadow: 0 0 16px #2ecc71cc, inset 0 0 12px #2ecc7133; text-shadow: 0 0 14px #80ffbeee; }
+}
+@keyframes esmeralda-orbs {
+  from { opacity: 0.3; transform: scale(0.9); }
+  to   { opacity: 1;   transform: scale(1.1); }
 }
 
-/* ── Oro ×20 — llamarada solar */
-.badge--oro {
+/* ── Oro ×20 — corona solar, rayos divinos ── */
+.badge-name.badge--oro {
+  background: radial-gradient(ellipse at 50% 120%, #2a1a00 0%, #180e00 50%, #0c0e1b 100%);
   border: 2px solid #ffd700;
-  color: #ffe750;
-  animation: oro-flare 1.6s ease-in-out infinite;
+  color: #fff3a0;
+  animation: oro-sun 1.8s ease-in-out infinite;
 }
-@keyframes oro-flare {
-  0%,100% { border-color: #b8860b; color: #d4a017; box-shadow: 0 0 4px #ffd70022; text-shadow: none; }
-  50%     { border-color: #ffd700; color: #fff3a0; box-shadow: 0 0 14px #ffd700ee, 0 0 6px #ffd700; text-shadow: 0 0 10px #ffd700ee, 0 0 18px #ffd70055; }
+.badge-name.badge--oro::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: repeating-conic-gradient(from 0deg, #ffd70015 0deg 20deg, transparent 20deg 40deg);
+  animation: oro-rays 6s linear infinite;
+  pointer-events: none;
 }
+@keyframes oro-sun {
+  0%,100% { border-color: #b8860b; box-shadow: 0 0 6px #ffd70044, inset 0 0 6px #2a1a0033; text-shadow: 0 0 6px #ffd70077; }
+  50%     { border-color: #ffe566; box-shadow: 0 0 20px #ffd700ee, 0 0 8px #ffd700, inset 0 0 12px #ffd70022; text-shadow: 0 0 16px #fff3a0ff; }
+}
+@keyframes oro-rays { to { transform: rotate(360deg); } }
 
-/* ── Zafiro ×25 — corriente eléctrica, stutter */
-.badge--zafiro {
+/* ── Zafiro ×25 — descarga eléctrica ── */
+.badge-name.badge--zafiro {
+  background: radial-gradient(ellipse at 50% 150%, #001035 0%, #000820 55%, #0c0e1b 100%);
   border: 2px solid #4f9dff;
-  color: #7eb8ff;
-  animation: zafiro-electric 2.2s ease-in-out infinite;
+  color: #a8d4ff;
+  animation: zafiro-bolt 2.5s ease-in-out infinite;
 }
-@keyframes zafiro-electric {
-  0%,100% { border-color: #0a2e8c; color: #3a70cc; box-shadow: none; text-shadow: none; }
-  55%     { border-color: #4f9dff; color: #7eb8ff; box-shadow: 0 0 6px #4f9dff77; }
-  60%     { border-color: #a8d4ff; color: #d0eaff; box-shadow: 0 0 12px #4f9dffcc; text-shadow: 0 0 8px #a8d4ffcc; }
-  63%     { border-color: #4f9dff; color: #7eb8ff; box-shadow: 0 0 5px #4f9dff55; }
-  66%     { border-color: #a8d4ff; color: #d0eaff; box-shadow: 0 0 10px #4f9dffbb; text-shadow: 0 0 6px #a8d4ffbb; }
-  70%     { border-color: #4f9dff; color: #7eb8ff; box-shadow: 0 0 4px #4f9dff44; }
+.badge-name.badge--zafiro::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(45deg, transparent 30%, #4f9dff18 50%, transparent 70%);
+  background-size: 200% 200%;
+  animation: zafiro-charge 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes zafiro-bolt {
+  0%,100% { border-color: #0a2e8c; box-shadow: 0 0 4px #4f9dff33; text-shadow: none; color: #7eb8ff; }
+  55%     { border-color: #4f9dff; box-shadow: 0 0 8px #4f9dff88; }
+  60%     { border-color: #a8d4ff; box-shadow: 0 0 18px #4f9dffee, 0 0 5px #fff; text-shadow: 0 0 10px #a8d4ffee; color: #d0eaff; }
+  63%     { border-color: #4f9dff; box-shadow: 0 0 8px #4f9dff88; }
+  66%     { border-color: #a8d4ff; box-shadow: 0 0 14px #4f9dffcc; text-shadow: 0 0 8px #a8d4ffcc; color: #d0eaff; }
+  70%     { border-color: #4f9dff; box-shadow: 0 0 5px #4f9dff55; color: #7eb8ff; }
+}
+@keyframes zafiro-charge {
+  0%,100% { background-position: -100% -100%; opacity: 0; }
+  55%,75% { opacity: 1; }
+  60%     { background-position: 100% 100%; }
 }
 
-/* ── Diamante ×30 — cristal, parpadeo ultra rápido */
-.badge--diamante {
+/* ── Diamante ×30 — cristal de hielo, destellos en facetas ── */
+.badge-name.badge--diamante {
+  background: linear-gradient(135deg, #001824 0%, #002233 50%, #001020 100%);
   border: 2px solid #b9f2ff;
-  color: #d8faff;
-  animation: diamante-crystal 0.85s ease-in-out infinite alternate;
+  color: #ffffff;
+  animation: diamante-facet 0.9s ease-in-out infinite alternate;
 }
-@keyframes diamante-crystal {
-  0%   { border-color: #70ddff; color: #b9f2ff; box-shadow: 0 0 5px #b9f2ff44; text-shadow: 0 0 4px #b9f2ff55; }
-  60%  { border-color: #cfffff; color: #efffff; box-shadow: 0 0 10px #b9f2ffbb; text-shadow: 0 0 7px #ffffffbb; }
-  100% { border-color: #ffffff; color: #ffffff;  box-shadow: 0 0 14px #ffffffee, 0 0 5px #b9f2ff; text-shadow: 0 0 12px #ffffffee; }
+.badge-name.badge--diamante::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 40%, rgba(185,242,255,0.10) 60%, transparent 100%);
+  animation: diamante-glint 0.9s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes diamante-facet {
+  0%   { border-color: #70ddff; box-shadow: 0 0 6px #b9f2ff55, inset 0 0 5px #b9f2ff22; text-shadow: 0 0 5px #b9f2ff77; color: #b9f2ff; }
+  100% { border-color: #ffffff; box-shadow: 0 0 18px #ffffffee, 0 0 6px #b9f2ff, inset 0 0 10px #b9f2ff33; text-shadow: 0 0 14px #ffffffee; color: #fff; }
+}
+@keyframes diamante-glint {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
 }
 
-/* ── Amatista ×40 — vórtice místico lento */
-.badge--amatista {
+/* ── Amatista ×40 — vórtice cósmico ── */
+.badge-name.badge--amatista {
+  background: radial-gradient(ellipse at 50% 50%, #1a0035 0%, #0d0020 55%, #0c0e1b 100%);
   border: 2px solid #c084fc;
-  color: #d4aaff;
-  animation: amatista-vortex 4s cubic-bezier(.25,.46,.45,.94) infinite alternate;
+  color: #e8c0ff;
+  animation: amatista-void 4s ease-in-out infinite alternate;
 }
-@keyframes amatista-vortex {
-  0%   { border-color: #3a0070; color: #7a30c0; box-shadow: 0 0 3px #c084fc11; text-shadow: none; }
-  50%  { border-color: #9050d0; color: #c090f0; box-shadow: 0 0 7px #c084fc77; text-shadow: 0 0 5px #c084fc77; }
-  100% { border-color: #e0b0ff; color: #f0d8ff; box-shadow: 0 0 12px #c084fccc, 0 0 18px #c084fc44; text-shadow: 0 0 10px #e0b0ffcc; }
+.badge-name.badge--amatista::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, #c084fc22 0%, transparent 60%);
+  animation: amatista-pulse 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes amatista-void {
+  from { border-color: #3a0070; box-shadow: 0 0 4px #c084fc22, inset 0 0 6px #3a007033; text-shadow: 0 0 5px #c084fc55; color: #c090f0; }
+  to   { border-color: #e0b0ff; box-shadow: 0 0 16px #c084fccc, 0 0 28px #c084fc44, inset 0 0 14px #c084fc33; text-shadow: 0 0 14px #e8c0ffee; color: #f5e0ff; }
+}
+@keyframes amatista-pulse {
+  from { transform: scale(0.7); opacity: 0.2; }
+  to   { transform: scale(1.3); opacity: 0.8; }
 }
 
-/* ── Legendario ×50 — arcoíris caótico */
-.badge--legendario {
-  border: 1.5px solid transparent;
-  position: relative; isolation: isolate; background: #0d0f1a;
+/* ── Legendario ×50 — caos arcoíris ── */
+.badge-name.badge--legendario {
+  border: 2px solid transparent;
+  position: relative; isolation: isolate; background: #0c0e1b;
   animation: legendario-text 3s linear infinite;
 }
-.badge--legendario::before {
+.badge-name.badge--legendario::before {
   content: ''; position: absolute; inset: -2px; border-radius: 7px;
   background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080);
   background-size: 300% 100%;
   animation: badge-rainbow-sweep 2s linear infinite;
   z-index: -1;
 }
+.badge-name.badge--legendario::after {
+  content: ''; position: absolute; inset: 0; border-radius: 5px;
+  background: linear-gradient(90deg,#ff008015,#ff8c0015,#ffe40015,#00ff8815,#00c8ff15,#a800ff15,#ff008015);
+  background-size: 300% 100%;
+  animation: badge-rainbow-sweep 2s linear infinite;
+  pointer-events: none;
+}
 @keyframes legendario-text {
-  0%   { color: #ff8c9e; text-shadow: 0 0 8px #ff008099; box-shadow: 0 0 8px #ff008044; }
-  25%  { color: #ffe490; text-shadow: 0 0 8px #ff8c0099; box-shadow: 0 0 8px #ff8c0044; }
-  50%  { color: #90ffc8; text-shadow: 0 0 8px #00ff8899; box-shadow: 0 0 8px #00ff8844; }
-  75%  { color: #90d8ff; text-shadow: 0 0 8px #00c8ff99; box-shadow: 0 0 8px #00c8ff44; }
-  100% { color: #ff8c9e; text-shadow: 0 0 8px #ff008099; box-shadow: 0 0 8px #ff008044; }
+  0%   { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
+  25%  { color:#ffe490; text-shadow:0 0 8px #ff8c0099; box-shadow:0 0 8px #ff8c0044; }
+  50%  { color:#90ffc8; text-shadow:0 0 8px #00ff8899; box-shadow:0 0 8px #00ff8844; }
+  75%  { color:#90d8ff; text-shadow:0 0 8px #00c8ff99; box-shadow:0 0 8px #00c8ff44; }
+  100% { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
 }
 @keyframes badge-rainbow-sweep { to { background-position: 300% 0%; } }
 
