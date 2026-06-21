@@ -2123,11 +2123,15 @@ async function _refreshTowerSetupScreen() {
     }
   }
 
-  // Continue button: pick whichever save (local vs cloud) is more recent
+  // Continue button: sync local with cloud (cloud is source of truth when logged in)
   const localSaved = loadTowerRun();
-  const cloudSaved = await loadTowerRunCloud();
+  const { save: cloudSaved, loggedIn } = await loadTowerRunCloud();
   let saved;
-  if (cloudSaved && (!localSaved || (cloudSaved.savedAt ?? 0) > (localSaved.savedAt ?? 0))) {
+  if (loggedIn && !cloudSaved) {
+    // Run was cleared on another device — discard stale local save
+    try { localStorage.removeItem('tower_saved_run'); } catch {}
+    saved = null;
+  } else if (cloudSaved && (!localSaved || (cloudSaved.savedAt ?? 0) > (localSaved.savedAt ?? 0))) {
     saved = cloudSaved;
     try { localStorage.setItem('tower_saved_run', JSON.stringify(cloudSaved)); } catch {}
   } else {

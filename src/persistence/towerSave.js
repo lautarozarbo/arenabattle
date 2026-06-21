@@ -55,16 +55,21 @@ export function loadTowerRun() {
   } catch { return null; }
 }
 
-/** Load saved run from cloud (used on fresh device where localStorage is empty). */
+/**
+ * Load saved run from cloud.
+ * Returns { save, loggedIn } — loggedIn lets callers distinguish
+ * "not logged in" (save=null, loggedIn=false) from
+ * "logged in but run was cleared" (save=null, loggedIn=true).
+ */
 export async function loadTowerRunCloud() {
   const uid = await _getUID();
-  if (!uid) return null;
+  if (!uid) return { save: null, loggedIn: false };
   const { data } = await supabase
     .from('user_stats')
     .select('tower_saved_run')
     .eq('user_id', uid)
     .single();
-  return data?.tower_saved_run ?? null;
+  return { save: data?.tower_saved_run ?? null, loggedIn: true };
 }
 
 export function clearTowerRun() {
