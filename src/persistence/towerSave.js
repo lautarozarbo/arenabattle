@@ -6,8 +6,8 @@
  *   - Supabase user_stats.tower_saved_run  (cross-device)
  *
  * Best run saved to:
- *   - localStorage  (local display / fallback)
- *   - Supabase user_stats.tower_max_floor / tower_best_char  (via stats.js)
+ *   - localStorage  (instant, offline fallback)
+ *   - Supabase user_stats.tower_best_run  (cross-device)
  */
 
 import { supabase } from '../supabase.js';
@@ -81,7 +81,7 @@ async function _clearFromCloud() {
     .then(() => {});
 }
 
-// ── Best run record (local only — cloud via stats.js recordTowerRun) ─────────
+// ── Best run record ──────────────────────────────────────────────────────────
 
 export function maybeSaveBestRun(run) {
   const best = getBestTowerRun();
@@ -93,6 +93,16 @@ export function maybeSaveBestRun(run) {
     date:        Date.now(),
   };
   try { localStorage.setItem(LS_BEST, JSON.stringify(record)); } catch {}
+  _saveBestToCloud(record);
+}
+
+async function _saveBestToCloud(record) {
+  const uid = await _getUID();
+  if (!uid) return;
+  supabase.from('user_stats')
+    .upsert({ user_id: uid, tower_best_run: record, updated_at: new Date().toISOString() },
+             { onConflict: 'user_id' })
+    .then(() => {});
 }
 
 export function getBestTowerRun() {
@@ -100,4 +110,16 @@ export function getBestTowerRun() {
     const raw = localStorage.getItem(LS_BEST);
     return raw ? JSON.parse(raw) : null;
   } catch { return null; }
+}
+
+/** Load best run from cloud (used on fresh device where localStorage is empty). */
+export async function loadBestTowerRunCloud() {
+  const uid = await _getUID();
+  if (!uid) return null;
+  const { data } = await supabase
+    .from('user_stats')
+    .select('tower_best_run')
+    .eq('user_id', uid)
+    .single();
+  return data?.tower_best_run ?? null;
 }
