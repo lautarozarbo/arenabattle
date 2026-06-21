@@ -4966,7 +4966,7 @@ td.rank {
   font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 2px 6px;
 }
 .ms-close-btn:hover { color: #fff; }
-#missions-content { overflow-y: scroll; padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+#missions-content { overflow-y: scroll; padding: 14px 16px 20px; flex: 1; min-height: 0; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 
 /* Streak counter */
 .ms-streak-counter {
@@ -4974,6 +4974,7 @@ td.rank {
   background: rgba(255,160,0,0.08);
   border: 1px solid rgba(255,160,0,0.22);
   border-radius: 12px; padding: 12px 16px;
+  margin-bottom: 12px;
 }
 .ms-streak-number {
   font-size: 2rem; font-weight: 800; color: #ffa500;
@@ -4988,6 +4989,7 @@ td.rank {
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 12px;
   overflow: hidden;
+  margin-bottom: 12px;
 }
 .ms-section-header {
   font-size: 0.68rem; font-weight: 700; letter-spacing: 0.10em;
