@@ -97,7 +97,7 @@ export class InfiniteTower {
   }
 
   _onRunFailed() {
-    const xpGained = this._run.floor * 2;
+    const xpGained = this._run.floor * 5;
     this._onRunOver(this._run, xpGained);
     this._ui.showRunOver(this._run.floor, this._run.upgrades, xpGained);
   }

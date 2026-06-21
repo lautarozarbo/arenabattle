@@ -154,7 +154,7 @@ export class TowerUI {
         ? `${upgradeIds.length} mejora${upgradeIds.length > 1 ? 's' : ''} aplicada${upgradeIds.length > 1 ? 's' : ''}`
         : 'Sin mejoras aplicadas';
     const xpEl = el.querySelector('.tro-xp');
-    if (xpEl) xpEl.textContent = `+${xpGained} XP (${floor} pisos × 2)`;
+    if (xpEl) xpEl.textContent = `+${xpGained} XP (${floor} pisos × 5)`;
     el.classList.remove('tt--hidden');
   }
 
