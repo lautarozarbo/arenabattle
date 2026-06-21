@@ -76,7 +76,7 @@ export class TurretPower extends BasePower {
     if (avail.length === 0) return;
     const ci = avail[Math.floor(Math.random() * avail.length)];
 
-    if (this._turrets.length >= MAX_TURRETS) this._turrets.shift();
+    if (this._turrets.length >= MAX_TURRETS + this._extraPlace()) this._turrets.shift();
 
     const { x, y } = corners[ci];
     this._turrets.push({
