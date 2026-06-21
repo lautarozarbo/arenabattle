@@ -2074,19 +2074,20 @@ let _pendingWinnerSide = -1;
 async function _refreshTowerSetupScreen() {
   const allMetas = getAllPowerMetas();
 
-  // Best run: cloud for floor/char/upgrades, local fallback
+  // Best run: always prefer cloud if it has a higher floor (source of truth)
   const cloudStats = getStats();
-  let localBest = getBestTowerRun();
-  if (!localBest) {
-    const cloud = await loadBestTowerRunCloud();
-    if (cloud) {
-      try { localStorage.setItem('tower_best_run', JSON.stringify(cloud)); } catch {}
-      localBest = cloud;
-    }
+  const localBest  = getBestTowerRun();
+  const cloudBest  = await loadBestTowerRunCloud();
+  let bestRecord;
+  if (cloudBest && (!localBest || (cloudBest.floor ?? 0) >= (localBest.floor ?? 0))) {
+    bestRecord = cloudBest;
+    try { localStorage.setItem('tower_best_run', JSON.stringify(cloudBest)); } catch {}
+  } else {
+    bestRecord = localBest;
   }
-  let bestFloor    = cloudStats.towerMaxFloor ?? localBest?.floor ?? 0;
-  let bestCharId   = cloudStats.towerBestChar ?? localBest?.powerMetaId ?? null;
-  let bestUpgrades = localBest?.upgrades ?? [];
+  let bestFloor    = cloudStats.towerMaxFloor ?? bestRecord?.floor ?? 0;
+  let bestCharId   = cloudStats.towerBestChar ?? bestRecord?.powerMetaId ?? null;
+  let bestUpgrades = bestRecord?.upgrades ?? [];
 
   const bestEl = document.getElementById("tower-best-run");
   if (bestEl) {
