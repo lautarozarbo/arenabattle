@@ -5095,19 +5095,19 @@ td.rank {
 }
 .badge--legendario {
   border: 1.5px solid transparent;
-  background-clip: padding-box;
-  animation: badge-rainbow 3s linear infinite;
   position: relative;
+  isolation: isolate;
+  background: #0d0f1a;
+  animation: badge-rainbow 3s linear infinite;
 }
 .badge--legendario::before {
   content: '';
   position: absolute; inset: -2px;
-  border-radius: inherit;
+  border-radius: 7px;
   background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080);
   background-size: 300% 100%;
   animation: badge-rainbow-bg 3s linear infinite;
   z-index: -1;
-  border-radius: 7px;
 }
 @keyframes badge-rainbow {
   0%  { color: #ff8c9e; }
