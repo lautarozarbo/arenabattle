@@ -99,10 +99,46 @@ export const CHAR_SKINS = {
     { id: "default", name: "Default", color: null },
     { id: "atomo", name: "Átomo", color: "#071428" },
   ],
+  pulsar: [
+    { id: "default", name: "Default", color: null },
+    { id: "quasar", name: "Quásar", color: "#010d1a" },
+  ],
+  serpiente: [
+    { id: "default", name: "Default", color: null },
+    { id: "cascabel", name: "Cascabel", color: "#0d1a08" },
+  ],
+  earthquake: [
+    { id: "default", name: "Default", color: null },
+    { id: "tectonico", name: "Tectónico", color: "#120a04" },
+  ],
+  caballero: [
+    { id: "default", name: "Default", color: null },
+    { id: "eclipse", name: "Eclipse", color: "#06020a" },
+  ],
+  parasite: [
+    { id: "default", name: "Default", color: null },
+    { id: "simbionte", name: "Simbionte", color: "#04010a" },
+  ],
+  turret: [
+    { id: "default", name: "Default", color: null },
+    { id: "mech", name: "Mech", color: "#080c12" },
+  ],
+  portal: [
+    { id: "default", name: "Default", color: null },
+    { id: "singularidad", name: "Singularidad", color: "#020108" },
+  ],
+  clock: [
+    { id: "default", name: "Default", color: null },
+    { id: "cronos", name: "Cronos", color: "#0e0a04" },
+  ],
+  crystalbeam: [
+    { id: "default", name: "Default", color: null },
+    { id: "prisma", name: "Prisma", color: "#030810" },
+  ],
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
-export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo']);
+export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo', 'quasar', 'cascabel', 'tectonico', 'eclipse', 'simbionte', 'mech', 'singularidad', 'cronos', 'prisma']);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 

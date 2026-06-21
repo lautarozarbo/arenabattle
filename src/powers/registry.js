@@ -116,9 +116,9 @@ export function createPower(id, owner) {
 
 const CATEGORIES = {
   "Cuerpo a cuerpo": ["none", "saw", "assassin", "momentum", "electric", "vampire", "venom", "parasite", "hotpotato", "tortuga", "reflectshield", "karma", "diminuto", "caballero"],
-  "Proyectiles":     ["rocket", "bloodshard", "clusterbomb", "fenix", "crystalbeam", "volcano", "ninja", "angel", "archer", "boomerang", "revolver"],
+  "Proyectiles":     ["rocket", "bloodshard", "clusterbomb", "fenix", "crystalbeam", "volcano", "ninja", "archer", "boomerang", "revolver"],
   "Control de zona": ["spider", "territory", "spike", "grid", "chromatic", "toxictrail", "glass", "aura", "earthquake", "cursedwall", "portal", "domainexpansion", "laser"],
-  "Invocación":      ["cactus", "duo", "chess", "turret", "alien", "bomb", "mage", "pulsar", "apostador", "clock", "serpiente"],
+  "Invocación":      ["cactus", "duo", "chess", "turret", "alien", "bomb", "mage", "pulsar", "apostador", "clock", "serpiente", "angel"],
 };
 
 const _idToCategory = Object.fromEntries(

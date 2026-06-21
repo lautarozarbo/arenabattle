@@ -1,5 +1,5 @@
 import { CHAR_SKINS, ANIMATED_SKIN_IDS, drawCharPreview } from '../skins/index.js';
-import { ARENA_SKINS, drawArenaBg } from '../skins/arenaSkins.js';
+import { ARENA_SKINS, drawArenaBg, isAnimatedArenaSkin } from '../skins/arenaSkins.js';
 import { isSkinUnlocked, isArenaSkinUnlocked } from '../persistence/rewards.js';
 import { getAllPowerMetas } from '../powers/registry.js';
 import { sfx } from '../audio/index.js';
@@ -31,16 +31,27 @@ export function switchWardrobeTab(tab) {
   _tab = tab;
   document.getElementById('wardrobe-tab-chars').classList.toggle('active', tab === 'chars');
   document.getElementById('wardrobe-tab-arena').classList.toggle('active', tab === 'arena');
-  if (tab === 'chars') { _renderContent(); _startAnim(); }
-  else                 { _stopAnim(); _renderContent(); }
+  _renderContent();
+  _startAnim();
 }
 
 function _startAnim() {
   if (_rafId) return;
   function tick() {
+    const t = performance.now() / 1000;
     document.querySelectorAll('.wardrobe-skin-canvas[data-animated]').forEach(cvs => {
       const meta = _metas.find(m => m.id === cvs.dataset.charid);
       if (meta) drawCharPreview(cvs, meta, cvs.dataset.skinid, { rScale: 0.28, yScale: 0.5 });
+    });
+    document.querySelectorAll('.wardrobe-skin-canvas[data-animated-arena]').forEach(cvs => {
+      const skinId = cvs.dataset.skinid;
+      const ctx = cvs.getContext('2d');
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(0, 0, cvs.width, cvs.height, 8);
+      ctx.clip();
+      drawArenaBg(ctx, 0, 0, cvs.width, cvs.height, skinId, t);
+      ctx.restore();
     });
     _rafId = requestAnimationFrame(tick);
   }
@@ -131,7 +142,12 @@ function _renderArena(container) {
     cvs.width  = 200;
     cvs.height = 120;
     cvs.className = 'wardrobe-skin-canvas';
-    _drawArenaSkinThumb(cvs, skin);
+    if (isAnimatedArenaSkin(skin.id)) {
+      cvs.dataset.animatedArena = '1';
+      cvs.dataset.skinid = skin.id;
+    } else {
+      _drawArenaSkinThumb(cvs, skin);
+    }
     card.appendChild(cvs);
 
     if (!owned) {

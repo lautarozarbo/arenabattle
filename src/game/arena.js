@@ -101,7 +101,7 @@ export class Arena {
   }
 
   render(ctx) {
-    drawArenaBg(ctx, this.x, this.y, this.width, this.height, this.skinId);
+    drawArenaBg(ctx, this.x, this.y, this.width, this.height, this.skinId, performance.now() / 1000);
     for (const obs of this.obstacles) {
       drawArenaObstacle(ctx, obs.cx, obs.cy, obs.r, this.skinId);
     }

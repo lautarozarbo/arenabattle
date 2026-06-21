@@ -1402,6 +1402,621 @@ function _atomOrbits(ctx, x, y, r) {
   ctx.restore();
 }
 
+// ── Parasite: Simbionte ───────────────────────────────────────────────────────
+function _simbionteBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  for (let i = 0; i < 6; i++) {
+    const phase = (i / 6) * Math.PI * 2;
+    const speed = 0.8 + (i % 3) * 0.3;
+    const ext   = 0.5 + 0.5 * Math.sin(t * speed + phase);
+    const angle = (i / 6) * Math.PI * 2 + Math.sin(t * 0.4 + phase) * 0.4;
+    const len   = r * (0.4 + 0.6 * ext);
+    const tx0 = x + Math.cos(angle) * r * 0.9, ty0 = y + Math.sin(angle) * r * 0.9;
+    const tx1 = x + Math.cos(angle) * (r + len), ty1 = y + Math.sin(angle) * (r + len);
+    const lw  = 1.5 + ext * 2.0;
+    ctx.save();
+    ctx.strokeStyle = `rgba(20,0,30,${0.55 + ext*0.35})`; ctx.lineWidth = lw; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(tx0,ty0); ctx.lineTo(tx1,ty1); ctx.stroke();
+    ctx.beginPath(); ctx.arc(tx1, ty1, lw*0.6, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(150,0,200,${ext*0.6})`; ctx.shadowColor='#9000c8'; ctx.shadowBlur=6; ctx.fill();
+    ctx.shadowBlur=0; ctx.restore();
+  }
+  const ag = ctx.createRadialGradient(x,y,r*0.6,x,y,r*1.8);
+  ag.addColorStop(0,'rgba(50,0,70,0.10)'); ag.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=ag; ctx.beginPath(); ctx.arc(x,y,r*1.8,0,Math.PI*2); ctx.fill();
+}
+
+function _simbionteAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  // Liquid ripple rings
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r-1,0,Math.PI*2); ctx.clip();
+  for (let i = 0; i < 3; i++) {
+    const ph = ((t*0.7 + i/3) % 1);
+    ctx.beginPath(); ctx.arc(x, y, r*ph*0.9, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(100,0,140,${(1-ph)*0.15})`; ctx.lineWidth=2; ctx.stroke();
+  }
+  ctx.restore();
+  // Asymmetric white eyes (blink occasionally)
+  const blink  = Math.sin(t*0.3) > 0.85 ? 0 : 1;
+  const eyeP   = 0.75 + 0.25*Math.sin(t*2.2);
+  if (blink) {
+    for (const [ex, ey, rx, ry, poff] of [
+      [x-r*0.25, y-r*0.10, r*0.18, r*0.11, -0.3],
+      [x+r*0.28, y-r*0.08, r*0.15, r*0.08,  0.2],
+    ]) {
+      ctx.save(); ctx.shadowColor='#ffffff'; ctx.shadowBlur=8;
+      ctx.beginPath(); ctx.ellipse(ex,ey,rx,ry*eyeP,poff,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${eyeP*0.92})`; ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,0.90)'; ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.ellipse(ex,ey,rx*0.38,ry*0.65*eyeP,0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
+  // Purple pulsing rim
+  const rp = 0.50+0.25*Math.sin(t*1.8);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(120,0,180,${rp})`; ctx.lineWidth=3;
+  ctx.shadowColor='#6000aa'; ctx.shadowBlur=14; ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ── Turret: Mech ──────────────────────────────────────────────────────────────
+function _mechBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  const gears = [
+    { dist:r*1.45, sp: 0.50, teeth:8, sz:r*0.13, ph:0.0 },
+    { dist:r*1.72, sp:-0.34, teeth:6, sz:r*0.10, ph:2.1 },
+    { dist:r*1.56, sp: 0.68, teeth:5, sz:r*0.08, ph:4.2 },
+  ];
+  for (const g of gears) {
+    const a = t*g.sp + g.ph;
+    const gx = x+Math.cos(a)*g.dist, gy = y+Math.sin(a)*g.dist;
+    ctx.save(); ctx.translate(gx,gy); ctx.rotate(t*g.sp*3);
+    ctx.beginPath(); ctx.arc(0,0,g.sz*0.65,0,Math.PI*2);
+    ctx.fillStyle='rgba(50,65,85,0.88)'; ctx.strokeStyle='rgba(80,160,255,0.35)'; ctx.lineWidth=1; ctx.fill(); ctx.stroke();
+    for (let i=0; i<g.teeth; i++) {
+      const ta=(i/g.teeth)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(ta)*g.sz*0.65*0.85, Math.sin(ta)*g.sz*0.65*0.85);
+      ctx.lineTo(Math.cos(ta)*g.sz, Math.sin(ta)*g.sz);
+      ctx.lineWidth=g.sz*0.3; ctx.strokeStyle='rgba(60,80,100,0.85)'; ctx.lineCap='round'; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0,0,g.sz*0.22,0,Math.PI*2);
+    ctx.fillStyle='rgba(20,30,45,0.9)'; ctx.fill();
+    ctx.restore();
+  }
+}
+
+function _mechAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r-1,0,Math.PI*2); ctx.clip();
+  const hR = r*0.32, hH = Math.sqrt(3)*hR;
+  for (const [dx,dy] of [[0,0],[hH,hR*1.5],[-hH,hR*1.5],[hH,-hR*1.5],[-hH,-hR*1.5],[hH*2,0],[-hH*2,0],[0,hR*3],[0,-hR*3]]) {
+    if (Math.sqrt(dx**2+dy**2)>r*1.6) continue;
+    ctx.beginPath();
+    for (let i=0;i<6;i++){const a=(i/6)*Math.PI*2-Math.PI/6; ctx.lineTo(x+dx+Math.cos(a)*hR*0.85,y+dy+Math.sin(a)*hR*0.85);}
+    ctx.closePath();
+    ctx.strokeStyle=`rgba(80,160,255,${0.10+0.04*Math.sin(t*1.2+dx*0.05+dy*0.05)})`; ctx.lineWidth=0.8; ctx.stroke();
+  }
+  ctx.restore();
+  // Blue energy core
+  const cp = 0.5+0.5*Math.abs(Math.sin(t*2.0));
+  const cg = ctx.createRadialGradient(x,y,0,x,y,r*0.35);
+  cg.addColorStop(0,`rgba(100,200,255,${0.6+cp*0.3})`); cg.addColorStop(0.5,`rgba(50,120,255,${0.2+cp*0.15})`); cg.addColorStop(1,'rgba(0,80,200,0)');
+  ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(x,y,r*0.35,0,Math.PI*2); ctx.fill();
+  // Mechanical rim
+  const rp=0.45+0.20*Math.sin(t*1.5);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(80,160,255,${rp})`; ctx.lineWidth=2.8; ctx.shadowColor='#0080ff'; ctx.shadowBlur=12; ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ── Portal: Singularidad ──────────────────────────────────────────────────────
+function _singularidadBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(t*0.14);
+  const disk = [
+    {rx:r*2.2,ry:r*0.28,col:`rgba(180,80,0,`,lw:8, fp:0.20},
+    {rx:r*1.55,ry:r*0.20,col:`rgba(255,155,15,`,lw:4, fp:0.32},
+    {rx:r*0.90,ry:r*0.12,col:`rgba(255,235,195,`,lw:2.5,fp:0.45},
+  ];
+  for (const d of disk) {
+    ctx.beginPath(); ctx.ellipse(0,0,d.rx,d.ry,0,0,Math.PI*2);
+    ctx.strokeStyle=`${d.col}${d.fp+0.08*Math.sin(t*1.1)})`;
+    ctx.lineWidth=d.lw; ctx.stroke();
+  }
+  ctx.restore();
+  const bg=ctx.createRadialGradient(x,y,r*0.3,x,y,r*2.5);
+  bg.addColorStop(0,'rgba(60,0,90,0.12)'); bg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(x,y,r*2.5,0,Math.PI*2); ctx.fill();
+}
+
+function _singularidadAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r-1,0,Math.PI*2); ctx.clip();
+  // Spiral arms pulling inward
+  for (let arm=0;arm<3;arm++) {
+    const basePhase=(arm/3)*Math.PI*2+t*0.3;
+    ctx.beginPath();
+    for (let step=0;step<=60;step++) {
+      const frac=step/60;
+      const a=basePhase+frac*Math.PI*4;
+      const rr=r*(1-frac*0.98);
+      step===0 ? ctx.moveTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr) : ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);
+    }
+    ctx.strokeStyle=`rgba(140,60,200,${0.10+0.04*Math.sin(t+arm)})`; ctx.lineWidth=0.8; ctx.stroke();
+  }
+  // Central void
+  const vg=ctx.createRadialGradient(x,y,0,x,y,r*0.55);
+  vg.addColorStop(0,'rgba(0,0,0,0.80)'); vg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=vg; ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
+  // Lensing rings
+  for (let i=0;i<3;i++) {
+    const ph=((t*0.4+i/3)%1);
+    ctx.beginPath(); ctx.arc(x,y,r*(1.05+ph*1.6),0,Math.PI*2);
+    ctx.strokeStyle=`rgba(100,0,180,${(1-ph)*0.28})`; ctx.lineWidth=1.8*(1-ph); ctx.stroke();
+  }
+  const rp=0.60+0.20*Math.sin(t*1.5);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(120,0,200,${rp})`; ctx.lineWidth=3.0; ctx.shadowColor='#5000aa'; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ── Clock: Cronos ─────────────────────────────────────────────────────────────
+function _cronosAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r-1,0,Math.PI*2); ctx.clip();
+  // Bezel
+  ctx.beginPath(); ctx.arc(x,y,r*0.92,0,Math.PI*2);
+  ctx.strokeStyle='rgba(180,140,60,0.35)'; ctx.lineWidth=2; ctx.stroke();
+  // Hour tick marks
+  for (let h=0;h<12;h++) {
+    const a=(h/12)*Math.PI*2-Math.PI/2;
+    const isMain=h%3===0;
+    ctx.beginPath();
+    ctx.moveTo(x+Math.cos(a)*r*(isMain?0.72:0.78), y+Math.sin(a)*r*(isMain?0.72:0.78));
+    ctx.lineTo(x+Math.cos(a)*r*0.88, y+Math.sin(a)*r*0.88);
+    ctx.strokeStyle=`rgba(200,162,60,${isMain?0.40:0.22})`; ctx.lineWidth=isMain?2:1; ctx.stroke();
+  }
+  ctx.restore();
+  // Minute hand
+  const mA = t*0.5-Math.PI/2;
+  ctx.save(); ctx.strokeStyle='rgba(180,150,60,0.70)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+  ctx.shadowColor='#b49030'; ctx.shadowBlur=4;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(mA)*r*0.68,y+Math.sin(mA)*r*0.68); ctx.stroke(); ctx.restore();
+  // Hour hand
+  const hA = t*(0.5/12)-Math.PI/2;
+  ctx.save(); ctx.strokeStyle='rgba(220,192,80,0.82)'; ctx.lineWidth=2.5; ctx.lineCap='round';
+  ctx.shadowColor='#d4aa40'; ctx.shadowBlur=6;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(hA)*r*0.48,y+Math.sin(hA)*r*0.48); ctx.stroke(); ctx.restore();
+  // Center pin
+  ctx.beginPath(); ctx.arc(x,y,r*0.055,0,Math.PI*2);
+  ctx.fillStyle='rgba(230,196,80,0.92)'; ctx.shadowColor='#d4aa40'; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+  // Time distortion rings
+  for (let i=0;i<2;i++){
+    const ph=((t*0.38+i*0.5)%1);
+    ctx.beginPath(); ctx.arc(x,y,r*(1.05+ph*1.8),0,Math.PI*2);
+    ctx.strokeStyle=`rgba(180,150,60,${(1-ph)*0.30})`; ctx.lineWidth=1.8*(1-ph); ctx.stroke();
+  }
+  // Bronze rim
+  const rp=0.50+0.22*Math.sin(t*1.6);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(190,150,55,${rp})`; ctx.lineWidth=2.8; ctx.shadowColor='#b49030'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ── CrystalBeam: Prisma ───────────────────────────────────────────────────────
+function _prismaBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  for (let i=0;i<6;i++) {
+    const baseA=(i/6)*Math.PI*2+t*0.08;
+    const hue  =(i/6)*360;
+    const pulse=Math.max(0, Math.sin(t*0.9+(i/6)*Math.PI*2));
+    if (pulse<0.12) continue;
+    const bLen =r*(0.8+0.6*pulse);
+    const bx0=x+Math.cos(baseA)*r*0.92, by0=y+Math.sin(baseA)*r*0.92;
+    const bx1=x+Math.cos(baseA)*(r+bLen), by1=y+Math.sin(baseA)*(r+bLen);
+    const hw  =r*0.065*pulse;
+    const perp=baseA+Math.PI/2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(bx0+Math.cos(perp)*hw, by0+Math.sin(perp)*hw);
+    ctx.lineTo(bx1,by1);
+    ctx.lineTo(bx0+Math.cos(perp-Math.PI)*hw, by0+Math.sin(perp-Math.PI)*hw);
+    ctx.fillStyle=`hsla(${hue},100%,70%,${pulse*0.38})`; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(bx0,by0); ctx.lineTo(bx1,by1);
+    ctx.strokeStyle=`hsla(${hue},100%,85%,${pulse*0.55})`; ctx.lineWidth=1.2;
+    ctx.shadowColor=`hsl(${hue},100%,65%)`; ctx.shadowBlur=6; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.restore();
+  }
+}
+
+function _prismaAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r-1,0,Math.PI*2); ctx.clip();
+  // Triangular crystal facets
+  for (let i=0;i<8;i++) {
+    const a0=(i/8)*Math.PI*2, a1=((i+1)/8)*Math.PI*2;
+    const hue=((i/8)*360+t*18)%360;
+    const al=0.08+0.04*Math.sin(t*1.2+i*0.8);
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x+Math.cos(a0)*r, y+Math.sin(a0)*r);
+    ctx.lineTo(x+Math.cos(a1)*r, y+Math.sin(a1)*r);
+    ctx.closePath();
+    ctx.fillStyle=`hsla(${hue},80%,70%,${al})`; ctx.fill();
+    ctx.strokeStyle=`hsla(${hue},90%,82%,${al*1.6})`; ctx.lineWidth=0.6; ctx.stroke();
+  }
+  // Rainbow shimmer rotating
+  const sa=t*0.4;
+  const sg=ctx.createLinearGradient(x+Math.cos(sa)*r,y+Math.sin(sa)*r,x+Math.cos(sa+Math.PI)*r,y+Math.sin(sa+Math.PI)*r);
+  for (let s=0;s<=6;s++) sg.addColorStop(s/6,`hsla(${(s/6)*360},90%,65%,0.07)`);
+  ctx.fillStyle=sg; ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
+  // Prismatic rim (color-shifting)
+  const rimHue=(t*45)%360;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle=`hsla(${rimHue},100%,72%,${0.60+0.20*Math.sin(t*2.5)})`;
+  ctx.lineWidth=2.8; ctx.shadowColor=`hsl(${rimHue},100%,65%)`; ctx.shadowBlur=12; ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ── Serpiente: Cascabel ───────────────────────────────────────────────────────
+function _cascabelAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+
+  // Scale pattern — overlapping semicircles in offset rows
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.clip();
+  const sr = r * 0.22;
+  for (let row = -1; row * sr * 1.5 < r * 2 + sr; row++) {
+    const off = (row % 2) * sr;
+    for (let col = -1; col * sr * 2 < r * 2 + sr * 2; col++) {
+      const sx  = x - r + col * sr * 2 + off;
+      const sy  = y - r + row * sr * 1.5;
+      const hue = (((sx - x) + (sy - y)) * 1.3 + t * 32) % 360;
+      const al  = 0.14 + 0.06 * Math.sin(t * 1.2 + row * 0.6 + col * 0.8);
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr * 0.90, 0, Math.PI);
+      ctx.strokeStyle = `hsla(${hue},65%,50%,${al})`;
+      ctx.lineWidth = 0.9; ctx.stroke();
+    }
+  }
+  // Iridescent shimmer overlay
+  const shimHue = (t * 38) % 360;
+  const sg = ctx.createRadialGradient(
+    x + r * 0.22 * Math.cos(t * 0.55), y + r * 0.22 * Math.sin(t * 0.55), 0,
+    x, y, r
+  );
+  sg.addColorStop(0,   `hsla(${shimHue},80%,65%,0.14)`);
+  sg.addColorStop(0.5, `hsla(${(shimHue+60)%360},80%,55%,0.05)`);
+  sg.addColorStop(1,    'rgba(0,0,0,0)');
+  ctx.fillStyle = sg; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  ctx.restore();
+
+  // Amber slit eyes
+  const eyeR = r * 0.115;
+  const eyeY = y - r * 0.15;
+  for (const ex of [x - r * 0.28, x + r * 0.28]) {
+    const eg = ctx.createRadialGradient(ex, eyeY, 0, ex, eyeY, eyeR);
+    eg.addColorStop(0,    'rgba(255,210,10,0.98)');
+    eg.addColorStop(0.55, 'rgba(210,110,0,0.85)');
+    eg.addColorStop(1,    'rgba(100,40,0,0)');
+    ctx.beginPath(); ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
+    ctx.fillStyle = eg; ctx.shadowColor = '#ffaa00'; ctx.shadowBlur = 10; ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.90)'; ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.ellipse(ex, eyeY, eyeR * 0.16, eyeR * 0.78, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+
+  // Forked tongue (periodic flick)
+  const tph = ((t * 0.9) % (Math.PI * 2));
+  const tout = Math.max(0, Math.sin(tph));
+  if (tout > 0.05) {
+    const stemLen = r * 0.65 * tout;
+    const forkLen = r * 0.28 * tout;
+    ctx.save();
+    ctx.strokeStyle = `rgba(200,25,25,${Math.min(1, tout * 1.2)})`;
+    ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, y + r * 0.85); ctx.lineTo(x, y + r * 0.85 + stemLen); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y + r * 0.85 + stemLen); ctx.lineTo(x - forkLen * 0.65, y + r * 0.85 + stemLen + forkLen); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y + r * 0.85 + stemLen); ctx.lineTo(x + forkLen * 0.65, y + r * 0.85 + stemLen + forkLen); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Iridescent rim
+  const rimHue = (110 + 25 * Math.sin(t * 1.5)) % 360;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.strokeStyle = `hsla(${rimHue},75%,52%,${0.55 + 0.20 * Math.sin(t * 2.0)})`;
+  ctx.lineWidth = 2.5; ctx.shadowColor = '#22c55e'; ctx.shadowBlur = 10;
+  ctx.stroke(); ctx.shadowBlur = 0;
+}
+
+// ── Earthquake: Tectónico ─────────────────────────────────────────────────────
+function _tectonicBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  const rocks = [
+    { s: 0,   sp: 0.40,  d: r * 1.55, sz: r * 0.12 },
+    { s: 50,  sp: -0.30, d: r * 1.80, sz: r * 0.09 },
+    { s: 25,  sp: 0.58,  d: r * 1.65, sz: r * 0.08 },
+    { s: 75,  sp: -0.48, d: r * 1.45, sz: r * 0.10 },
+  ];
+  for (const rock of rocks) {
+    const angle = t * rock.sp + rock.s;
+    const rx = x + Math.cos(angle) * rock.d;
+    const ry = y + Math.sin(angle) * rock.d;
+    ctx.save();
+    ctx.translate(rx, ry); ctx.rotate(angle * 1.3);
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2;
+      const h = Math.sin(rock.s * 13.7 + i * 57.3) * 43758.5453;
+      const rr = rock.sz * (0.72 + 0.28 * (h - Math.floor(h)));
+      i === 0 ? ctx.moveTo(Math.cos(a)*rr, Math.sin(a)*rr) : ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr);
+    }
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(70,48,22,0.88)';
+    ctx.strokeStyle = 'rgba(200,115,20,0.45)';
+    ctx.lineWidth   = 0.8; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function _tectonicAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+
+  // Cracked lava surface
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.clip();
+  for (let i = 0; i < 9; i++) {
+    const hx  = Math.sin(i * 127.1) * 43758.5453;
+    const hy  = Math.sin(i * 311.7 + 5.3) * 43758.5453;
+    const hd  = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+    const hl  = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+    const hp  = Math.sin(i * 231.1 + 41.3) * 43758.5453;
+    const cx1 = x + (hx - Math.floor(hx) - 0.5) * r * 1.5;
+    const cy1 = y + (hy - Math.floor(hy) - 0.5) * r * 1.5;
+    const ang  = (hd - Math.floor(hd)) * Math.PI * 2;
+    const len  = r * (0.28 + (hl - Math.floor(hl)) * 0.55);
+    const pulse = 0.45 + 0.55 * Math.sin(t * 1.5 + (hp - Math.floor(hp)) * Math.PI * 2);
+    ctx.shadowColor = `rgba(255,110,0,${pulse * 0.9})`;
+    ctx.shadowBlur  = 5 + pulse * 7;
+    ctx.strokeStyle = `rgba(255,${Math.round(75 + pulse * 65)},0,${0.45 + pulse * 0.45})`;
+    ctx.lineWidth   = 0.9 + pulse * 0.9;
+    ctx.beginPath(); ctx.moveTo(cx1, cy1);
+    ctx.lineTo(cx1 + Math.cos(ang) * len, cy1 + Math.sin(ang) * len); ctx.stroke();
+  }
+  ctx.shadowBlur = 0; ctx.restore();
+
+  // Shockwave rings
+  for (let i = 0; i < 2; i++) {
+    const phase = ((t / 2.2 + i * 0.5) % 1);
+    const ringR = r * (1.05 + phase * 1.9);
+    const alpha = (1 - phase) * 0.42;
+    ctx.beginPath(); ctx.arc(x, y, ringR, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(200,115,15,${alpha})`;
+    ctx.lineWidth   = 2.5 * (1 - phase); ctx.stroke();
+  }
+
+  // Rocky rim
+  const rp = 0.45 + 0.20 * Math.sin(t * 1.8);
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(180,88,10,${rp})`;
+  ctx.lineWidth   = 2.8; ctx.shadowColor = '#ca6f1e'; ctx.shadowBlur = 10;
+  ctx.stroke(); ctx.shadowBlur = 0;
+}
+
+// ── Caballero: Eclipse ────────────────────────────────────────────────────────
+function _eclipseBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  // Shadow mist orbiting
+  const mists = [
+    { sp: 0.30,  d: r*1.30, sz: r*0.20, ph: 0.0  },
+    { sp: -0.22, d: r*1.55, sz: r*0.16, ph: 2.1  },
+    { sp: 0.42,  d: r*1.42, sz: r*0.18, ph: 4.2  },
+    { sp: -0.35, d: r*1.65, sz: r*0.13, ph: 1.05 },
+    { sp: 0.26,  d: r*1.22, sz: r*0.22, ph: 3.35 },
+  ];
+  for (const m of mists) {
+    const a = t * m.sp + m.ph;
+    const mx = x + Math.cos(a) * m.d, my = y + Math.sin(a) * m.d;
+    const al = 0.11 + 0.05 * Math.sin(t * 1.5 + m.ph);
+    const g  = ctx.createRadialGradient(mx, my, 0, mx, my, m.sz);
+    g.addColorStop(0, `rgba(80,0,10,${al})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(mx, my, m.sz, 0, Math.PI * 2);
+    ctx.fillStyle = g; ctx.fill();
+  }
+  // Dark halo
+  const dg = ctx.createRadialGradient(x, y, r*0.5, x, y, r*2.0);
+  dg.addColorStop(0, 'rgba(70,0,15,0.09)'); dg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = dg; ctx.beginPath(); ctx.arc(x, y, r*2.0, 0, Math.PI*2); ctx.fill();
+}
+
+function _eclipseAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+
+  // Dark energy veins inside ball
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.clip();
+  for (let i = 0; i < 6; i++) {
+    const hx = Math.sin(i*200.7)*43758.5453, hy = Math.sin(i*321.3+4.1)*43758.5453;
+    const hd = Math.sin(i*117.9+2.3)*43758.5453, hp = Math.sin(i*89.1+8.7)*43758.5453;
+    const vx1 = x + (hx-Math.floor(hx)-0.5)*r*1.3;
+    const vy1 = y + (hy-Math.floor(hy)-0.5)*r*1.3;
+    const ang  = (hd - Math.floor(hd)) * Math.PI * 2;
+    const pulse = 0.28 + 0.42 * Math.sin(t*1.2 + (hp-Math.floor(hp))*Math.PI*2);
+    ctx.strokeStyle = `rgba(200,0,0,${pulse*0.55})`;
+    ctx.lineWidth   = 0.9; ctx.shadowColor='rgba(255,0,0,0.5)'; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.moveTo(vx1,vy1);
+    ctx.lineTo(vx1+Math.cos(ang)*r*0.52, vy1+Math.sin(ang)*r*0.52); ctx.stroke();
+  }
+  // Visor panel lines
+  const vY = y - r*0.08;
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(140,0,0,0.22)'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(x-r*0.88,vY); ctx.lineTo(x+r*0.88,vY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,vY-r*0.22); ctx.lineTo(x,vY+r*0.55); ctx.stroke();
+  ctx.restore();
+
+  // Glowing red eye slits
+  const ep = 0.62 + 0.38 * Math.abs(Math.sin(t*1.8));
+  const eyeY = y - r*0.08;
+  for (const ex of [x-r*0.30, x+r*0.30]) {
+    ctx.save();
+    ctx.shadowColor='#ff0000'; ctx.shadowBlur=16;
+    ctx.beginPath(); ctx.ellipse(ex, eyeY, r*0.115, r*0.062, 0, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(255,18,18,${ep})`; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ex, eyeY, r*0.055, r*0.032, 0, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(255,175,175,${ep*0.80})`; ctx.fill();
+    ctx.restore();
+  }
+
+  // Crown spikes above the ball
+  ctx.save();
+  const spikes = 5;
+  for (let i = 0; i < spikes; i++) {
+    const frac  = (i-(spikes-1)/2)/((spikes-1)/2);
+    const sx    = x + frac*r*0.80;
+    const baseY = y - r + 2;
+    const ht    = r*(0.30 - Math.abs(frac)*0.12) + r*0.04*Math.sin(t*1.6+i*0.9);
+    ctx.beginPath();
+    ctx.moveTo(sx - r*0.065, baseY);
+    ctx.lineTo(sx, baseY - ht);
+    ctx.lineTo(sx + r*0.065, baseY);
+    ctx.closePath();
+    const sa = 0.68 - Math.abs(frac)*0.18;
+    ctx.fillStyle   = `rgba(30,0,0,${sa})`;
+    ctx.strokeStyle = `rgba(180,0,0,${sa*0.55})`;
+    ctx.lineWidth   = 0.8; ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Pulsing dark rim
+  const rp = 0.55 + 0.26*Math.sin(t*2.0);
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.strokeStyle = `rgba(185,0,0,${rp})`;
+  ctx.lineWidth   = 3.2; ctx.shadowColor='#aa0000'; ctx.shadowBlur=18;
+  ctx.stroke(); ctx.shadowBlur=0;
+}
+
+function _pulsarQuasarBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+
+  // Accretion disk — three nested rotating ellipses (hot inner edge → cool outer)
+  const rx   = r * 2.3;
+  const ry   = r * 0.30;
+  const rot  = t * 0.12;
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+
+  // Outer glow band
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(0,190,255,${0.16 + 0.06 * Math.sin(t * 0.8)})`;
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Mid ring
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx * 0.68, ry * 0.68, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(60,220,255,${0.28 + 0.08 * Math.sin(t * 1.1)})`;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Hot inner edge
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx * 0.42, ry * 0.42, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(180,245,255,${0.40 + 0.10 * Math.sin(t * 1.6)})`;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Background nebula glow
+  const bgGlow = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 2.3);
+  bgGlow.addColorStop(0, 'rgba(0,170,255,0.09)');
+  bgGlow.addColorStop(1, 'rgba(0,100,200,0)');
+  ctx.fillStyle = bgGlow;
+  ctx.beginPath(); ctx.arc(x, y, r * 2.3, 0, Math.PI * 2); ctx.fill();
+}
+
+function _pulsarQuasarAbove(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+
+  // ── Magnetic field bands inside the ball
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.clip();
+  for (let i = 0; i < 4; i++) {
+    const frac  = (i + 0.5) / 4;
+    const by    = y + (frac - 0.5) * r * 1.9;
+    const halfW = Math.sqrt(Math.max(0, r * r - (by - y) ** 2));
+    const alpha = 0.07 + 0.03 * Math.sin(t * 1.3 + i * 1.4);
+    ctx.beginPath();
+    ctx.moveTo(x - halfW, by); ctx.lineTo(x + halfW, by);
+    ctx.strokeStyle = `rgba(0,210,255,${alpha})`;
+    ctx.lineWidth = 1.2; ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Emission rings — expanding periodically from the star
+  const period = 1.6;
+  for (let i = 0; i < 3; i++) {
+    const phase = ((t / period + i / 3) % 1);
+    const ringR = r * (1.05 + phase * 2.2);
+    const alpha = (1 - phase) * 0.38;
+    ctx.beginPath(); ctx.arc(x, y, ringR, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(0,215,255,${alpha})`;
+    ctx.lineWidth   = 2.2 * (1 - phase);
+    ctx.stroke();
+  }
+
+  // ── Polar jets (top and bottom)
+  const pulse  = 0.50 + 0.22 * Math.abs(Math.sin(t * 2.2));
+  const jetLen = r * 2.6;
+  const jHalf  = r * 0.14;
+
+  for (const dir of [-1, 1]) {
+    const jy0 = y + dir * r;
+    const jy1 = y + dir * (r + jetLen);
+    const grd = ctx.createLinearGradient(x, jy0, x, jy1);
+    grd.addColorStop(0,    `rgba(100,235,255,${pulse})`);
+    grd.addColorStop(0.35, `rgba(0,200,255,${pulse * 0.5})`);
+    grd.addColorStop(1,     'rgba(0,170,255,0)');
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x - jHalf, jy0);
+    ctx.lineTo(x, jy1);
+    ctx.lineTo(x + jHalf, jy0);
+    ctx.fillStyle = grd; ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x, jy0); ctx.lineTo(x, jy1);
+    ctx.strokeStyle = `rgba(220,252,255,${pulse * 0.88})`;
+    ctx.lineWidth   = 1.8;
+    ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  // ── Rotating hot spot (magnetic pole on the star surface)
+  const sa = t * 2.8;
+  ctx.beginPath();
+  ctx.arc(x + Math.cos(sa) * r * 0.70, y + Math.sin(sa) * r * 0.70, r * 0.09, 0, Math.PI * 2);
+  ctx.fillStyle   = 'rgba(220,255,255,0.92)';
+  ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.shadowBlur  = 0;
+
+  // ── Pulsing rim glow
+  const rimA = 0.58 + 0.24 * Math.sin(t * 2.5);
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(0,228,255,${rimA})`;
+  ctx.lineWidth   = 2.8;
+  ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 14;
+  ctx.stroke();
+  ctx.shadowBlur  = 0;
+}
+
 // ── Public draw API ───────────────────────────────────────────────────────────
 
 // Called BEFORE drawing the main circle (things that go behind it).
@@ -1424,6 +2039,13 @@ export function drawSkinDecorationBelow(
   if (charId === "fenix" && skinId === "alas") _fenixAlas(ctx, x, y, r);
   if (charId === "toxictrail" && skinId === "gasmask") _gasMaskFilters(ctx, x, y, r);
   if (charId === "spider"    && skinId === "viudanegra") _blackWidowLegs(ctx, x, y, r);
+  if (charId === "pulsar"      && skinId === "quasar")       _pulsarQuasarBelow(ctx, x, y, r);
+  if (charId === "earthquake"  && skinId === "tectonico")    _tectonicBelow(ctx, x, y, r);
+  if (charId === "caballero"   && skinId === "eclipse")      _eclipseBelow(ctx, x, y, r);
+  if (charId === "parasite"    && skinId === "simbionte")    _simbionteBelow(ctx, x, y, r);
+  if (charId === "turret"      && skinId === "mech")         _mechBelow(ctx, x, y, r);
+  if (charId === "portal"      && skinId === "singularidad") _singularidadBelow(ctx, x, y, r);
+  if (charId === "crystalbeam" && skinId === "prisma")       _prismaBelow(ctx, x, y, r);
 }
 
 // Called AFTER drawing the main circle (things that go in front / above it).
@@ -1458,6 +2080,15 @@ export function drawSkinDecorationAbove(
   if (charId === "laser"    && skinId === "neon")        _neonBorder(ctx, x, y, r);
   if (charId === "karma"    && skinId === "yinyang")     _yinYang(ctx, x, y, r);
   if (charId === "diminuto" && skinId === "atomo")       _atomOrbits(ctx, x, y, r);
+  if (charId === "pulsar"      && skinId === "quasar")       _pulsarQuasarAbove(ctx, x, y, r);
+  if (charId === "serpiente"   && skinId === "cascabel")     _cascabelAbove(ctx, x, y, r);
+  if (charId === "earthquake"  && skinId === "tectonico")    _tectonicAbove(ctx, x, y, r);
+  if (charId === "caballero"   && skinId === "eclipse")      _eclipseAbove(ctx, x, y, r);
+  if (charId === "parasite"    && skinId === "simbionte")    _simbionteAbove(ctx, x, y, r);
+  if (charId === "turret"      && skinId === "mech")         _mechAbove(ctx, x, y, r);
+  if (charId === "portal"      && skinId === "singularidad") _singularidadAbove(ctx, x, y, r);
+  if (charId === "clock"       && skinId === "cronos")       _cronosAbove(ctx, x, y, r);
+  if (charId === "crystalbeam" && skinId === "prisma")       _prismaAbove(ctx, x, y, r);
 }
 
 // Renders a full character circle preview onto a canvas element.

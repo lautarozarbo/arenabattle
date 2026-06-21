@@ -1,4 +1,4 @@
-import { ARENA_SKINS, getSelectedArenaSkinId, drawArenaBg, drawArenaObstacle } from '../skins/arenaSkins.js';
+import { ARENA_SKINS, getSelectedArenaSkinId, drawArenaBg, drawArenaObstacle, isAnimatedArenaSkin } from '../skins/arenaSkins.js';
 import { isArenaSkinUnlocked } from '../persistence/rewards.js';
 
 export const ARENA_SIZES = [
@@ -64,42 +64,57 @@ export function buildCompArenaOpts() {
 }
 
 // ── Preview renderers ──────────────────────────────────────────────────────────
-export function drawArenaPreview() {
-  const cvs = document.getElementById('arena-preview');
-  if (!cvs) return;
-  const ctx = cvs.getContext('2d');
-  const W = cvs.width, H = cvs.height;
+let _quickRafId    = null;
+let _prematchRafId = null;
+
+function _renderArenaFrame(ctx, W, H, skinId, layout, nameEl) {
+  const pad = 6;
+  const aW  = W - pad * 2;
+  const aH  = H - pad * 2;
   ctx.clearRect(0, 0, W, H);
-  const pad    = 6;
-  const aW     = W - pad * 2;
-  const aH     = H - pad * 2;
-  const skinId = ARENA_SKINS[quickArenaSkinIdx].id;
-  drawArenaBg(ctx, pad, pad, aW, aH, skinId);
-  const layout = ARENA_LAYOUTS[quickArenaLayoutIdx];
+  drawArenaBg(ctx, pad, pad, aW, aH, skinId, performance.now() / 1000);
   for (const o of layout.obstacles) {
     drawArenaObstacle(ctx, pad + o.x * aW, pad + o.y * aH, o.r * Math.min(aW, aH), skinId);
   }
-  const nameEl = document.getElementById('arena-layout-name');
   if (nameEl) nameEl.textContent = layout.name;
+}
+
+export function drawArenaPreview() {
+  const cvs = document.getElementById('arena-preview');
+  if (!cvs) return;
+  if (_quickRafId) { cancelAnimationFrame(_quickRafId); _quickRafId = null; }
+  const ctx    = cvs.getContext('2d');
+  const skinId = ARENA_SKINS[quickArenaSkinIdx].id;
+  const layout = ARENA_LAYOUTS[quickArenaLayoutIdx];
+  const nameEl = document.getElementById('arena-layout-name');
+  if (isAnimatedArenaSkin(skinId)) {
+    const loop = () => {
+      _renderArenaFrame(ctx, cvs.width, cvs.height, skinId, layout, nameEl);
+      _quickRafId = requestAnimationFrame(loop);
+    };
+    _quickRafId = requestAnimationFrame(loop);
+  } else {
+    _renderArenaFrame(ctx, cvs.width, cvs.height, skinId, layout, nameEl);
+  }
 }
 
 export function drawPrematchArenaPreview() {
   const cvs = document.getElementById('prematch-arena-preview');
   if (!cvs) return;
-  const ctx = cvs.getContext('2d');
-  const W = cvs.width, H = cvs.height;
-  ctx.clearRect(0, 0, W, H);
-  const pad    = 6;
-  const aW     = W - pad * 2;
-  const aH     = H - pad * 2;
+  if (_prematchRafId) { cancelAnimationFrame(_prematchRafId); _prematchRafId = null; }
+  const ctx    = cvs.getContext('2d');
   const skinId = ARENA_SKINS[_prematchSkinIdx].id;
-  drawArenaBg(ctx, pad, pad, aW, aH, skinId);
   const layout = ARENA_LAYOUTS[_prematchLayoutIdx];
-  for (const o of layout.obstacles) {
-    drawArenaObstacle(ctx, pad + o.x * aW, pad + o.y * aH, o.r * Math.min(aW, aH), skinId);
-  }
   const nameEl = document.getElementById('prematch-layout-name');
-  if (nameEl) nameEl.textContent = layout.name;
+  if (isAnimatedArenaSkin(skinId)) {
+    const loop = () => {
+      _renderArenaFrame(ctx, cvs.width, cvs.height, skinId, layout, nameEl);
+      _prematchRafId = requestAnimationFrame(loop);
+    };
+    _prematchRafId = requestAnimationFrame(loop);
+  } else {
+    _renderArenaFrame(ctx, cvs.width, cvs.height, skinId, layout, nameEl);
+  }
 }
 
 export function syncPrematchSkinSelector() {

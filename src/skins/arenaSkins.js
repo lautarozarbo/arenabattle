@@ -68,7 +68,7 @@ export const ARENA_SKINS = [
   {
     id: 'circuitos', name: 'Circuitos',
     bg: '#060c0a', bgGrad: null,
-    gridColor: 'rgba(0,200,120,0.18)', gridStyle: 'circuit',
+    gridColor: 'rgba(0,200,120,0.18)', gridStyle: 'circuit', animated: true,
     borderColor: '#0d4a30', borderWidth: 3, borderGlow: false,
     obsInner: 'rgba(0,180,100,0.2)', obsOuter: 'rgba(0,70,40,0.55)',
     obsRing: 'rgba(0,220,130,0.5)', obsGlow: false,
@@ -76,7 +76,7 @@ export const ARENA_SKINS = [
   {
     id: 'nebulosa', name: 'Nebulosa',
     bg: '#07050f', bgGrad: ['#07050f', '#0d0820'],
-    gridColor: 'rgba(200,150,255,0.65)', gridStyle: 'dots',
+    gridColor: 'rgba(200,150,255,0.65)', gridStyle: 'stardust', animated: true,
     borderColor: '#4a2080', borderWidth: 3, borderGlow: false,
     obsInner: 'rgba(140,80,255,0.25)', obsOuter: 'rgba(60,20,120,0.55)',
     obsRing: 'rgba(160,100,255,0.5)', obsGlow: false,
@@ -137,6 +137,54 @@ export const ARENA_SKINS = [
     obsInner: 'rgba(20,160,240,0.25)', obsOuter: 'rgba(5,60,110,0.6)',
     obsRing: 'rgba(30,190,255,0.55)', obsGlow: false,
   },
+  {
+    id: 'voragine', name: 'Espiral',
+    bg: '#060410', bgGrad: ['#060410', '#0b0620'],
+    gridColor: 'rgba(120,80,255,0.15)', gridStyle: 'vortex', animated: true,
+    borderColor: '#3a1880', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(100,60,220,0.25)', obsOuter: 'rgba(40,15,100,0.65)',
+    obsRing: 'rgba(140,90,255,0.65)', obsGlow: true,
+  },
+  {
+    id: 'aurora', name: 'Aurora',
+    bg: '#020b0d', bgGrad: ['#020b0d', '#040e10'],
+    gridColor: 'rgba(0,220,160,0.12)', gridStyle: 'aurora', animated: true,
+    borderColor: '#0d4a3a', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(0,180,130,0.22)', obsOuter: 'rgba(0,60,50,0.60)',
+    obsRing: 'rgba(0,210,150,0.50)', obsGlow: false,
+  },
+  {
+    id: 'pulso', name: 'Pulso',
+    bg: '#020810', bgGrad: null,
+    gridColor: 'rgba(0,200,255,0.12)', gridStyle: 'pulso', animated: true,
+    borderColor: '#007aaa', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(0,180,240,0.20)', obsOuter: 'rgba(0,55,100,0.60)',
+    obsRing: 'rgba(0,210,255,0.70)', obsGlow: true,
+  },
+  {
+    id: 'lluvia', name: 'Lluvia',
+    bg: '#060810', bgGrad: ['#060810', '#0a0d18'],
+    gridColor: 'rgba(140,180,255,0.10)', gridStyle: 'lluvia', animated: true,
+    borderColor: '#253550', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(100,140,200,0.20)', obsOuter: 'rgba(30,50,90,0.60)',
+    obsRing: 'rgba(120,165,230,0.50)', obsGlow: false,
+  },
+  {
+    id: 'rayo', name: 'Rayo',
+    bg: '#04060e', bgGrad: ['#04060e', '#080a18'],
+    gridColor: 'rgba(180,210,255,0.10)', gridStyle: 'rayo', animated: true,
+    borderColor: '#2a4aaa', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(120,160,255,0.22)', obsOuter: 'rgba(30,50,130,0.65)',
+    obsRing: 'rgba(150,190,255,0.65)', obsGlow: true,
+  },
+  {
+    id: 'cosmos', name: 'Cosmos',
+    bg: '#020207', bgGrad: ['#020207', '#050210'],
+    gridColor: 'rgba(200,215,255,0.10)', gridStyle: 'cosmos', animated: true,
+    borderColor: '#1a1440', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(80,70,160,0.22)', obsOuter: 'rgba(20,15,60,0.65)',
+    obsRing: 'rgba(100,90,200,0.50)', obsGlow: false,
+  },
 ];
 
 export function getSelectedArenaSkinId() {
@@ -148,8 +196,11 @@ export function setSelectedArenaSkinId(id) {
 export function getArenaSkinById(id) {
   return ARENA_SKINS.find(s => s.id === id) ?? ARENA_SKINS[0];
 }
+export function isAnimatedArenaSkin(id) {
+  return !!(getArenaSkinById(id).animated);
+}
 
-function _drawGrid(ctx, x, y, w, h, skin) {
+function _drawGrid(ctx, x, y, w, h, skin, t = 0) {
   ctx.save();
   ctx.strokeStyle = skin.gridColor;
   ctx.lineWidth = 1;
@@ -186,26 +237,71 @@ function _drawGrid(ctx, x, y, w, h, skin) {
     ctx.stroke();
 
   } else if (skin.gridStyle === 'circuit') {
-    const step = Math.max(w, h) / 7;
-    // Thin verticals
+    const step     = Math.max(w, h) / 7;
+    const pulseLen = step * 0.65;
+
+    // Static grid
     ctx.lineWidth = 0.5;
     for (let gx = x + step; gx < x + w; gx += step) {
       ctx.beginPath(); ctx.moveTo(gx, y); ctx.lineTo(gx, y + h); ctx.stroke();
     }
-    // Horizontals — alternating thickness
     let row = 0;
     for (let gy = y + step; gy < y + h; gy += step) {
       ctx.lineWidth = (row % 2 === 0) ? 1.5 : 0.5;
       ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x + w, gy); ctx.stroke();
       row++;
     }
-    // Nodes at intersections
     ctx.fillStyle = skin.gridColor;
     for (let gx = x + step; gx < x + w; gx += step) {
       for (let gy = y + step; gy < y + h; gy += step) {
         ctx.beginPath(); ctx.arc(gx, gy, 2, 0, Math.PI * 2); ctx.fill();
       }
     }
+
+    // Animated data pulses along horizontal lines
+    let hRow = 0;
+    for (let gy = y + step; gy < y + h; gy += step) {
+      const s1    = hRow * 17.3;
+      const hph   = Math.sin(s1 * 127.1) * 43758.5453;
+      const hspd  = Math.sin(s1 * 311.7 + 3.1) * 43758.5453;
+      const phase = (hph  - Math.floor(hph))  * (w + pulseLen);
+      const speed = 45 + (hspd - Math.floor(hspd)) * 60;
+      const px    = x - pulseLen + ((t * speed + phase) % (w + pulseLen));
+      const x1    = Math.max(x, px);
+      const x2    = Math.min(x + w, px + pulseLen);
+      if (x2 > x1) {
+        ctx.shadowColor = 'rgba(0,255,140,0.8)';
+        ctx.shadowBlur  = 7;
+        ctx.strokeStyle = 'rgba(0,255,140,0.90)';
+        ctx.lineWidth   = (hRow % 2 === 0) ? 2.0 : 1.0;
+        ctx.beginPath(); ctx.moveTo(x1, gy); ctx.lineTo(x2, gy); ctx.stroke();
+      }
+      hRow++;
+    }
+
+    // Animated data pulses along vertical lines
+    let vCol = 0;
+    for (let gx = x + step; gx < x + w; gx += step) {
+      const s2    = vCol * 23.7 + 100;
+      const hph   = Math.sin(s2 * 127.1) * 43758.5453;
+      const hspd  = Math.sin(s2 * 311.7 + 7.3) * 43758.5453;
+      const phase = (hph  - Math.floor(hph))  * (h + pulseLen);
+      const speed = 38 + (hspd - Math.floor(hspd)) * 50;
+      const py    = y - pulseLen + ((t * speed + phase) % (h + pulseLen));
+      const y1    = Math.max(y, py);
+      const y2    = Math.min(y + h, py + pulseLen);
+      if (y2 > y1) {
+        ctx.shadowColor = 'rgba(0,255,140,0.6)';
+        ctx.shadowBlur  = 5;
+        ctx.strokeStyle = 'rgba(0,255,140,0.70)';
+        ctx.lineWidth   = 0.9;
+        ctx.beginPath(); ctx.moveTo(gx, y1); ctx.lineTo(gx, y2); ctx.stroke();
+      }
+      vCol++;
+    }
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur  = 0;
 
   } else if (skin.gridStyle === 'diag') {
     // Diagonal cross-hatch lines
@@ -278,12 +374,355 @@ function _drawGrid(ctx, x, y, w, h, skin) {
       }
       ctx.stroke();
     }
+
+  } else if (skin.gridStyle === 'vortex') {
+    // Rotating concentric arc rings — cosmic vortex
+    const cx   = x + w / 2;
+    const cy   = y + h / 2;
+    const maxR = Math.min(w, h) * 0.52;
+    const rings = 10;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    // Faint pulsing center glow
+    const glowR = maxR * (0.28 + Math.sin(t * 0.9) * 0.04);
+    const grd   = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+    grd.addColorStop(0, 'rgba(100,60,255,0.10)');
+    grd.addColorStop(1, 'rgba(100,60,255,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(x, y, w, h);
+
+    for (let i = 1; i <= rings; i++) {
+      const frac   = i / rings;
+      const r      = maxR * frac;
+      const speed  = 0.22 * (1 - frac * 0.65); // inner rings rotate faster
+      const angle  = t * speed * Math.PI * 2;
+      const arc1   = Math.PI * (0.5 + frac * 0.25);
+      const arc2   = arc1 * 0.55;
+      const alpha1 = 0.07 + frac * 0.14;
+      const lw     = 0.7 + frac * 1.6;
+
+      // Primary arc — purple
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, angle, angle + arc1);
+      ctx.strokeStyle = `rgba(130,70,255,${alpha1})`;
+      ctx.lineWidth   = lw;
+      ctx.stroke();
+
+      // Opposing arc — cyan
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, angle + Math.PI, angle + Math.PI + arc2);
+      ctx.strokeStyle = `rgba(50,180,255,${alpha1 * 0.65})`;
+      ctx.lineWidth   = lw * 0.55;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'aurora') {
+    // Northern lights — undulating horizontal bands shifting in color
+    const bands = 6;
+    const bandH = h / bands;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    for (let i = 0; i < bands; i++) {
+      const hue  = ((i / bands) * 140 + t * 7) % 360; // shifts green → cyan → violet
+      const cy   = y + (i + 0.5) * bandH;
+      const amp  = bandH * 0.45;
+      const phase = t * 0.35 + i * 1.1;
+
+      // Filled wavy band
+      ctx.beginPath();
+      for (let px = 0; px <= w; px += 4) {
+        const wave = Math.sin((px / w) * Math.PI * 3.5 + phase) * amp * 0.55;
+        const py   = cy - amp * 0.3 + wave;
+        px === 0 ? ctx.moveTo(x + px, py) : ctx.lineTo(x + px, py);
+      }
+      for (let px = w; px >= 0; px -= 4) {
+        const wave = Math.sin((px / w) * Math.PI * 3.5 + phase + 0.6) * amp * 0.55;
+        const py   = cy + amp * 0.3 + wave;
+        ctx.lineTo(x + px, py);
+      }
+      ctx.closePath();
+      const pulse = 0.05 + Math.sin(t * 0.6 + i * 0.9) * 0.025;
+      ctx.fillStyle = `hsla(${hue},80%,62%,${pulse})`;
+      ctx.fill();
+
+      // Bright edge line
+      ctx.beginPath();
+      for (let px = 0; px <= w; px += 3) {
+        const py = cy + Math.sin((px / w) * Math.PI * 3.5 + phase) * amp;
+        px === 0 ? ctx.moveTo(x + px, py) : ctx.lineTo(x + px, py);
+      }
+      const lineAlpha = 0.07 + Math.sin(t * 0.8 + i * 1.3) * 0.04;
+      ctx.strokeStyle = `hsla(${hue},90%,75%,${lineAlpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'pulso') {
+    // Sonar pulses expanding from center
+    const cx    = x + w / 2;
+    const cy    = y + h / 2;
+    const maxR  = Math.min(w, h) * 0.54;
+    const count = 5;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    // Faint center glow
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.18);
+    grd.addColorStop(0, 'rgba(0,210,255,0.12)');
+    grd.addColorStop(1, 'rgba(0,210,255,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(x, y, w, h);
+
+    for (let i = 0; i < count; i++) {
+      const phase = (t * 0.32 + i / count) % 1; // 0..1 lifecycle
+      const r     = phase * maxR;
+      const alpha = (1 - phase) * 0.28;
+      const lw    = (1 - phase) * 2.8 + 0.4;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0,210,255,${alpha})`;
+      ctx.lineWidth   = lw;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'lluvia') {
+    // Diagonal rain streaks
+    const count = 65;
+    const driftPerH = w * 0.25; // how far right-to-left across full height
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    for (let i = 0; i < count; i++) {
+      const hx = Math.sin(i * 127.1) * 43758.5453;
+      const hy = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const hs = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+      const hv = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+
+      const fx    = hx - Math.floor(hx);
+      const fy0   = hy - Math.floor(hy);
+      const len   = 10 + (hs - Math.floor(hs)) * 22;
+      const speed = 150 + (hv - Math.floor(hv)) * 130;
+      const alpha = 0.10 + (hs - Math.floor(hs)) * 0.22;
+
+      const travel  = h + len;
+      const elapsed = (t * speed + fy0 * travel) % travel;
+      const py_bot  = y + elapsed;       // leading (bottom) edge of streak
+      const py_top  = py_bot - len;
+
+      if (py_top > y + h || py_bot < y) continue;
+
+      const progress = elapsed / travel;
+      const px = x + fx * w - progress * driftPerH; // drifts slightly sideways
+
+      ctx.beginPath();
+      ctx.moveTo(px, py_top);
+      ctx.lineTo(px + driftPerH * (len / travel), py_bot);
+      ctx.strokeStyle = `rgba(150,195,255,${alpha})`;
+      ctx.lineWidth   = 0.9;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'rayo') {
+    // Lightning bolts that flash with random zigzag paths
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const boltCount = 5;
+    for (let i = 0; i < boltCount; i++) {
+      // Each bolt has a seeded frequency and phase so they flash independently
+      const hf  = Math.sin(i * 127.1) * 43758.5453;
+      const hph = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const hx  = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+
+      const freq    = 0.6 + (hf  - Math.floor(hf))  * 0.8; // how often it flashes
+      const phase   = (hph - Math.floor(hph)) * 100;
+      const xFrac   = (hx  - Math.floor(hx));
+
+      // Bolt is visible when the fractional part of (t*freq + phase) is within a small window
+      const frac = ((t * freq + phase) % 1 + 1) % 1;
+      if (frac > 0.12) continue; // only visible 12% of its cycle
+
+      const brightness = 1 - frac / 0.12; // bright at start, fades quickly
+
+      // Build zigzag path from top to bottom at xFrac * w, using i as seed
+      const bx     = x + xFrac * w;
+      const steps  = 7;
+      const stepH  = h / steps;
+
+      ctx.shadowColor = `rgba(180,210,255,${brightness * 0.9})`;
+      ctx.shadowBlur  = 18;
+      ctx.strokeStyle = `rgba(210,230,255,${brightness * 0.95})`;
+      ctx.lineWidth   = 1.5 + brightness * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx, y);
+
+      for (let s = 1; s <= steps; s++) {
+        // Zigzag offset seeded per bolt+step
+        const hzx = Math.sin((i * 100 + s) * 57.3) * 43758.5453;
+        const oz  = ((hzx - Math.floor(hzx)) - 0.5) * w * 0.18;
+        ctx.lineTo(bx + oz, y + s * stepH);
+      }
+      ctx.stroke();
+
+      // Bright core (thin white line on top)
+      ctx.shadowBlur  = 4;
+      ctx.strokeStyle = `rgba(255,255,255,${brightness * 0.7})`;
+      ctx.lineWidth   = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(bx, y);
+      for (let s = 1; s <= steps; s++) {
+        const hzx = Math.sin((i * 100 + s) * 57.3) * 43758.5453;
+        const oz  = ((hzx - Math.floor(hzx)) - 0.5) * w * 0.18;
+        ctx.lineTo(bx + oz, y + s * stepH);
+      }
+      ctx.stroke();
+    }
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur  = 0;
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'cosmos') {
+    // Multi-layer parallax star field
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const layers = [
+      { count: 14, speed: 3,  size: 1.9, opacity: 0.65, twinkle: true  },
+      { count: 35, speed: 9,  size: 1.1, opacity: 0.42, twinkle: false },
+      { count: 65, speed: 24, size: 0.55, opacity: 0.28, twinkle: false },
+    ];
+
+    for (let li = 0; li < layers.length; li++) {
+      const layer = layers[li];
+      for (let i = 0; i < layer.count; i++) {
+        const seed  = li * 1000 + i;
+        const hx    = Math.sin(seed * 127.1) * 43758.5453;
+        const hy    = Math.sin(seed * 311.7 + 19.3) * 43758.5453;
+        const hp    = Math.sin(seed * 91.3  + 7.1)  * 43758.5453;
+
+        const fy    = hy - Math.floor(hy);
+        const fx0   = hx - Math.floor(hx);
+        const phase = (hp - Math.floor(hp)) * Math.PI * 2;
+
+        const fx    = ((fx0 + (t * layer.speed) / w) % 1 + 1) % 1;
+
+        let alpha = layer.opacity;
+        if (layer.twinkle) alpha *= 0.4 + Math.sin(t * 2.5 + phase) * 0.6;
+
+        ctx.beginPath();
+        ctx.arc(x + fx * w, y + fy * h, layer.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(215,225,255,${alpha})`;
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'stardust') {
+    // Rising stardust particles — purple/violet cosmic variant of embers
+    const count = 80;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    // Subtle violet glow from below
+    const sdGrd = ctx.createLinearGradient(x, y + h, x, y + h * 0.5);
+    sdGrd.addColorStop(0, 'rgba(120,50,220,0.08)');
+    sdGrd.addColorStop(1, 'rgba(120,50,220,0)');
+    ctx.fillStyle = sdGrd;
+    ctx.fillRect(x, y, w, h);
+
+    for (let i = 0; i < count; i++) {
+      const hx = Math.sin(i * 127.1) * 43758.5453;
+      const hy = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const hs = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+      const hv = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+      const hd = Math.sin(i * 231.1 + 41.3) * 43758.5453;
+      const hc = Math.sin(i * 173.5 + 31.7) * 43758.5453;
+
+      const fx    = hx - Math.floor(hx);
+      const fy0   = hy - Math.floor(hy);
+      const size  = 0.5 + (hs - Math.floor(hs)) * 1.8;
+      const speed = 12 + (hv - Math.floor(hv)) * 25;
+      const drift = ((hd - Math.floor(hd)) - 0.5) * 8;
+      const colorT = hc - Math.floor(hc); // 0=violet, 1=cyan
+
+      const elapsed  = (t * speed + fy0 * h) % h;
+      const py       = y + h - elapsed;
+      if (py < y || py > y + h) continue;
+
+      const progress = elapsed / h;
+      const alpha    = (1 - progress * 0.80) * 0.80;
+      const r = Math.round(140 + colorT * 80);   // 140..220
+      const g = Math.round(60  + colorT * 100);  // 60..160
+      const b = 255;
+
+      ctx.beginPath();
+      ctx.arc(x + fx * w + drift * progress, py, size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.fill();
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'embers') {
+    // Rising ember particles from the arena floor
+    const count = 75;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    // Warm glow from the bottom
+    const emberGrd = ctx.createLinearGradient(x, y + h, x, y + h * 0.55);
+    emberGrd.addColorStop(0, 'rgba(200,80,10,0.10)');
+    emberGrd.addColorStop(1, 'rgba(200,80,10,0)');
+    ctx.fillStyle = emberGrd;
+    ctx.fillRect(x, y, w, h);
+
+    for (let i = 0; i < count; i++) {
+      const hx = Math.sin(i * 127.1) * 43758.5453;
+      const hy = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const hs = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+      const hv = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+      const hd = Math.sin(i * 231.1 + 41.3) * 43758.5453;
+
+      const fx    = hx - Math.floor(hx);          // x lane 0..1
+      const fy0   = hy - Math.floor(hy);          // y phase offset 0..1
+      const size  = 0.7 + (hs - Math.floor(hs)) * 2.0;
+      const speed = 18 + (hv - Math.floor(hv)) * 30; // px/s
+      const drift = ((hd - Math.floor(hd)) - 0.5) * 10;
+
+      const elapsed  = (t * speed + fy0 * h) % h;
+      const py       = y + h - elapsed;            // rises bottom → top
+      if (py < y || py > y + h) continue;
+
+      const progress = elapsed / h;               // 0 = just born, 1 = top
+      const alpha    = (1 - progress * 0.85) * 0.75;
+      const g        = Math.round(110 + progress * 90);
+      const b        = Math.round(progress * 30);
+
+      ctx.beginPath();
+      ctx.arc(x + fx * w + drift * progress, py, size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,${g},${b},${alpha})`;
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   ctx.restore();
 }
 
-export function drawArenaBg(ctx, x, y, w, h, skinId) {
+export function drawArenaBg(ctx, x, y, w, h, skinId, t = 0) {
   const skin = getArenaSkinById(skinId);
 
   // Background fill / gradient
@@ -298,7 +737,7 @@ export function drawArenaBg(ctx, x, y, w, h, skinId) {
   ctx.fillRect(x, y, w, h);
 
   // Grid / pattern
-  _drawGrid(ctx, x, y, w, h, skin);
+  _drawGrid(ctx, x, y, w, h, skin, t);
 
   // Border (with optional glow)
   ctx.save();

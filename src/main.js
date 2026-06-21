@@ -43,6 +43,7 @@ import {
   ARENA_SKINS,
   setSelectedArenaSkinId,
   drawArenaBg,
+  isAnimatedArenaSkin,
 } from "./skins/arenaSkins.js";
 import {
   openWardrobe,
@@ -393,9 +394,16 @@ function _showChestModal(result) {
       previewEl.classList.remove("hidden");
       previewEl.classList.add("chest-preview-arena");
       const pCtx = previewEl.getContext("2d");
-      const pW = previewEl.width,
-        pH = previewEl.height;
-      drawArenaBg(pCtx, 0, 0, pW, pH, result.skinId);
+      const pW = previewEl.width, pH = previewEl.height;
+      if (isAnimatedArenaSkin(result.skinId)) {
+        const loop = () => {
+          drawArenaBg(pCtx, 0, 0, pW, pH, result.skinId, performance.now() / 1000);
+          _chestPreviewAnimId = requestAnimationFrame(loop);
+        };
+        _chestPreviewAnimId = requestAnimationFrame(loop);
+      } else {
+        drawArenaBg(pCtx, 0, 0, pW, pH, result.skinId);
+      }
 
       if (document.getElementById("arena-skin-name")) _syncArenaSkinSelector();
     } else {

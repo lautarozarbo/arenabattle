@@ -1,4 +1,4 @@
-import { drawArenaBg, drawArenaObstacle } from '../../skins/arenaSkins.js';
+import { drawArenaBg, drawArenaObstacle, isAnimatedArenaSkin } from '../../skins/arenaSkins.js';
 
 /**
  * TowerUI — all DOM for the infinite tower mode.
@@ -81,7 +81,12 @@ export class TowerUI {
   }
 
   hideTransition() {
-    this._transition?.classList.add('tt--hidden');
+    if (this._transition) {
+      this._transition.classList.add('tt--hidden');
+      this._transition.querySelectorAll('.tt-arena-cvs').forEach(cvs => {
+        if (cvs._animRaf) { cancelAnimationFrame(cvs._animRaf); cvs._animRaf = null; }
+      });
+    }
   }
 
   // ── 2. Upgrade picker ─────────────────────────────────────────────────────
@@ -364,15 +369,23 @@ function _renderArenaPreview(cvs, skinId, obstacles) {
   const ctx = cvs.getContext('2d');
   const W = cvs.width, H = cvs.height;
   const pad = 5;
-  ctx.clearRect(0, 0, W, H);
-  drawArenaBg(ctx, pad, pad, W - pad * 2, H - pad * 2, skinId);
-  for (const o of obstacles) {
-    drawArenaObstacle(
-      ctx,
-      pad + o.x * (W - pad * 2),
-      pad + o.y * (H - pad * 2),
-      o.r * Math.min(W - pad * 2, H - pad * 2),
-      skinId,
-    );
+  const aW  = W - pad * 2;
+  const aH  = H - pad * 2;
+
+  if (cvs._animRaf) { cancelAnimationFrame(cvs._animRaf); cvs._animRaf = null; }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+    drawArenaBg(ctx, pad, pad, aW, aH, skinId, performance.now() / 1000);
+    for (const o of obstacles) {
+      drawArenaObstacle(ctx, pad + o.x * aW, pad + o.y * aH, o.r * Math.min(aW, aH), skinId);
+    }
+  }
+
+  if (isAnimatedArenaSkin(skinId)) {
+    const loop = () => { drawFrame(); cvs._animRaf = requestAnimationFrame(loop); };
+    cvs._animRaf = requestAnimationFrame(loop);
+  } else {
+    drawFrame();
   }
 }
