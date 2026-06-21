@@ -119,6 +119,10 @@ import {
 } from "./persistence/towerSave.js";
 import { loadLeagueCloud, loadTournamentCloud } from "./persistence/competitionSave.js";
 import { summarizeUpgrades } from "./modes/tower/TowerUpgrades.js";
+import { recordMissionEvent, loadMissions, syncMissionsFromCloud } from "./persistence/missionsSave.js";
+import { initMissionsUI } from "./ui/missionsUI.js";
+import { applyBadgeToElement } from "./ui/badge.js";
+import { POWER_CATEGORIES } from "./powers/registry.js";
 
 const canvas = document.getElementById("game-canvas");
 canvas.width = canvas.height = 420;
@@ -557,19 +561,23 @@ const _profilePanel = document.getElementById("profile-panel");
 const _profileEditRow = document.getElementById("profile-name-edit-row");
 
 function _loadPlayerName() {
-  _chipName.textContent = "Invitado";
-  _profileName.textContent = "Invitado";
-  _profileInput.value = "Invitado";
+  const name = localStorage.getItem("playerName") || "Invitado";
+  _chipName.dataset.rawName = name;
+  _profileName.dataset.rawName = name;
+  _chipName.textContent = name;
+  _profileName.textContent = name;
+  _profileInput.value = name;
 }
 _loadPlayerName();
 
 function _savePlayerName(val) {
   val = val.trim() || "Invitado";
   localStorage.setItem("playerName", val);
-  _chipName.textContent = val;
-  _profileName.textContent = val;
+  _chipName.dataset.rawName = val;
+  _profileName.dataset.rawName = val;
   _profileInput.value = val;
   updateUsername(val);
+  _applyPlayerBadge(loadMissions().activeBadge);
 }
 
 function _confirmProfileName() {
@@ -1666,6 +1674,15 @@ const _sharedDeps = {
 initLeagueUI(_sharedDeps);
 initTournamentUI(_sharedDeps);
 
+// ── Missions ──────────────────────────────────────────────────────────────────
+initMissionsUI({ onBadgeChange: _applyPlayerBadge });
+syncMissionsFromCloud().then(() => _applyPlayerBadge(loadMissions().activeBadge));
+
+function _applyPlayerBadge(badgeId) {
+  applyBadgeToElement(_chipName, badgeId);
+  applyBadgeToElement(_profileName, badgeId);
+}
+
 // ── Skin helpers ──────────────────────────────────────────────────────────────
 // Picks a random unlocked skin for an AI character (equal chance per option incl. default).
 function _randomAiSkinMeta(meta) {
@@ -1864,9 +1881,11 @@ function _ttHandleKnockout(winnerSide) {
     if (winner === 0) {
       sfx.gameOverWin();
       recordWin("tag2v2");
+      _recordMissions(true);
     } else {
       sfx.gameOverLose();
       recordLoss("tag2v2");
+      _recordMissions(false);
     }
     document.getElementById("fight-tag-area").classList.add("hidden");
     _ttMatch = null;
@@ -2262,6 +2281,33 @@ function _startTowerRun(powerMeta, savedState = null) {
   _tower.startRun(powerMeta, category, savedState);
 }
 
+function _recordMissions(won) {
+  const allMetas  = getAllPowerMetas();
+  const charMeta  = allMetas.find(m => m.id === _pendingCharUseId);
+  const category  = charMeta?.category ?? null;
+  const rewards   = recordMissionEvent(category, won);
+  for (const r of rewards) {
+    addPoints(r.xp);
+    _updateXpBar();
+    _showMissionToast(r);
+    if (r.badge) _applyPlayerBadge(loadMissions().activeBadge);
+  }
+}
+
+function _showMissionToast(reward) {
+  const toast = document.createElement('div');
+  toast.className = 'mission-toast';
+  toast.innerHTML = `<span class="mission-toast-icon">🎯</span>
+    <div>
+      <div class="mission-toast-title">¡Misión completada!</div>
+      <div class="mission-toast-label">${reward.label}</div>
+      <div class="mission-toast-xp">+${reward.xp} XP${reward.badge ? ` · Marco desbloqueado` : ''}</div>
+    </div>`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('mission-toast--show'), 50);
+  setTimeout(() => { toast.classList.remove('mission-toast--show'); setTimeout(() => toast.remove(), 400); }, 3500);
+}
+
 function handleGameOver(winner, winnerSide) {
   stopHudLoop();
   _stopAbilitiesLoop();
@@ -2271,6 +2317,7 @@ function handleGameOver(winner, winnerSide) {
     const playerWon = winnerSide === 0;
     if (playerWon) recordWin("tower");
     else           recordLoss("tower");
+    _recordMissions(playerWon);
     if (_pendingCharUseId) {
       recordCharUse(_pendingCharUseId);
       refreshMasteryBadges();
@@ -2321,6 +2368,7 @@ function handleGameOver(winner, winnerSide) {
     text.style.color = playerWon ? "#7ec8f7" : "#f77e7e";
     if (playerWon) { sfx.gameOverWin(); recordWin("sim2v2"); }
     else           { sfx.gameOverLose(); recordLoss("sim2v2"); }
+    _recordMissions(playerWon);
     const ptLines = [`+${POINTS.MATCH_COMPLETE} por terminar la partida`];
     if (playerWon) ptLines.push(`+${POINTS.MATCH_WIN} por ganar`);
     addPoints(POINTS.MATCH_COMPLETE + (playerWon ? POINTS.MATCH_WIN : 0));
@@ -2345,6 +2393,7 @@ function handleGameOver(winner, winnerSide) {
     text.style.color  = playerWon ? "#7ec8f7" : "#f77e7e";
     if (playerWon) { sfx.gameOverWin(); recordWin("battle"); }
     else           { sfx.gameOverLose(); recordLoss("battle"); }
+    _recordMissions(playerWon);
     const ptLines = [`+${POINTS.MATCH_COMPLETE} por terminar la partida`];
     if (playerWon) ptLines.push(`+${POINTS.MATCH_WIN} por ganar`);
     addPoints(POINTS.MATCH_COMPLETE + (playerWon ? POINTS.MATCH_WIN : 0));
@@ -2364,9 +2413,9 @@ function handleGameOver(winner, winnerSide) {
     gameMode === "league" ||
     gameMode === "tournament"
   ) {
-    if (!winner) recordDraw(gameMode);
-    else if (playerWon) recordWin(gameMode);
-    else recordLoss(gameMode);
+    if (!winner) { recordDraw(gameMode); _recordMissions(null); }
+    else if (playerWon) { recordWin(gameMode); _recordMissions(true); }
+    else { recordLoss(gameMode); _recordMissions(false); }
   }
 
   const bar = document.getElementById("gameover-bar");

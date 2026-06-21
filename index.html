@@ -155,6 +155,7 @@
         <!-- Center overlay: logo + XP bar -->
         <div class="menu-overlay">
           <div class="menu-logo-block">
+            <button id="btn-misiones">Misiones</button>
             <span class="menu-app-name">ARENA</span>
             <div class="xp-bar-wrap" id="xp-bar-wrap">
               <div class="xp-track-group">
@@ -1478,6 +1479,17 @@
           <button class="confirm-btn confirm-btn--cancel" id="confirm-cancel">Cancelar</button>
           <button class="confirm-btn confirm-btn--danger" id="confirm-ok">Eliminar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Missions modal -->
+    <div id="missions-modal" class="hidden">
+      <div class="ms-panel">
+        <div class="ms-panel-header">
+          <span class="ms-panel-title">Misiones</span>
+          <button class="ms-close-btn" id="missions-close">✕</button>
+        </div>
+        <div id="missions-content"></div>
       </div>
     </div>
 

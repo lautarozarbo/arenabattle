@@ -1,5 +1,6 @@
 import { supabase } from '../supabase.js';
 import { openUserProfile } from './userProfile.js';
+import { badgeNameHtml } from '../ui/badge.js';
 
 export async function openLeaderboard() {
   const modal = document.getElementById('leaderboard-modal');
@@ -9,7 +10,7 @@ export async function openLeaderboard() {
 
   try {
     const [{ data: statsData, error: statsErr }, { data: profilesData, error: profErr }] = await Promise.all([
-      supabase.from('user_stats').select('user_id, wins, losses, draws'),
+      supabase.from('user_stats').select('user_id, wins, losses, draws, missions_progress'),
       supabase.from('profiles').select('user_id, username'),
     ]);
 
@@ -25,7 +26,7 @@ export async function openLeaderboard() {
         const total_wins   = Object.values(s.wins   ?? {}).reduce((a, b) => a + b, 0);
         const total_losses = Object.values(s.losses ?? {}).reduce((a, b) => a + b, 0);
         const total_draws  = Object.values(s.draws  ?? {}).reduce((a, b) => a + b, 0);
-        return { user_id: s.user_id, username: usernameMap[s.user_id] ?? 'Usuario', total_wins, total_losses, total_draws };
+        return { user_id: s.user_id, username: usernameMap[s.user_id] ?? 'Usuario', total_wins, total_losses, total_draws, activeBadge: s.missions_progress?.activeBadge ?? null };
       })
       .filter(r => r.total_wins + r.total_losses + r.total_draws > 0)
       .sort((a, b) => b.total_wins - a.total_wins)
@@ -46,7 +47,7 @@ export async function openLeaderboard() {
       const medal   = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
       return `<tr class="lb-row${isMe ? ' lb-row--me' : ''}" data-userid="${row.user_id}">
         <td class="lb-rank">${medal}</td>
-        <td class="lb-name lb-name--link">${_esc(row.username)}</td>
+        <td class="lb-name lb-name--link">${badgeNameHtml(row.username, row.activeBadge)}</td>
         <td class="lb-wins">${row.total_wins}</td>
         <td class="lb-rate">${winRate}%</td>
       </tr>`;

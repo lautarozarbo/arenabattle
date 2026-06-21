@@ -3,6 +3,7 @@ import { getAllPowerMetas } from '../powers/registry.js';
 import { refreshFriendsBadge } from './friends.js';
 import { loadComments, renderCommentsSection, wireComments, clearProfileCommentsBadge } from './profileComments.js';
 import { showConfirm } from '../ui/confirmDialog.js';
+import { badgeNameHtml } from '../ui/badge.js';
 
 export async function openUserProfile(userId) {
   const modal   = document.getElementById('user-profile-modal');
@@ -63,7 +64,7 @@ export async function openUserProfile(userId) {
   const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
 
   content.innerHTML = `
-    <div class="up-username">${_esc(profile.username)}</div>
+    <div class="up-username">${badgeNameHtml(profile.username, stats?.missions_progress?.activeBadge ?? null)}</div>
     ${lastSeenHtml ? `<div class="up-last-seen">${lastSeenHtml}</div>` : ''}
     ${friendBtnHtml}
 

@@ -4915,3 +4915,198 @@ td.rank {
   white-space: nowrap;
 }
 .confirm-btn--danger:hover { background: #dc2626; }
+
+/* ── Missions modal ─────────────────────────────────────────────────────────── */
+#missions-modal {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(0,0,0,0.72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+#missions-modal.hidden { display: none; }
+.ms-panel {
+  background: #0d0f1a;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  width: 100%; max-width: 460px;
+  max-height: 88vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.ms-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.ms-panel-title { font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; }
+.ms-close-btn {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 2px 6px;
+}
+.ms-close-btn:hover { color: #fff; }
+#missions-content { overflow-y: auto; padding: 14px 16px 20px; }
+
+.ms-streak-counter {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,160,0,0.10);
+  border: 1px solid rgba(255,160,0,0.25);
+  border-radius: 10px; padding: 8px 14px; margin-bottom: 16px;
+}
+.ms-streak-icon { font-size: 1.2rem; }
+.ms-streak-label { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+.ms-streak-label strong { color: #ffa500; }
+
+.ms-section-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.10em;
+  color: rgba(255,255,255,0.40); text-transform: uppercase;
+  margin: 16px 0 8px;
+}
+.ms-missions-list { display: flex; flex-direction: column; gap: 8px; }
+.ms-mission-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 10px 12px;
+}
+.ms-mission-card.ms-done {
+  opacity: 0.45;
+  border-color: rgba(100,255,130,0.20);
+}
+.ms-mission-header {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.ms-cat-icon { font-size: 1rem; }
+.ms-cat-name { font-size: 0.82rem; font-weight: 700; }
+.ms-level-tag {
+  margin-left: auto; font-size: 0.68rem; color: rgba(255,255,255,0.40);
+}
+.ms-mission-label { font-size: 0.78rem; color: rgba(255,255,255,0.70); margin-bottom: 7px; }
+.ms-progress-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.ms-progress-bar {
+  flex: 1; height: 5px; background: rgba(255,255,255,0.10); border-radius: 4px; overflow: hidden;
+}
+.ms-progress-fill {
+  height: 100%; background: #7c9dff; border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.ms-fill--streak { background: #ff9d2f; }
+.ms-progress-text { font-size: 0.7rem; color: rgba(255,255,255,0.45); white-space: nowrap; }
+.ms-xp-reward { font-size: 0.7rem; color: #a5f3af; margin-top: 5px; display: block; }
+
+.ms-badge-chip {
+  font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 6px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* Badge grid */
+.ms-badge-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px; margin-top: 4px;
+}
+.ms-badge-btn {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px; padding: 10px 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transition: border-color 0.2s;
+}
+.ms-badge-btn:hover { border-color: rgba(255,255,255,0.25); }
+.ms-badge-btn--active { border-color: #7c9dff; background: rgba(124,157,255,0.10); }
+.ms-badge-preview {
+  font-size: 1rem; font-weight: 700; padding: 3px 10px; border-radius: 6px;
+  display: inline-block;
+}
+.ms-badge-name { font-size: 0.65rem; color: rgba(255,255,255,0.55); }
+.ms-empty { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin: 4px 0; }
+
+/* ── Missions button ─────────────────────────────────────────────────────────── */
+#btn-misiones {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.40); text-transform: uppercase;
+  padding: 2px 0; display: block; margin: 0 auto 2px;
+  transition: color 0.2s;
+}
+#btn-misiones:hover { color: rgba(255,255,255,0.75); }
+
+/* ── Name badges ─────────────────────────────────────────────────────────────── */
+.badge-wrap { display: inline-flex; align-items: center; }
+.badge-name { display: inline-block; border-radius: 5px; padding: 1px 6px; }
+
+.badge--none { /* no style */ }
+
+.badge--bronce {
+  border: 1.5px solid #cd7f32;
+  color: #e8a96a;
+}
+.badge--plata {
+  border: 1.5px solid #c0c0c0;
+  color: #e0e0e0;
+  box-shadow: 0 0 4px rgba(200,200,200,0.25);
+}
+.badge--oro {
+  border: 1.5px solid #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(255,215,0,0.45);
+  animation: badge-glow-oro 2s ease-in-out infinite alternate;
+}
+@keyframes badge-glow-oro {
+  from { box-shadow: 0 0 5px rgba(255,215,0,0.30); }
+  to   { box-shadow: 0 0 14px rgba(255,215,0,0.70); }
+}
+.badge--diamante {
+  border: 1.5px solid #b9f2ff;
+  color: #b9f2ff;
+  animation: badge-sparkle 1.8s ease-in-out infinite alternate;
+}
+@keyframes badge-sparkle {
+  0%   { box-shadow: 0 0 6px rgba(100,230,255,0.35); border-color: #b9f2ff; }
+  50%  { box-shadow: 0 0 12px rgba(100,230,255,0.65); border-color: #80eeff; }
+  100% { box-shadow: 0 0 6px rgba(100,230,255,0.35); border-color: #ffffff; }
+}
+.badge--legendario {
+  border: 1.5px solid transparent;
+  background-clip: padding-box;
+  animation: badge-rainbow 3s linear infinite;
+  position: relative;
+}
+.badge--legendario::before {
+  content: '';
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080);
+  background-size: 300% 100%;
+  animation: badge-rainbow-bg 3s linear infinite;
+  z-index: -1;
+  border-radius: 7px;
+}
+@keyframes badge-rainbow {
+  0%  { color: #ff8c9e; }
+  25% { color: #ffe490; }
+  50% { color: #90ffc8; }
+  75% { color: #90d8ff; }
+  100%{ color: #ff8c9e; }
+}
+@keyframes badge-rainbow-bg {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ── Mission toast notification ──────────────────────────────────────────────── */
+.mission-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  z-index: 9000;
+  background: #0d0f1a; border: 1px solid rgba(124,157,255,0.35);
+  border-radius: 12px; padding: 12px 18px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.55);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.35s;
+  opacity: 0; min-width: 240px; max-width: 340px;
+}
+.mission-toast--show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.mission-toast-icon { font-size: 1.4rem; flex-shrink: 0; }
+.mission-toast-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: #7c9dff; margin-bottom: 2px; }
+.mission-toast-label { font-size: 0.78rem; color: rgba(255,255,255,0.80); }
+.mission-toast-xp    { font-size: 0.68rem; color: #a5f3af; margin-top: 2px; }
