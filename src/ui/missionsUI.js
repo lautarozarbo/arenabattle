@@ -26,6 +26,19 @@ export function openMissions() {
   document.getElementById('missions-modal').classList.remove('hidden');
 }
 
+const CAT_COLOR = {
+  'Cuerpo a cuerpo': '#ff6b6b',
+  'Proyectiles':     '#7c9dff',
+  'Control de zona': '#c084fc',
+  'Invocación':      '#4ade80',
+};
+const CAT_ABBR = {
+  'Cuerpo a cuerpo': 'CC',
+  'Proyectiles':     'PR',
+  'Control de zona': 'CZ',
+  'Invocación':      'IN',
+};
+
 function _render() {
   const state = loadMissions();
   const modal = document.getElementById('missions-modal');
@@ -38,19 +51,20 @@ function _render() {
     const count   = isDone ? (getCategoryMission(cat, CAT_LEVELS_COUNT - 1)?.target ?? 0) : cp.count;
     const target  = isDone ? (getCategoryMission(cat, CAT_LEVELS_COUNT - 1)?.target ?? 0) : mission.target;
     const pct     = isDone ? 100 : Math.min(100, Math.round((count / target) * 100));
-    const catIcon = { 'Cuerpo a cuerpo': '⚔️', 'Proyectiles': '🎯', 'Control de zona': '🔮', 'Invocación': '✨' }[cat] ?? '🎮';
-    const levelLabel = isDone ? `Completado (${CAT_LEVELS_COUNT}/${CAT_LEVELS_COUNT})` : `Nivel ${cp.level + 1}/${CAT_LEVELS_COUNT}`;
+    const color   = CAT_COLOR[cat] ?? '#7c9dff';
+    const abbr    = CAT_ABBR[cat]  ?? '??';
+    const levelLabel = isDone ? `${CAT_LEVELS_COUNT}/${CAT_LEVELS_COUNT}` : `Niv. ${cp.level + 1}/${CAT_LEVELS_COUNT}`;
 
-    return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}">
+    return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}" style="--cat-color:${color}">
       <div class="ms-mission-header">
-        <span class="ms-cat-icon">${catIcon}</span>
+        <span class="ms-cat-abbr" style="background:${color}22;color:${color};border-color:${color}44">${abbr}</span>
         <span class="ms-cat-name">${cat}</span>
         <span class="ms-level-tag">${levelLabel}</span>
       </div>
       <div class="ms-mission-label">${isDone ? 'Todas las misiones completadas' : mission.label}</div>
       <div class="ms-progress-row">
-        <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%"></div></div>
-        <span class="ms-progress-text">${isDone ? '✓' : `${count}/${target}`}</span>
+        <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="ms-progress-text">${isDone ? 'Completado' : `${count}/${target}`}</span>
       </div>
       ${!isDone ? `<span class="ms-xp-reward">+${mission.xp} XP</span>` : ''}
     </div>`;
@@ -62,20 +76,20 @@ function _render() {
   const nextStreak = STREAK_MILESTONES.find(ms => !completed.has(ms.target));
 
   const streakHtml = STREAK_MILESTONES.map(ms => {
-    const done = completed.has(ms.target);
+    const done   = completed.has(ms.target);
     const isNext = nextStreak && ms.target === nextStreak.target;
-    const pct  = done ? 100 : isNext ? Math.min(100, Math.round((curStreak / ms.target) * 100)) : 0;
+    const pct    = done ? 100 : isNext ? Math.min(100, Math.round((curStreak / ms.target) * 100)) : 0;
     return `<div class="ms-mission-card ${done ? 'ms-done' : ''}">
       <div class="ms-mission-header">
-        <span class="ms-cat-icon">🏆</span>
-        <span class="ms-mission-label">${ms.target} victorias seguidas</span>
-        ${ms.badge ? `<span class="ms-badge-chip ms-badge-chip--${ms.badge}">Marco ${BADGES[ms.badge].name}</span>` : ''}
+        <span class="ms-streak-chip">×${ms.target}</span>
+        <span class="ms-cat-name">${ms.target} victorias seguidas</span>
+        ${ms.badge ? `<span class="ms-badge-chip">Marco ${BADGES[ms.badge].name}</span>` : ''}
       </div>
       ${isNext ? `<div class="ms-progress-row">
         <div class="ms-progress-bar"><div class="ms-progress-fill ms-fill--streak" style="width:${pct}%"></div></div>
         <span class="ms-progress-text">${curStreak}/${ms.target}</span>
-      </div>` : done ? `<div class="ms-progress-row"><span class="ms-progress-text">✓ Completado</span></div>` : ''}
-      <span class="ms-xp-reward">${done ? '' : `+${ms.xp} XP`}${ms.badge && !done ? ` + Marco ${BADGES[ms.badge].name}` : ''}</span>
+      </div>` : done ? `<div class="ms-progress-row"><span class="ms-progress-text">Completado</span></div>` : ''}
+      <span class="ms-xp-reward">${done ? '' : `+${ms.xp} XP`}${ms.badge && !done ? ` · Marco ${BADGES[ms.badge].name}` : ''}</span>
     </div>`;
   }).join('');
 
@@ -97,18 +111,27 @@ function _render() {
 
   modal.querySelector('#missions-content').innerHTML = `
     <div class="ms-streak-counter">
-      <span class="ms-streak-icon">🔥</span>
-      <span class="ms-streak-label">Racha actual: <strong>${curStreak}</strong></span>
+      <div class="ms-streak-number">${curStreak}</div>
+      <div class="ms-streak-info">
+        <span class="ms-streak-title">Racha actual</span>
+        <span class="ms-streak-sub">${nextStreak ? `Próximo hito: ×${nextStreak.target} victorias` : 'Todos los hitos completados'}</span>
+      </div>
     </div>
 
-    <h3 class="ms-section-title">Partidas por categoría</h3>
-    <div class="ms-missions-list">${catHtml}</div>
+    <div class="ms-section">
+      <div class="ms-section-header">Partidas por categoría</div>
+      <div class="ms-missions-list">${catHtml}</div>
+    </div>
 
-    <h3 class="ms-section-title">Victorias seguidas</h3>
-    <div class="ms-missions-list">${streakHtml}</div>
+    <div class="ms-section">
+      <div class="ms-section-header">Victorias seguidas</div>
+      <div class="ms-missions-list">${streakHtml}</div>
+    </div>
 
-    <h3 class="ms-section-title">Marcos de nombre</h3>
-    ${badgeHtml}
+    <div class="ms-section">
+      <div class="ms-section-header">Marcos de nombre</div>
+      ${badgeHtml}
+    </div>
   `;
 
   // Badge selection
