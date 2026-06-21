@@ -2171,7 +2171,7 @@ function _startTowerRun(powerMeta, savedState = null) {
       showScreen("screen-tower-setup");
     },
     onSave:    (run, pendingFloor) => saveTowerRun(run, pendingFloor),
-    onRunOver: (run) => { maybeSaveBestRun(run); recordTowerRun(run); clearTowerRun(); },
+    onRunOver: (run, xpGained) => { maybeSaveBestRun(run); recordTowerRun(run); clearTowerRun(); if (xpGained > 0) { addPoints(xpGained); _updateXpBar(); } },
     getArenaOpts: () => {
       const layout = ARENA_LAYOUTS[Math.floor(Math.random() * ARENA_LAYOUTS.length)];
       const skin   = _unlockedArenaSkins[Math.floor(Math.random() * _unlockedArenaSkins.length)] ?? ARENA_SKINS[0];

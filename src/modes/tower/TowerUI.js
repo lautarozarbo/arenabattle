@@ -145,7 +145,7 @@ export class TowerUI {
 
   // ── 3. Run-over screen ────────────────────────────────────────────────────
 
-  showRunOver(floor, upgradeIds) {
+  showRunOver(floor, upgradeIds, xpGained = 0) {
     this._ensureRunOver();
     const el = this._runOver;
     el.querySelector('.tro-floor').textContent   = `Llegaste al piso ${floor}`;
@@ -153,6 +153,8 @@ export class TowerUI {
       upgradeIds.length > 0
         ? `${upgradeIds.length} mejora${upgradeIds.length > 1 ? 's' : ''} aplicada${upgradeIds.length > 1 ? 's' : ''}`
         : 'Sin mejoras aplicadas';
+    const xpEl = el.querySelector('.tro-xp');
+    if (xpEl) xpEl.textContent = `+${xpGained} XP (${floor} pisos × 2)`;
     el.classList.remove('tt--hidden');
   }
 
@@ -269,6 +271,7 @@ export class TowerUI {
         <div class="tro-title">RUN TERMINADO</div>
         <div class="tro-floor"></div>
         <div class="tro-upgrades"></div>
+        <div class="tro-xp"></div>
         <button class="btn-primary tro-btn">Volver al menú</button>
       </div>
     `;

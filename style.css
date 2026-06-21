@@ -4877,6 +4877,12 @@ td.rank {
   font-size: 0.8rem;
   color: rgba(255,255,255,0.42);
 }
+.tro-xp {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #facc15;
+  margin-top: 4px;
+}
 .tro-btn {
   margin-top: 10px;
   width: 100%;
