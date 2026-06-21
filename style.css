@@ -4966,7 +4966,7 @@ td.rank {
   font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 2px 6px;
 }
 .ms-close-btn:hover { color: #fff; }
-#missions-content { overflow-y: auto; padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+#missions-content { overflow-y: auto; padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
 
 /* Streak counter */
 .ms-streak-counter {
