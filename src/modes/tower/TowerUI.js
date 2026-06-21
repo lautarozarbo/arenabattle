@@ -177,8 +177,8 @@ export class TowerUI {
     if (mods.speedMult     > 1)  chips.push({ label: `Vel +${Math.round((mods.speedMult - 1) * 100)}%`,         color: '#22d3ee' });
     if (mods.regenPerSec   > 0)  chips.push({ label: `Regen +${mods.regenPerSec} HP/s`,                        color: '#f472b6' });
     if (mods.contactDmgAdd > 0)  chips.push({ label: `+${mods.contactDmgAdd} choque`,                          color: '#fb923c' });
-    if (mods.bleedPerSec   > 0)  chips.push({ label: `Sangrado ${+mods.bleedPerSec.toFixed(1)}/s`,             color: '#ef4444' });
-    if (mods.contactSlow   > 0)  chips.push({ label: `Lentitud ${Math.round(mods.contactSlow * 100)}%`,        color: '#818cf8' });
+    if (mods.bleedPerSec   > 0)  chips.push({ label: `Sangrado ${+mods.bleedPerSec.toFixed(1)}/s ${mods.bleedDuration ?? 3}s`, color: '#ef4444' });
+    if (mods.contactSlow   > 0)  chips.push({ label: `Lentitud ${Math.round(mods.contactSlow * 100)}% ${mods.slowDuration ?? 3}s`, color: '#818cf8' });
     if (mods.hpBonus       > 0)  chips.push({ label: `+${mods.hpBonus} HP`,                                    color: '#f87171' });
     if (pmods.cdMult       < 1)  chips.push({ label: `CD -${Math.round((1 - pmods.cdMult) * 100)}%`,           color: '#60a5fa' });
     if (pmods.extraProjectile > 0) chips.push({ label: `+${pmods.extraProjectile} proyectil`,                  color: '#facc15' });

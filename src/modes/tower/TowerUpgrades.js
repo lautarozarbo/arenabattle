@@ -77,11 +77,13 @@ const ZONE_DUR = [
 const BLEED = [
   { id: 'bleed_unlock', group: 'bleed', color: '#ef4444', label: 'Sangrado al chocar',    description: 'Al chocar aplicás 0.5 HP/s de sangrado al enemigo (3s).', apply(r) { r.playerMods.bleedPerSec += 0.5; } },
   { id: 'bleed_up',     group: 'bleed', color: '#ef4444', label: '+0.5 daño de sangrado', description: 'El sangrado que aplicás aumenta en 0.5 HP/s.',            apply(r) { r.playerMods.bleedPerSec += 0.5; } },
+  { id: 'bleed_dur',    group: 'bleed', color: '#ef4444', label: '+1s de sangrado',       description: 'El sangrado dura 1 segundo más.',                        apply(r) { r.playerMods.bleedDuration += 1; } },
 ];
 
 const SLOW = [
-  { id: 'slow_unlock', group: 'slow', color: '#818cf8', label: 'Ralentizar al chocar', description: 'Al chocar ralentizás al enemigo un 10% por 2s.',     apply(r) { r.playerMods.contactSlow += 0.10; } },
-  { id: 'slow_up',     group: 'slow', color: '#818cf8', label: '+2% ralentización',    description: 'La ralentización al chocar aumenta un 2% más.',      apply(r) { r.playerMods.contactSlow += 0.02; } },
+  { id: 'slow_unlock', group: 'slow', color: '#818cf8', label: 'Ralentizar al chocar', description: 'Al chocar ralentizás al enemigo un 10% por 3s.',   apply(r) { r.playerMods.contactSlow += 0.10; } },
+  { id: 'slow_up',     group: 'slow', color: '#818cf8', label: '+2% ralentización',    description: 'La ralentización al chocar aumenta un 2% más.',    apply(r) { r.playerMods.contactSlow += 0.02; } },
+  { id: 'slow_dur',    group: 'slow', color: '#818cf8', label: '+1s de ralentización', description: 'La ralentización dura 1 segundo más.',             apply(r) { r.playerMods.slowDuration += 1; } },
 ];
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -116,8 +118,8 @@ export function summarizeUpgrades(ids) {
   if (pm.regenPerSec   > 0) chips.push({ label: `Regen +${+pm.regenPerSec.toFixed(1)} HP/s`, color: '#f472b6' });
   if (pm.speedMult     > 1) chips.push({ label: `Vel +${Math.round((pm.speedMult-1)*100)}%`, color: '#22d3ee' });
   if (pm.contactDmgAdd > 0) chips.push({ label: `+${pm.contactDmgAdd} choque`,             color: '#fb923c' });
-  if (pm.bleedPerSec   > 0) chips.push({ label: `Sangrado ${+pm.bleedPerSec.toFixed(1)}/s`, color: '#ef4444' });
-  if (pm.contactSlow   > 0) chips.push({ label: `Lentitud ${Math.round(pm.contactSlow*100)}%`, color: '#818cf8' });
+  if (pm.bleedPerSec   > 0) chips.push({ label: `Sangrado ${+pm.bleedPerSec.toFixed(1)}/s ${pm.bleedDuration ?? 3}s`, color: '#ef4444' });
+  if (pm.contactSlow   > 0) chips.push({ label: `Lentitud ${Math.round(pm.contactSlow*100)}% ${pm.slowDuration ?? 3}s`, color: '#818cf8' });
   if (pw.cdMult        < 1) chips.push({ label: `CD -${Math.round((1-pw.cdMult)*100)}%`,   color: '#60a5fa' });
   if (pw.extraProjectile>0) chips.push({ label: `+${pw.extraProjectile} proyectil`,        color: '#facc15' });
   if (pw.extraPlacement >0) chips.push({ label: `+${pw.extraPlacement} elemento`,          color: '#4ade80' });
@@ -203,12 +205,14 @@ export function getUpgradeChoices(run, count = 3) {
 
 function _getPool(group, run) {
   if (group === 'bleed') {
-    const unlocked = (run.playerMods?.bleedPerSec ?? 0) > 0;
-    return [{ u: _BY_ID[unlocked ? 'bleed_up' : 'bleed_unlock'], w: 100 }];
+    if ((run.playerMods?.bleedPerSec ?? 0) === 0) return [{ u: _BY_ID['bleed_unlock'], w: 100 }];
+    // Unlocked: +daño (60%) vs +duración (40%)
+    return [{ u: _BY_ID['bleed_up'], w: 60 }, { u: _BY_ID['bleed_dur'], w: 40 }];
   }
   if (group === 'slow') {
-    const unlocked = (run.playerMods?.contactSlow ?? 0) > 0;
-    return [{ u: _BY_ID[unlocked ? 'slow_up' : 'slow_unlock'], w: 100 }];
+    if ((run.playerMods?.contactSlow ?? 0) === 0) return [{ u: _BY_ID['slow_unlock'], w: 100 }];
+    // Unlocked: +ralentización (60%) vs +duración (40%)
+    return [{ u: _BY_ID['slow_up'], w: 60 }, { u: _BY_ID['slow_dur'], w: 40 }];
   }
   return GROUP_POOLS[group];
 }

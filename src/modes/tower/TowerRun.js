@@ -22,7 +22,9 @@ export class TowerRun {
       regenPerSec:    0,   // HP regen per second during fight
       contactDmgAdd:  0,   // added to body-collision hit damage
       bleedPerSec:    0,   // HP/s bleed applied to enemy on contact
+      bleedDuration:  3,   // seconds bleed lasts
       contactSlow:    0,   // fraction slow applied to enemy on contact (0.1 = 10%)
+      slowDuration:   3,   // seconds slow lasts
     };
 
     // Power-specific mods — read by powers that support them via this.owner
