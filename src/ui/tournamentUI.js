@@ -3,6 +3,7 @@ import { getAllPowerMetas } from '../powers/registry.js';
 import { sfx } from '../audio/index.js';
 import { t } from '../i18n.js';
 import { POINTS, addPoints } from '../persistence/rewards.js';
+import { saveTournamentCloud, clearTournamentCloud } from '../persistence/competitionSave.js';
 import { recordChampionship } from '../persistence/stats.js';
 import { buildCompArenaOpts } from './arenaConfig.js';
 import { showScreen, showConfirm } from './screens.js';
@@ -43,19 +44,22 @@ export function initTournamentUI(deps) {
 // ── Persistence ───────────────────────────────────────────────────────────────
 function _saveTournament() {
   if (!tournament) return;
+  const payload = {
+    participants: tournament.participants, playerIdx: tournament.playerIdx,
+    groups: tournament.groups, groupStandings: tournament.groupStandings,
+    groupMatches: tournament.groupMatches,
+    currentGroupMatchIdx: tournament.currentGroupMatchIdx,
+    bracketRounds: tournament.bracketRounds,
+    currentBracketMatch: tournament.currentBracketMatch,
+    phase: tournament.phase, champion: tournament.champion,
+    _totalBracketRounds: tournament._totalBracketRounds,
+    savedAt: Date.now(),
+  };
   try {
-    localStorage.setItem(LS_TOURNAMENT, JSON.stringify({
-      participants: tournament.participants, playerIdx: tournament.playerIdx,
-      groups: tournament.groups, groupStandings: tournament.groupStandings,
-      groupMatches: tournament.groupMatches,
-      currentGroupMatchIdx: tournament.currentGroupMatchIdx,
-      bracketRounds: tournament.bracketRounds,
-      currentBracketMatch: tournament.currentBracketMatch,
-      phase: tournament.phase, champion: tournament.champion,
-      _totalBracketRounds: tournament._totalBracketRounds,
-    }));
+    localStorage.setItem(LS_TOURNAMENT, JSON.stringify(payload));
     localStorage.setItem(LS_P1CHOICE, JSON.stringify(_getP1Choice()));
   } catch {}
+  saveTournamentCloud(payload);
 }
 
 export function loadTournament() {
@@ -74,6 +78,7 @@ export function loadTournament() {
 
 function _resetTournament() {
   localStorage.removeItem(LS_TOURNAMENT);
+  clearTournamentCloud();
   tournament = null;
   _setGameMode('tournament');
   updateTournamentInfo();

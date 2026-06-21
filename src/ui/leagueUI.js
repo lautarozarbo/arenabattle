@@ -3,6 +3,7 @@ import { getAllPowerMetas } from '../powers/registry.js';
 import { sfx } from '../audio/index.js';
 import { t } from '../i18n.js';
 import { POINTS, addPoints, isArenaSkinUnlocked } from '../persistence/rewards.js';
+import { saveLeagueCloud, clearLeagueCloud } from '../persistence/competitionSave.js';
 import { recordChampionship } from '../persistence/stats.js';
 import {
   ARENA_SKINS, getSelectedArenaSkinId, setSelectedArenaSkinId,
@@ -48,14 +49,17 @@ export function initLeagueUI(deps) {
 // ── Persistence ───────────────────────────────────────────────────────────────
 function _saveLeague() {
   if (!league) return;
+  const payload = {
+    format: league.format, participants: league.participants,
+    playerIdx: league.playerIdx, matches: league.matches,
+    currentMatchIdx: league.currentMatchIdx,
+    savedAt: Date.now(),
+  };
   try {
-    localStorage.setItem(LS_LEAGUE, JSON.stringify({
-      format: league.format, participants: league.participants,
-      playerIdx: league.playerIdx, matches: league.matches,
-      currentMatchIdx: league.currentMatchIdx,
-    }));
+    localStorage.setItem(LS_LEAGUE, JSON.stringify(payload));
     localStorage.setItem(LS_P1CHOICE, JSON.stringify(_getP1Choice()));
   } catch {}
+  saveLeagueCloud(payload);
 }
 
 export function loadLeague() {
@@ -74,6 +78,7 @@ export function loadLeague() {
 
 function _resetLeague() {
   localStorage.removeItem(LS_LEAGUE);
+  clearLeagueCloud();
   league = null;
   _setGameMode('league');
   updateLeagueInfo();

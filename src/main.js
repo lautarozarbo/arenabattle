@@ -117,6 +117,7 @@ import {
   maybeSaveBestRun,
   getBestTowerRun,
 } from "./persistence/towerSave.js";
+import { loadLeagueCloud, loadTournamentCloud } from "./persistence/competitionSave.js";
 import { summarizeUpgrades } from "./modes/tower/TowerUpgrades.js";
 
 const canvas = document.getElementById("game-canvas");
@@ -842,8 +843,9 @@ document.getElementById("btn-quickmatch")?.addEventListener("click", () => {
   goToQuickSetup();
 });
 
-document.getElementById("btn-league").addEventListener("click", () => {
+document.getElementById("btn-league").addEventListener("click", async () => {
   sfx.uiClick();
+  await _syncCompetitionFromCloud('league_saved', 'arena_league');
   if (loadLeague()) {
     showLeagueStandings(isLeagueFinished());
   } else {
@@ -853,8 +855,9 @@ document.getElementById("btn-league").addEventListener("click", () => {
   }
 });
 
-document.getElementById("btn-tournament").addEventListener("click", () => {
+document.getElementById("btn-tournament").addEventListener("click", async () => {
   sfx.uiClick();
+  await _syncCompetitionFromCloud('tournament_saved', 'arena_tournament');
   if (loadTournament()) {
     showTournamentScreen();
   } else {
@@ -2110,6 +2113,24 @@ function _startBattleHudLoop() {
 
 // ── Game over ─────────────────────────────────────────────────────────────────
 let _pendingWinnerSide = -1;
+
+// ── Competition cloud sync ────────────────────────────────────────────────────
+async function _syncCompetitionFromCloud(cloudField, lsKey) {
+  try {
+    const loadFn = cloudField === 'league_saved' ? loadLeagueCloud : loadTournamentCloud;
+    const { save: cloudSave, loggedIn } = await loadFn();
+    if (!loggedIn) return;
+    if (!cloudSave) {
+      try { localStorage.removeItem(lsKey); } catch {}
+      return;
+    }
+    const localRaw  = localStorage.getItem(lsKey);
+    const localSave = localRaw ? JSON.parse(localRaw) : null;
+    if (!localSave || (cloudSave.savedAt ?? 0) > (localSave.savedAt ?? 0)) {
+      try { localStorage.setItem(lsKey, JSON.stringify(cloudSave)); } catch {}
+    }
+  } catch {}
+}
 
 // ── Infinite Tower ────────────────────────────────────────────────────────────
 
