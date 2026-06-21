@@ -5067,221 +5067,168 @@ td.rank {
 
 .badge--none {}
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   BADGE PREVIEWS (solo borde + glow, sin fondo, para el panel de misiones)
-   ═══════════════════════════════════════════════════════════════════════════════ */
-.ms-badge-preview.badge--bronce   { border:1.5px solid #cd7f32; color:#f0a855; animation: prev-pulse 2.5s ease-in-out infinite alternate; --pc:#cd7f3288; --pc2:#ff950055; }
-.ms-badge-preview.badge--plata    { border:1.5px solid #bbb;    color:#ddd;    animation: prev-flash 2s ease-in-out infinite; --pc:#ffffff99; --pc2:#aaaaaa44; }
-.ms-badge-preview.badge--esmeralda{ border:1.5px solid #2ecc71; color:#55e890; animation: prev-pulse 2.8s ease-in-out infinite alternate; --pc:#2ecc71aa; --pc2:#2ecc7144; }
-.ms-badge-preview.badge--oro      { border:1.5px solid #ffd700; color:#ffe750; animation: prev-pulse 1.6s ease-in-out infinite alternate; --pc:#ffd700cc; --pc2:#ffd70055; }
-.ms-badge-preview.badge--zafiro   { border:1.5px solid #4f9dff; color:#7eb8ff; animation: prev-pulse 2s ease-in-out infinite alternate; --pc:#4f9dffaa; --pc2:#4f9dff44; }
-.ms-badge-preview.badge--diamante { border:1.5px solid #b9f2ff; color:#d8faff; animation: prev-pulse 0.9s ease-in-out infinite alternate; --pc:#ffffffcc; --pc2:#b9f2ff55; }
-.ms-badge-preview.badge--amatista { border:1.5px solid #c084fc; color:#d4aaff; animation: prev-pulse 3.5s ease-in-out infinite alternate; --pc:#c084fcaa; --pc2:#c084fc44; }
-.ms-badge-preview.badge--legendario { border:1.5px solid transparent; position:relative; isolation:isolate; background:#0d0f1a; animation:legendario-text 3s linear infinite; }
-.ms-badge-preview.badge--legendario::before { content:''; position:absolute; inset:-1.5px; border-radius:7px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080); background-size:300% 100%; animation:badge-rainbow-sweep 2s linear infinite; z-index:-1; }
-@keyframes prev-pulse { from { box-shadow:0 0 3px var(--pc,#fff5); } to { box-shadow:0 0 10px var(--pc,#fffa), 0 0 18px var(--pc2,#fff3); } }
-@keyframes prev-flash { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 10px var(--pc,#fffa);} }
+/* Base: contexto de posición para pseudo-elementos en username y preview */
+.badge-name, .ms-badge-preview { position: relative; isolation: isolate; }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   USERNAME BADGES (.badge-name.badge--X) — fondos, partículas, texto con color
-   Scopeados con .badge-name para no afectar previews del panel
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-/* Base compartida: contexto de posición para pseudo-elementos */
-.badge-name { position: relative; isolation: isolate; }
-
-/* ── Bronce ×5 — forja de cobre, brasas flotantes ── */
-.badge-name.badge--bronce {
+/* ── Bronce ×5 ── */
+:is(.badge-name, .ms-badge-preview).badge--bronce {
   background: radial-gradient(ellipse at 50% 150%, #3d1500 0%, #110800 55%, #0c0e1b 100%);
-  border: 2px solid #cd7f32;
-  color: #ffd080;
+  border: 2px solid #cd7f32; color: #ffd080;
   animation: bronce-forge 2.5s ease-in-out infinite alternate;
 }
-.badge-name.badge--bronce::after {
-  content: '';
-  position: absolute; inset: 0;
+:is(.badge-name, .ms-badge-preview).badge--bronce::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: radial-gradient(ellipse at 30% 80%, #ff950030 0%, transparent 60%),
               radial-gradient(ellipse at 70% 80%, #cd7f3228 0%, transparent 50%);
-  border-radius: inherit;
   animation: bronce-embers 3s ease-in-out infinite alternate;
-  pointer-events: none;
 }
 @keyframes bronce-forge {
-  from { border-color: #8B4513; box-shadow: 0 0 6px #cd7f3266, inset 0 0 6px #3d150033; text-shadow: 0 0 6px #cd7f3299; }
-  to   { border-color: #ffb347; box-shadow: 0 0 14px #ff9500bb, inset 0 0 10px #8B451344; text-shadow: 0 0 12px #ffb347dd; }
+  from { border-color:#8B4513; box-shadow:0 0 6px #cd7f3266,inset 0 0 6px #3d150033; text-shadow:0 0 6px #cd7f3299; }
+  to   { border-color:#ffb347; box-shadow:0 0 14px #ff9500bb,inset 0 0 10px #8B451344; text-shadow:0 0 12px #ffb347dd; }
 }
 @keyframes bronce-embers {
-  from { opacity: 0.4; transform: scaleY(0.9); }
-  to   { opacity: 1;   transform: scaleY(1.1); }
+  from { opacity:0.4; transform:scaleY(0.9); }
+  to   { opacity:1;   transform:scaleY(1.1); }
 }
 
-/* ── Plata ×10 — acero líquido, destello cruzado ── */
-.badge-name.badge--plata {
+/* ── Plata ×10 ── */
+:is(.badge-name, .ms-badge-preview).badge--plata {
   background: linear-gradient(105deg, #0c0e1b 0%, #1a1e30 40%, #0c0e1b 100%);
-  border: 2px solid #aaa;
-  color: #ffffff;
+  border: 2px solid #aaa; color: #fff;
   animation: plata-steel 2.2s ease-in-out infinite;
 }
-.badge-name.badge--plata::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%);
+:is(.badge-name, .ms-badge-preview).badge--plata::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.20) 50%, transparent 80%);
   background-size: 200% 100%;
-  border-radius: inherit;
   animation: plata-sweep 2.2s ease-in-out infinite;
-  pointer-events: none;
 }
 @keyframes plata-steel {
-  0%,100% { border-color: #555; box-shadow: 0 0 4px #88888855; text-shadow: none; color: #bbb; }
-  48%     { border-color: #ccc; box-shadow: 0 0 8px #aaaaaa77; text-shadow: none; color: #ddd; }
-  50%     { border-color: #fff; box-shadow: 0 0 16px #ffffffcc, 0 0 5px #fff; text-shadow: 0 0 10px #ffffffee; color: #fff; }
-  52%     { border-color: #ccc; box-shadow: 0 0 8px #aaaaaa77; text-shadow: none; color: #ddd; }
+  0%,100% { border-color:#555; box-shadow:0 0 4px #88888855; color:#bbb; text-shadow:none; }
+  48%     { border-color:#ccc; box-shadow:0 0 8px #aaaaaa77; color:#ddd; }
+  50%     { border-color:#fff; box-shadow:0 0 16px #ffffffcc,0 0 5px #fff; color:#fff; text-shadow:0 0 10px #ffffffee; }
+  52%     { border-color:#ccc; box-shadow:0 0 8px #aaaaaa77; color:#ddd; }
 }
 @keyframes plata-sweep {
-  0%,100% { background-position: -100% 0; opacity: 0; }
-  40%     { background-position: -100% 0; opacity: 0; }
-  50%     { background-position:  100% 0; opacity: 1; }
-  60%     { background-position:  200% 0; opacity: 0; }
+  0%,40%  { background-position:-100% 0; opacity:0; }
+  50%     { background-position: 100% 0; opacity:1; }
+  60%,100%{ background-position: 200% 0; opacity:0; }
 }
 
-/* ── Esmeralda ×15 — selva bioluminiscente ── */
-.badge-name.badge--esmeralda {
+/* ── Esmeralda ×15 ── */
+:is(.badge-name, .ms-badge-preview).badge--esmeralda {
   background: radial-gradient(ellipse at 50% 150%, #0a3d1a 0%, #051a0c 50%, #0c0e1b 100%);
-  border: 2px solid #2ecc71;
-  color: #80ffbe;
+  border: 2px solid #2ecc71; color: #80ffbe;
   animation: esmeralda-bio 2.8s ease-in-out infinite alternate;
 }
-.badge-name.badge--esmeralda::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
+:is(.badge-name, .ms-badge-preview).badge--esmeralda::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: radial-gradient(circle at 25% 60%, #2ecc7128 0%, transparent 40%),
               radial-gradient(circle at 75% 40%, #00ff8820 0%, transparent 35%);
   animation: esmeralda-orbs 2.8s ease-in-out infinite alternate;
-  pointer-events: none;
 }
 @keyframes esmeralda-bio {
-  from { border-color: #0d5c2e; box-shadow: 0 0 6px #2ecc7155, inset 0 0 6px #0a3d1a44; text-shadow: 0 0 6px #2ecc7188; }
-  to   { border-color: #2ecc71; box-shadow: 0 0 16px #2ecc71cc, inset 0 0 12px #2ecc7133; text-shadow: 0 0 14px #80ffbeee; }
+  from { border-color:#0d5c2e; box-shadow:0 0 6px #2ecc7155,inset 0 0 6px #0a3d1a44; text-shadow:0 0 6px #2ecc7188; }
+  to   { border-color:#2ecc71; box-shadow:0 0 16px #2ecc71cc,inset 0 0 12px #2ecc7133; text-shadow:0 0 14px #80ffbeee; }
 }
 @keyframes esmeralda-orbs {
-  from { opacity: 0.3; transform: scale(0.9); }
-  to   { opacity: 1;   transform: scale(1.1); }
+  from { opacity:0.3; transform:scale(0.9); }
+  to   { opacity:1;   transform:scale(1.1); }
 }
 
-/* ── Oro ×20 — corona solar, rayos divinos ── */
-.badge-name.badge--oro {
+/* ── Oro ×20 ── */
+:is(.badge-name, .ms-badge-preview).badge--oro {
   background: radial-gradient(ellipse at 50% 120%, #2a1a00 0%, #180e00 50%, #0c0e1b 100%);
-  border: 2px solid #ffd700;
-  color: #fff3a0;
+  border: 2px solid #ffd700; color: #fff3a0;
   animation: oro-sun 1.8s ease-in-out infinite;
 }
-.badge-name.badge--oro::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
+:is(.badge-name, .ms-badge-preview).badge--oro::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: repeating-conic-gradient(from 0deg, #ffd70015 0deg 20deg, transparent 20deg 40deg);
   animation: oro-rays 6s linear infinite;
-  pointer-events: none;
 }
 @keyframes oro-sun {
-  0%,100% { border-color: #b8860b; box-shadow: 0 0 6px #ffd70044, inset 0 0 6px #2a1a0033; text-shadow: 0 0 6px #ffd70077; }
-  50%     { border-color: #ffe566; box-shadow: 0 0 20px #ffd700ee, 0 0 8px #ffd700, inset 0 0 12px #ffd70022; text-shadow: 0 0 16px #fff3a0ff; }
+  0%,100% { border-color:#b8860b; box-shadow:0 0 6px #ffd70044,inset 0 0 6px #2a1a0033; text-shadow:0 0 6px #ffd70077; }
+  50%     { border-color:#ffe566; box-shadow:0 0 20px #ffd700ee,0 0 8px #ffd700,inset 0 0 12px #ffd70022; text-shadow:0 0 16px #fff3a0ff; }
 }
-@keyframes oro-rays { to { transform: rotate(360deg); } }
+@keyframes oro-rays { to { transform:rotate(360deg); } }
 
-/* ── Zafiro ×25 — descarga eléctrica ── */
-.badge-name.badge--zafiro {
+/* ── Zafiro ×25 ── */
+:is(.badge-name, .ms-badge-preview).badge--zafiro {
   background: radial-gradient(ellipse at 50% 150%, #001035 0%, #000820 55%, #0c0e1b 100%);
-  border: 2px solid #4f9dff;
-  color: #a8d4ff;
+  border: 2px solid #4f9dff; color: #a8d4ff;
   animation: zafiro-bolt 2.5s ease-in-out infinite;
 }
-.badge-name.badge--zafiro::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
+:is(.badge-name, .ms-badge-preview).badge--zafiro::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(45deg, transparent 30%, #4f9dff18 50%, transparent 70%);
   background-size: 200% 200%;
   animation: zafiro-charge 2.5s ease-in-out infinite;
-  pointer-events: none;
 }
 @keyframes zafiro-bolt {
-  0%,100% { border-color: #0a2e8c; box-shadow: 0 0 4px #4f9dff33; text-shadow: none; color: #7eb8ff; }
-  55%     { border-color: #4f9dff; box-shadow: 0 0 8px #4f9dff88; }
-  60%     { border-color: #a8d4ff; box-shadow: 0 0 18px #4f9dffee, 0 0 5px #fff; text-shadow: 0 0 10px #a8d4ffee; color: #d0eaff; }
-  63%     { border-color: #4f9dff; box-shadow: 0 0 8px #4f9dff88; }
-  66%     { border-color: #a8d4ff; box-shadow: 0 0 14px #4f9dffcc; text-shadow: 0 0 8px #a8d4ffcc; color: #d0eaff; }
-  70%     { border-color: #4f9dff; box-shadow: 0 0 5px #4f9dff55; color: #7eb8ff; }
+  0%,100% { border-color:#0a2e8c; box-shadow:0 0 4px #4f9dff33; text-shadow:none; color:#7eb8ff; }
+  55%     { border-color:#4f9dff; box-shadow:0 0 8px #4f9dff88; }
+  60%     { border-color:#a8d4ff; box-shadow:0 0 18px #4f9dffee,0 0 5px #fff; text-shadow:0 0 10px #a8d4ffee; color:#d0eaff; }
+  63%     { border-color:#4f9dff; box-shadow:0 0 8px #4f9dff88; }
+  66%     { border-color:#a8d4ff; box-shadow:0 0 14px #4f9dffcc; text-shadow:0 0 8px #a8d4ffcc; color:#d0eaff; }
+  70%     { border-color:#4f9dff; box-shadow:0 0 5px #4f9dff55; color:#7eb8ff; }
 }
 @keyframes zafiro-charge {
-  0%,100% { background-position: -100% -100%; opacity: 0; }
-  55%,75% { opacity: 1; }
-  60%     { background-position: 100% 100%; }
+  0%,100%  { background-position:-100% -100%; opacity:0; }
+  55%,75%  { opacity:1; }
+  60%      { background-position:100% 100%; }
 }
 
-/* ── Diamante ×30 — cristal de hielo, destellos en facetas ── */
-.badge-name.badge--diamante {
+/* ── Diamante ×30 ── */
+:is(.badge-name, .ms-badge-preview).badge--diamante {
   background: linear-gradient(135deg, #001824 0%, #002233 50%, #001020 100%);
-  border: 2px solid #b9f2ff;
-  color: #ffffff;
+  border: 2px solid #b9f2ff; color: #fff;
   animation: diamante-facet 0.9s ease-in-out infinite alternate;
 }
-.badge-name.badge--diamante::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
+:is(.badge-name, .ms-badge-preview).badge--diamante::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 40%, rgba(185,242,255,0.10) 60%, transparent 100%);
   animation: diamante-glint 0.9s ease-in-out infinite alternate;
-  pointer-events: none;
 }
 @keyframes diamante-facet {
-  0%   { border-color: #70ddff; box-shadow: 0 0 6px #b9f2ff55, inset 0 0 5px #b9f2ff22; text-shadow: 0 0 5px #b9f2ff77; color: #b9f2ff; }
-  100% { border-color: #ffffff; box-shadow: 0 0 18px #ffffffee, 0 0 6px #b9f2ff, inset 0 0 10px #b9f2ff33; text-shadow: 0 0 14px #ffffffee; color: #fff; }
+  0%   { border-color:#70ddff; box-shadow:0 0 6px #b9f2ff55,inset 0 0 5px #b9f2ff22; text-shadow:0 0 5px #b9f2ff77; color:#b9f2ff; }
+  100% { border-color:#ffffff; box-shadow:0 0 18px #ffffffee,0 0 6px #b9f2ff,inset 0 0 10px #b9f2ff33; text-shadow:0 0 14px #ffffffee; color:#fff; }
 }
-@keyframes diamante-glint {
-  from { opacity: 0.3; }
-  to   { opacity: 1; }
-}
+@keyframes diamante-glint { from{opacity:0.3} to{opacity:1} }
 
-/* ── Amatista ×40 — vórtice cósmico ── */
-.badge-name.badge--amatista {
+/* ── Amatista ×40 ── */
+:is(.badge-name, .ms-badge-preview).badge--amatista {
   background: radial-gradient(ellipse at 50% 50%, #1a0035 0%, #0d0020 55%, #0c0e1b 100%);
-  border: 2px solid #c084fc;
-  color: #e8c0ff;
+  border: 2px solid #c084fc; color: #e8c0ff;
   animation: amatista-void 4s ease-in-out infinite alternate;
 }
-.badge-name.badge--amatista::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
+:is(.badge-name, .ms-badge-preview).badge--amatista::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: radial-gradient(circle at 50% 50%, #c084fc22 0%, transparent 60%);
   animation: amatista-pulse 4s ease-in-out infinite alternate;
-  pointer-events: none;
 }
 @keyframes amatista-void {
-  from { border-color: #3a0070; box-shadow: 0 0 4px #c084fc22, inset 0 0 6px #3a007033; text-shadow: 0 0 5px #c084fc55; color: #c090f0; }
-  to   { border-color: #e0b0ff; box-shadow: 0 0 16px #c084fccc, 0 0 28px #c084fc44, inset 0 0 14px #c084fc33; text-shadow: 0 0 14px #e8c0ffee; color: #f5e0ff; }
+  from { border-color:#3a0070; box-shadow:0 0 4px #c084fc22,inset 0 0 6px #3a007033; text-shadow:0 0 5px #c084fc55; color:#c090f0; }
+  to   { border-color:#e0b0ff; box-shadow:0 0 16px #c084fccc,0 0 28px #c084fc44,inset 0 0 14px #c084fc33; text-shadow:0 0 14px #e8c0ffee; color:#f5e0ff; }
 }
-@keyframes amatista-pulse {
-  from { transform: scale(0.7); opacity: 0.2; }
-  to   { transform: scale(1.3); opacity: 0.8; }
-}
+@keyframes amatista-pulse { from{transform:scale(0.7);opacity:0.2} to{transform:scale(1.3);opacity:0.8} }
 
-/* ── Legendario ×50 — caos arcoíris ── */
-.badge-name.badge--legendario {
-  border: 2px solid transparent;
-  position: relative; isolation: isolate; background: #0c0e1b;
+/* ── Legendario ×50 ── */
+:is(.badge-name, .ms-badge-preview).badge--legendario {
+  border: 2px solid transparent; background: #0c0e1b;
   animation: legendario-text 3s linear infinite;
 }
-.badge-name.badge--legendario::before {
-  content: ''; position: absolute; inset: -2px; border-radius: 7px;
+:is(.badge-name, .ms-badge-preview).badge--legendario::before {
+  content: ''; position: absolute; inset: -2px; border-radius: 7px; z-index: -1;
   background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080);
   background-size: 300% 100%;
   animation: badge-rainbow-sweep 2s linear infinite;
-  z-index: -1;
 }
-.badge-name.badge--legendario::after {
-  content: ''; position: absolute; inset: 0; border-radius: 5px;
+:is(.badge-name, .ms-badge-preview).badge--legendario::after {
+  content: ''; position: absolute; inset: 0; border-radius: 5px; pointer-events: none;
   background: linear-gradient(90deg,#ff008015,#ff8c0015,#ffe40015,#00ff8815,#00c8ff15,#a800ff15,#ff008015);
   background-size: 300% 100%;
   animation: badge-rainbow-sweep 2s linear infinite;
-  pointer-events: none;
 }
 @keyframes legendario-text {
   0%   { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
@@ -5290,7 +5237,18 @@ td.rank {
   75%  { color:#90d8ff; text-shadow:0 0 8px #00c8ff99; box-shadow:0 0 8px #00c8ff44; }
   100% { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
 }
-@keyframes badge-rainbow-sweep { to { background-position: 300% 0%; } }
+@keyframes badge-rainbow-sweep { to { background-position:300% 0%; } }
+
+/* ── Chips de hitos con color del marco ── */
+.ms-badge-chip.badge--bronce    { background:#3d150033; border-color:#cd7f32; color:#f0a855; }
+.ms-badge-chip.badge--plata     { background:#22222233; border-color:#ccc;    color:#eee; }
+.ms-badge-chip.badge--esmeralda { background:#0a3d1a33; border-color:#2ecc71; color:#55e890; }
+.ms-badge-chip.badge--oro       { background:#2a1a0033; border-color:#ffd700; color:#ffe750; }
+.ms-badge-chip.badge--zafiro    { background:#00103533; border-color:#4f9dff; color:#7eb8ff; }
+.ms-badge-chip.badge--diamante  { background:#00182433; border-color:#b9f2ff; color:#d8faff; }
+.ms-badge-chip.badge--amatista  { background:#1a003533; border-color:#c084fc; color:#d4aaff; }
+.ms-badge-chip.badge--legendario { background:#0c0e1b; border-color:transparent; color:#90d8ff; position:relative; isolation:isolate; animation:legendario-text 3s linear infinite; }
+.ms-badge-chip.badge--legendario::before { content:''; position:absolute; inset:-1px; border-radius:7px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080); background-size:300% 100%; animation:badge-rainbow-sweep 2s linear infinite; z-index:-1; }
 
 /* ── Mission toast notification ──────────────────────────────────────────────── */
 .mission-toast {

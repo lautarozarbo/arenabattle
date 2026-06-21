@@ -83,7 +83,7 @@ function _render() {
       <div class="ms-mission-header">
         <span class="ms-streak-chip">×${ms.target}</span>
         <span class="ms-cat-name">${ms.target} victorias seguidas</span>
-        ${ms.badge ? `<span class="ms-badge-chip">Marco ${BADGES[ms.badge].name}</span>` : ''}
+        ${ms.badge ? `<span class="ms-badge-chip badge--${ms.badge.replace('badge_','')}">Marco ${BADGES[ms.badge].name}</span>` : ''}
       </div>
       ${isNext ? `<div class="ms-progress-row">
         <div class="ms-progress-bar"><div class="ms-progress-fill ms-fill--streak" style="width:${pct}%"></div></div>
