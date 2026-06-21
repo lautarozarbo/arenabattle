@@ -2155,7 +2155,7 @@ function _startTowerRun(powerMeta, savedState = null) {
       document.getElementById("fight-context-label").textContent =
         arenaOpts?.fightContextLabel ?? "";
       document.getElementById("btn-restart").textContent = "Abandonar run";
-      _startFightWithCfgs(cfgs, null, arenaOpts);
+      _startFightWithCfgs(cfgs, null, { ...arenaOpts, activeAbilities: false });
     },
     onRunEnd: (_floor) => {
       clearTowerRun();
