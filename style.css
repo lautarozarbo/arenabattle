@@ -1195,6 +1195,7 @@ html, body {
 }
 
 .profile-sheet {
+  position: relative;
   width: 100%;
   max-width: 430px;
   background: var(--surface);
@@ -1221,8 +1222,7 @@ html, body {
 }
 
 .profile-top-bar {
-  position: relative;
-  padding: 12px 0 6px;
+  padding: 12px 0 0;
 }
 
 .profile-drag-handle {
@@ -1235,7 +1235,7 @@ html, body {
 
 .profile-close-btn {
   position: absolute;
-  top: 6px; right: 0;
+  top: 14px; right: 16px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 50%;
