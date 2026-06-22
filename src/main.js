@@ -715,7 +715,7 @@ function _buildProfileStats() {
 }
 
 function _closeProfile() {
-  const sheet = _profilePanel.querySelector(".profile-sheet");
+  const sheet = _profilePanel.querySelector(".profile-sheet-wrap");
   sheet.classList.add("profile-sheet--closing");
   sheet.addEventListener(
     "animationend",

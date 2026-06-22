@@ -1194,25 +1194,23 @@ html, body {
   justify-content: center;
 }
 
-.profile-sheet {
+.profile-sheet-wrap {
   position: relative;
   width: 100%;
   max-width: 430px;
   background: var(--surface);
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
-  padding: 0 20px 40px;
   max-height: 82vh;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: flex;
+  flex-direction: column;
   animation: profileSlideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
 }
 @keyframes profileSlideUp {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
-.profile-sheet::-webkit-scrollbar { display: none; }
+.profile-sheet-wrap--closing,
 .profile-sheet--closing {
   animation: profileSlideDown 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
@@ -1221,16 +1219,21 @@ html, body {
   to   { transform: translateY(110%); }
 }
 
-.profile-top-bar {
-  padding: 12px 0 0;
+.profile-sheet {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 20px 40px;
 }
+.profile-sheet::-webkit-scrollbar { display: none; }
 
 .profile-drag-handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   background: rgba(255,255,255,0.12);
-  margin: 0 auto;
+  margin: 12px auto 16px;
 }
 
 .profile-close-btn {
