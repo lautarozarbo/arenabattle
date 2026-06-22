@@ -633,7 +633,7 @@ function _buildProfileStats() {
         <div class="pstat-char-circle" style="background:${mostUsed.color}28">${mostUsed.icon}</div>
         <div class="pstat-char-info">
           <span class="pstat-char-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
-          <span class="pstat-char-sub">${favCount} partida${favCount !== 1 ? 's' : ''} · Favorito</span>
+          <span class="pstat-char-sub">${favCount} partida${favCount !== 1 ? 's' : ''}</span>
         </div>
       </div>`
     : `<div class="pstat-char-card"><span class="pstat-char-empty">Sin partidas registradas</span></div>`;
@@ -653,14 +653,14 @@ function _buildProfileStats() {
 
   const champsCardHtml = `<div class="pstat-champs-card">
     <div class="pstat-champ-item">
-      <span class="pstat-champ-icon">🏆</span>
+      <div class="pstat-champ-badge pstat-champ-badge--liga">LG</div>
       <div>
         <span class="pstat-champ-n">${s.championships.league}</span>
         <span class="pstat-champ-lbl">Ligas ganadas</span>
       </div>
     </div>
     <div class="pstat-champ-item">
-      <span class="pstat-champ-icon">🥇</span>
+      <div class="pstat-champ-badge pstat-champ-badge--torneo">TR</div>
       <div>
         <span class="pstat-champ-n">${s.championships.tournament}</span>
         <span class="pstat-champ-lbl">Torneos ganados</span>
@@ -693,7 +693,10 @@ function _buildProfileStats() {
       <div class="pstat-section-hd">Victorias por modo</div>
       <div class="pstat-mode-bars">${modeBarsHtml}</div>
     </div>
-    ${charHtml}
+    <div class="pstat-section">
+      <div class="pstat-section-hd">Personaje favorito</div>
+      ${charHtml}
+    </div>
     <div class="pstat-bottom-row">${towerCardHtml}${champsCardHtml}</div>
   `;
 }

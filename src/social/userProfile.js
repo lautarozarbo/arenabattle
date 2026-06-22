@@ -72,7 +72,7 @@ export async function openUserProfile(userId) {
         <div class="up-char-circle" style="background:${mostUsed.color}28">${mostUsed.icon}</div>
         <div class="up-char-info">
           <span class="up-char-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
-          <span class="up-char-sub">${bestCount} partida${bestCount !== 1 ? 's' : ''} · Favorito</span>
+          <span class="up-char-sub">${bestCount} partida${bestCount !== 1 ? 's' : ''}</span>
         </div>
       </div>`
     : `<div class="up-char-card"><span class="up-char-empty">Sin partidas registradas</span></div>`;
@@ -116,17 +116,20 @@ export async function openUserProfile(userId) {
       <div class="up-mode-bars">${modeBarsHtml}</div>
     </div>
 
-    ${charCardHtml}
+    <div class="up-section">
+      <div class="up-section-hd">Personaje favorito</div>
+      ${charCardHtml}
+    </div>
 
     <div class="up-bottom-row">
       ${towerCardHtml}
       <div class="up-champs-card">
         <div class="up-champ-item">
-          <span class="up-champ-icon">🏆</span>
+          <div class="up-champ-badge up-champ-badge--liga">LG</div>
           <div><span class="up-champ-n">${champs.league}</span><span class="up-champ-lbl">Ligas ganadas</span></div>
         </div>
         <div class="up-champ-item">
-          <span class="up-champ-icon">🥇</span>
+          <div class="up-champ-badge up-champ-badge--torneo">TR</div>
           <div><span class="up-champ-n">${champs.tournament}</span><span class="up-champ-lbl">Torneos ganados</span></div>
         </div>
       </div>
