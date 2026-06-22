@@ -1512,23 +1512,54 @@ html, body {
 
 .pstat-bottom-row { display: flex; gap: 8px; margin-bottom: 18px; }
 
-.pstat-tower-card {
+/* Torre Infinita — full-width hero card */
+.pstat-tower-big {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px 12px;
+  gap: 0;
+}
+.pstat-tower-big-stat {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.pstat-tower-big-val { font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1; }
+.pstat-tower-big-lbl { font-size: 0.6rem; color: rgba(255,255,255,0.32); text-transform: uppercase; letter-spacing: 0.06em; }
+.pstat-tower-big-div { width: 1px; height: 38px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+.pstat-tower-big-char {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.pstat-tower-big-dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.pstat-tower-big-char-name { font-size: 0.7rem; font-weight: 600; }
+
+/* Personaje favorito — compact card in bottom-row */
+.pstat-fav-card {
   flex: 1;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 14px;
-  padding: 13px;
-  display: flex; flex-direction: column; gap: 5px;
+  padding: 13px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  min-height: 100px; justify-content: center;
 }
-.pstat-tower-hd {
-  font-size: 0.6rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.28);
+.pstat-fav-hd {
+  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.28);
 }
-.pstat-tower-floor { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1; }
-.pstat-tower-char-row { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
-.pstat-tower-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; }
-.pstat-tower-char-name { font-size: 0.7rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pstat-fav-circle {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+}
+.pstat-fav-name { font-size: 0.82rem; font-weight: 700; line-height: 1; text-align: center; }
+.pstat-fav-sub  { font-size: 0.6rem; color: rgba(255,255,255,0.32); }
+.pstat-fav-empty { font-size: 1rem; color: rgba(255,255,255,0.18); }
 
 .pstat-champs-card {
   flex: 1;
@@ -3590,7 +3621,7 @@ td.rank {
 .up-modal-topbar {
   display: flex;
   justify-content: flex-end;
-  padding: 12px 20px 0;
+  padding: 16px 22px 0;
 }
 .up-modal-topbar .auth-modal-close {
   background: rgba(255,255,255,0.07);

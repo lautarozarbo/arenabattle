@@ -80,14 +80,36 @@ export async function openUserProfile(userId) {
   const tMeta = towerChar
     ? (metas.find(m => m.id === towerChar) ?? metas.find(m => m.name === towerChar) ?? null)
     : null;
-  const towerCardHtml = `<div class="up-tower-card">
-    <span class="up-tower-hd">Torre Infinita</span>
-    <span class="up-tower-floor">${towerFloor > 0 ? towerFloor : '—'}</span>
-    ${tMeta ? `<div class="up-tower-char-row">
-      <div class="up-tower-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
-      <span class="up-tower-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
-    </div>` : ''}
-  </div>`;
+  const towerBigHtml = `
+    <div class="up-section">
+      <div class="up-section-hd">Torre Infinita</div>
+      <div class="pstat-tower-big">
+        <div class="pstat-tower-big-stat">
+          <span class="pstat-tower-big-val">${towerFloor > 0 ? towerFloor : '—'}</span>
+          <span class="pstat-tower-big-lbl">Piso máximo</span>
+        </div>
+        <div class="pstat-tower-big-div"></div>
+        <div class="pstat-tower-big-stat">
+          <span class="pstat-tower-big-val">${totalW}</span>
+          <span class="pstat-tower-big-lbl">Victorias</span>
+        </div>
+        ${tMeta ? `
+        <div class="pstat-tower-big-div"></div>
+        <div class="pstat-tower-big-char">
+          <div class="pstat-tower-big-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
+          <span class="pstat-tower-big-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
+        </div>` : ''}
+      </div>
+    </div>`;
+
+  const favCardHtml = mostUsed
+    ? `<div class="pstat-fav-card">
+        <span class="pstat-fav-hd">Favorito</span>
+        <div class="pstat-fav-circle" style="background:${mostUsed.color}28;color:${mostUsed.color}">${mostUsed.icon}</div>
+        <span class="pstat-fav-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
+        <span class="pstat-fav-sub">${bestCount} partidas</span>
+      </div>`
+    : `<div class="pstat-fav-card"><span class="pstat-fav-hd">Favorito</span><span class="pstat-fav-empty">—</span></div>`;
 
   const comments = await loadComments(userId);
   const lastSeenHtml = _formatLastSeen(profile.last_seen);
@@ -116,13 +138,10 @@ export async function openUserProfile(userId) {
       <div class="up-mode-bars">${modeBarsHtml}</div>
     </div>
 
-    <div class="up-section">
-      <div class="up-section-hd">Personaje favorito</div>
-      ${charCardHtml}
-    </div>
+    ${towerBigHtml}
 
     <div class="up-bottom-row">
-      ${towerCardHtml}
+      ${favCardHtml}
       <div class="up-champs-card">
         <div class="up-champ-item up-champ-item--liga">
           <span class="up-champ-n">${champs.league}</span>

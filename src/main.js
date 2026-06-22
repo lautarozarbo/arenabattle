@@ -642,14 +642,36 @@ function _buildProfileStats() {
   const charId = s.towerBestChar ?? bestTower?.powerMetaId ?? null;
   const tMeta  = charId ? (metas.find(m => m.id === charId) ?? metas.find(m => m.name === charId) ?? null) : null;
 
-  const towerCardHtml = `<div class="pstat-tower-card">
-    <span class="pstat-tower-hd">Torre Infinita</span>
-    <span class="pstat-tower-floor">${floor > 0 ? floor : '—'}</span>
-    ${tMeta ? `<div class="pstat-tower-char-row">
-      <div class="pstat-tower-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
-      <span class="pstat-tower-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
-    </div>` : ''}
-  </div>`;
+  const towerBigHtml = `
+    <div class="pstat-section">
+      <div class="pstat-section-hd">Torre Infinita</div>
+      <div class="pstat-tower-big">
+        <div class="pstat-tower-big-stat">
+          <span class="pstat-tower-big-val">${floor > 0 ? floor : '—'}</span>
+          <span class="pstat-tower-big-lbl">Piso máximo</span>
+        </div>
+        <div class="pstat-tower-big-div"></div>
+        <div class="pstat-tower-big-stat">
+          <span class="pstat-tower-big-val">${totalW}</span>
+          <span class="pstat-tower-big-lbl">Victorias</span>
+        </div>
+        ${tMeta ? `
+        <div class="pstat-tower-big-div"></div>
+        <div class="pstat-tower-big-char">
+          <div class="pstat-tower-big-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
+          <span class="pstat-tower-big-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
+        </div>` : ''}
+      </div>
+    </div>`;
+
+  const favCardHtml = mostUsed
+    ? `<div class="pstat-fav-card">
+        <span class="pstat-fav-hd">Favorito</span>
+        <div class="pstat-fav-circle" style="background:${mostUsed.color}28;color:${mostUsed.color}">${mostUsed.icon}</div>
+        <span class="pstat-fav-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
+        <span class="pstat-fav-sub">${favCount} partidas</span>
+      </div>`
+    : `<div class="pstat-fav-card"><span class="pstat-fav-hd">Favorito</span><span class="pstat-fav-empty">—</span></div>`;
 
   const champsCardHtml = `<div class="pstat-champs-card">
     <div class="pstat-champ-item pstat-champ-item--liga">
@@ -687,11 +709,8 @@ function _buildProfileStats() {
       <div class="pstat-section-hd">Victorias por modo</div>
       <div class="pstat-mode-bars">${modeBarsHtml}</div>
     </div>
-    <div class="pstat-section">
-      <div class="pstat-section-hd">Personaje favorito</div>
-      ${charHtml}
-    </div>
-    <div class="pstat-bottom-row">${towerCardHtml}${champsCardHtml}</div>
+    ${towerBigHtml}
+    <div class="pstat-bottom-row">${favCardHtml}${champsCardHtml}</div>
   `;
 }
 
