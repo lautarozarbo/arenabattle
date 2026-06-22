@@ -48,65 +48,89 @@ export async function openUserProfile(userId) {
   }
   const mostUsed = bestId ? metas.find(m => m.id === bestId) ?? null : null;
 
-  const favHtml = mostUsed
-    ? `<div class="up-fav-card">
-        <div class="up-fav-circle" style="background:${mostUsed.color}">${mostUsed.icon}</div>
-        <div class="up-fav-info">
-          <span class="up-fav-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
-          <span class="up-fav-sub">${bestCount} partida${bestCount !== 1 ? 's' : ''}</span>
+  const avatarColor = mostUsed?.color ?? _usernameColor(profile.username);
+  const avatarIcon  = mostUsed ? mostUsed.icon : (profile.username[0]?.toUpperCase() ?? '?');
+
+  const modeList = [
+    { lbl: '1 vs 1',  val: wins.quick1v1    },
+    { lbl: '2 vs 2',  val: wins.quick2v2    },
+    { lbl: 'Liga',    val: wins.league      },
+    { lbl: 'Torneo',  val: wins.tournament  },
+  ];
+  const maxMW = Math.max(...modeList.map(m => m.val), 1);
+  const modeBarsHtml = modeList.map(m => {
+    const pct = Math.round((m.val / maxMW) * 100);
+    return `<div class="up-mode-row">
+      <span class="up-mode-lbl">${m.lbl}</span>
+      <div class="up-mode-track"><div class="up-mode-fill" style="width:${pct}%"></div></div>
+      <span class="up-mode-num">${m.val}</span>
+    </div>`;
+  }).join('');
+
+  const charCardHtml = mostUsed
+    ? `<div class="up-char-card">
+        <div class="up-char-circle" style="background:${mostUsed.color}28">${mostUsed.icon}</div>
+        <div class="up-char-info">
+          <span class="up-char-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
+          <span class="up-char-sub">${bestCount} partida${bestCount !== 1 ? 's' : ''} · Favorito</span>
         </div>
       </div>`
-    : `<div class="up-fav-empty">Sin partidas registradas</div>`;
+    : `<div class="up-char-card"><span class="up-char-empty">Sin partidas registradas</span></div>`;
+
+  const tMeta = towerChar
+    ? (metas.find(m => m.id === towerChar) ?? metas.find(m => m.name === towerChar) ?? null)
+    : null;
+  const towerCardHtml = `<div class="up-tower-card">
+    <span class="up-tower-hd">Torre Infinita</span>
+    <span class="up-tower-floor">${towerFloor > 0 ? towerFloor : '—'}</span>
+    ${tMeta ? `<div class="up-tower-char-row">
+      <div class="up-tower-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
+      <span class="up-tower-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
+    </div>` : ''}
+  </div>`;
 
   const comments = await loadComments(userId);
-
   const lastSeenHtml = _formatLastSeen(profile.last_seen);
   const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
 
   content.innerHTML = `
-    <div class="up-username">${badgeNameHtml(profile.username, stats?.missions_progress?.activeBadge ?? null)}</div>
-    ${lastSeenHtml ? `<div class="up-last-seen">${lastSeenHtml}</div>` : ''}
+    <div class="up-hero">
+      <div class="up-avatar" style="background:${avatarColor}22;border-color:${avatarColor}55;color:${avatarColor}">${avatarIcon}</div>
+      <div class="up-username">${badgeNameHtml(profile.username, stats?.missions_progress?.activeBadge ?? null)}</div>
+      ${lastSeenHtml ? `<div class="up-last-seen">${lastSeenHtml}</div>` : ''}
+    </div>
     ${friendBtnHtml}
 
-    <div class="up-section-label">Resumen</div>
-    <div class="up-grid">
-      <div class="up-card"><span class="up-val">${totalG}</span><span class="up-lbl">Jugadas</span></div>
-      <div class="up-card"><span class="up-val up-val--win">${totalW}</span><span class="up-lbl">Victorias</span></div>
-      <div class="up-card"><span class="up-val up-val--loss">${totalL}</span><span class="up-lbl">Derrotas</span></div>
-      <div class="up-card"><span class="up-val">${winRate}%</span><span class="up-lbl">Win rate</span></div>
+    <div class="up-stat-row">
+      <div class="up-pill"><span class="up-pill-val">${totalG}</span><span class="up-pill-lbl">Partidas</span></div>
+      <div class="up-pill up-pill--win"><span class="up-pill-val">${totalW}</span><span class="up-pill-lbl">Victorias</span></div>
+      <div class="up-pill up-pill--loss"><span class="up-pill-val">${totalL}</span><span class="up-pill-lbl">Derrotas</span></div>
+    </div>
+    <div class="up-winrate-wrap">
+      <div class="up-winrate-track"><div class="up-winrate-fill" style="width:${winRate}%"></div></div>
+      <span class="up-winrate-label">${winRate}% win rate · ${totalD} empate${totalD !== 1 ? 's' : ''}</span>
     </div>
 
-    <div class="up-section-label">Victorias por modo</div>
-    <div class="up-grid">
-      <div class="up-card"><span class="up-val">${wins.quick1v1}</span><span class="up-lbl">1 vs 1</span></div>
-      <div class="up-card"><span class="up-val">${wins.quick2v2}</span><span class="up-lbl">2 vs 2</span></div>
-      <div class="up-card"><span class="up-val">${wins.league}</span><span class="up-lbl">Liga</span></div>
-      <div class="up-card"><span class="up-val">${wins.tournament}</span><span class="up-lbl">Torneo</span></div>
+    <div class="up-section">
+      <div class="up-section-hd">Victorias por modo</div>
+      <div class="up-mode-bars">${modeBarsHtml}</div>
     </div>
 
-    <div class="up-section-label">Campeonatos</div>
-    <div class="up-champ-row">
-      <div class="up-champ-card">
-        <span class="up-champ-trophy">🏆</span>
-        <div class="up-champ-info">
-          <span class="up-champ-val">${champs.league}</span>
-          <span class="up-champ-lbl">Ligas ganadas</span>
+    ${charCardHtml}
+
+    <div class="up-bottom-row">
+      ${towerCardHtml}
+      <div class="up-champs-card">
+        <div class="up-champ-item">
+          <span class="up-champ-icon">🏆</span>
+          <div><span class="up-champ-n">${champs.league}</span><span class="up-champ-lbl">Ligas ganadas</span></div>
         </div>
-      </div>
-      <div class="up-champ-card">
-        <span class="up-champ-trophy">🏆</span>
-        <div class="up-champ-info">
-          <span class="up-champ-val">${champs.tournament}</span>
-          <span class="up-champ-lbl">Torneos ganados</span>
+        <div class="up-champ-item">
+          <span class="up-champ-icon">🥇</span>
+          <div><span class="up-champ-n">${champs.tournament}</span><span class="up-champ-lbl">Torneos ganados</span></div>
         </div>
       </div>
     </div>
-
-    <div class="up-section-label">Torre Infinita</div>
-    ${_towerSection(towerFloor, towerChar, metas, wins.tower ?? 0)}
-
-    <div class="up-section-label">Personaje más usado</div>
-    ${favHtml}
 
     ${renderCommentsSection(comments, myId, userId)}
   `;
@@ -235,36 +259,9 @@ function _esc(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function _towerSection(floor, charId, metas, wins = 0) {
-  // charId may be an ID (new) or a display name (old saves) — try both
-  const meta = charId
-    ? (metas.find(m => m.id === charId) ?? metas.find(m => m.name === charId) ?? null)
-    : null;
-
-  const floorHtml = `
-    <div class="up-card">
-      <span class="up-val">${floor > 0 ? floor : '—'}</span>
-      <span class="up-lbl">Piso más alto</span>
-    </div>`;
-
-  const charHtml = meta
-    ? `<div class="up-fav-card up-tower-char">
-        <div class="up-fav-circle" style="background:${meta.color}">${meta.icon}</div>
-        <div class="up-fav-info">
-          <span class="up-fav-name" style="color:${meta.color}">${meta.name}</span>
-          <span class="up-fav-sub">Mejor run</span>
-        </div>
-      </div>`
-    : `<div class="up-card">
-        <span class="up-val">—</span>
-        <span class="up-lbl">Mejor personaje</span>
-      </div>`;
-
-  const winsHtml = `
-    <div class="up-card">
-      <span class="up-val">${wins}</span>
-      <span class="up-lbl">Victorias</span>
-    </div>`;
-
-  return `<div class="up-tower-row">${floorHtml}${charHtml}${winsHtml}</div>`;
+function _usernameColor(name) {
+  const palette = ['#7c9dff','#c084fc','#4ade80','#fb923c','#f472b6','#34d399','#a78bfa','#60a5fa'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return palette[Math.abs(h) % palette.length];
 }

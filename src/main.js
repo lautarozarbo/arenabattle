@@ -595,12 +595,14 @@ function _buildProfileStats() {
   const favCount = favResult?.count ?? 0;
 
   if (mostUsed) {
-    _profileAvatar.style.background = mostUsed.color;
-    _profileAvatar.style.borderColor = mostUsed.color + "55";
-    _profileAvatar.innerHTML = mostUsed.icon;
+    _profileAvatar.style.background = mostUsed.color + "28";
+    _profileAvatar.style.borderColor = mostUsed.color + "66";
+    _profileAvatar.style.color = mostUsed.color;
+    _profileAvatar.innerHTML = `<span style="font-size:2rem">${mostUsed.icon}</span>`;
   } else {
     _profileAvatar.style.background = "";
     _profileAvatar.style.borderColor = "";
+    _profileAvatar.style.color = "";
     _profileAvatar.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
   }
 
@@ -608,116 +610,92 @@ function _buildProfileStats() {
   const totalL = Object.values(s.losses).reduce((a, b) => a + b, 0);
   const totalD = Object.values(s.draws).reduce((a, b) => a + b, 0);
   const totalG = totalW + totalL + totalD;
+  const winRate = totalG > 0 ? Math.round((totalW / totalG) * 100) : 0;
 
-  const favHtml = mostUsed
-    ? `<div class="pstat-fav-card">
-        <div class="pstat-fav-circle" style="background:${mostUsed.color}">${mostUsed.icon}</div>
-        <div class="pstat-fav-info">
-          <span class="pstat-fav-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
-          <span class="pstat-fav-sublabel">${favCount} partida${favCount !== 1 ? "s" : ""} jugadas</span>
+  const modeWins = [
+    { lbl: '1 vs 1',  val: s.wins.quick1v1    },
+    { lbl: '2 vs 2',  val: s.wins.quick2v2    },
+    { lbl: 'Liga',    val: s.wins.league      },
+    { lbl: 'Torneo',  val: s.wins.tournament  },
+  ];
+  const maxMW = Math.max(...modeWins.map(m => m.val), 1);
+  const modeBarsHtml = modeWins.map(m => {
+    const pct = Math.round((m.val / maxMW) * 100);
+    return `<div class="pstat-mode-row">
+      <span class="pstat-mode-lbl">${m.lbl}</span>
+      <div class="pstat-mode-track"><div class="pstat-mode-fill" style="width:${pct}%"></div></div>
+      <span class="pstat-mode-num">${m.val}</span>
+    </div>`;
+  }).join('');
+
+  const charHtml = mostUsed
+    ? `<div class="pstat-char-card">
+        <div class="pstat-char-circle" style="background:${mostUsed.color}28">${mostUsed.icon}</div>
+        <div class="pstat-char-info">
+          <span class="pstat-char-name" style="color:${mostUsed.color}">${mostUsed.name}</span>
+          <span class="pstat-char-sub">${favCount} partida${favCount !== 1 ? 's' : ''} · Favorito</span>
         </div>
       </div>`
-    : `<div class="pstat-fav-card">
-        <span class="pstat-fav-empty">Aún no hay partidas registradas</span>
-      </div>`;
+    : `<div class="pstat-char-card"><span class="pstat-char-empty">Sin partidas registradas</span></div>`;
 
-  _profileStatsEl.innerHTML = `
-    <div class="pstat-section-label">Resumen</div>
-    <div class="pstat-grid">
-      <div class="pstat-card">
-        <span class="pstat-val">${totalG}</span>
-        <span class="pstat-lbl">Jugadas</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val pstat-val--win">${totalW}</span>
-        <span class="pstat-lbl">Victorias</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val pstat-val--loss">${totalL}</span>
-        <span class="pstat-lbl">Derrotas</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val pstat-val--draw">${totalD}</span>
-        <span class="pstat-lbl">Empates</span>
-      </div>
-    </div>
-    <div class="pstat-section-label">Victorias por modo</div>
-    <div class="pstat-grid">
-      <div class="pstat-card">
-        <span class="pstat-val">${s.wins.quick1v1}</span>
-        <span class="pstat-lbl">1 vs 1</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val">${s.wins.quick2v2}</span>
-        <span class="pstat-lbl">2 vs 2</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val">${s.wins.league}</span>
-        <span class="pstat-lbl">Partidas liga</span>
-      </div>
-      <div class="pstat-card">
-        <span class="pstat-val">${s.wins.tournament}</span>
-        <span class="pstat-lbl">Partidas torneo</span>
-      </div>
-    </div>
-    <div class="pstat-section-label">Campeonatos</div>
-    <div class="pstat-champ-row">
-      <div class="pstat-champ-card">
-        <span class="pstat-champ-trophy">🏆</span>
-        <div class="pstat-champ-info">
-          <span class="pstat-champ-val">${s.championships.league}</span>
-          <span class="pstat-champ-lbl">Ligas ganadas</span>
-        </div>
-      </div>
-      <div class="pstat-champ-card">
-        <span class="pstat-champ-trophy">🏆</span>
-        <div class="pstat-champ-info">
-          <span class="pstat-champ-val">${s.championships.tournament}</span>
-          <span class="pstat-champ-lbl">Torneos ganados</span>
-        </div>
-      </div>
-    </div>
-    <div class="pstat-section-label">Torre Infinita</div>
-    ${_buildTowerSection(s, bestTower, metas)}
-    <div class="pstat-section-label">Personaje favorito</div>
-    ${favHtml}
-  `;
-}
-
-function _buildTowerSection(s, bestTower, allMetas) {
   const floor  = s.towerMaxFloor > 0 ? s.towerMaxFloor : (bestTower?.floor ?? 0);
   const charId = s.towerBestChar ?? bestTower?.powerMetaId ?? null;
-  const meta   = charId
-    ? (allMetas.find(m => m.id === charId) ?? allMetas.find(m => m.name === charId) ?? null)
-    : null;
+  const tMeta  = charId ? (metas.find(m => m.id === charId) ?? metas.find(m => m.name === charId) ?? null) : null;
 
-  const floorCard = `
-    <div class="pstat-card pstat-card--wide">
-      <span class="pstat-val">${floor > 0 ? floor : '—'}</span>
-      <span class="pstat-lbl">Piso más alto</span>
-    </div>`;
+  const towerCardHtml = `<div class="pstat-tower-card">
+    <span class="pstat-tower-hd">Torre Infinita</span>
+    <span class="pstat-tower-floor">${floor > 0 ? floor : '—'}</span>
+    ${tMeta ? `<div class="pstat-tower-char-row">
+      <div class="pstat-tower-dot" style="background:${tMeta.color}28;color:${tMeta.color}">${tMeta.icon}</div>
+      <span class="pstat-tower-char-name" style="color:${tMeta.color}">${tMeta.name}</span>
+    </div>` : ''}
+  </div>`;
 
-  const charCard = meta
-    ? `<div class="pstat-tower-char">
-        <div class="pstat-tower-circle" style="background:${meta.color}">${meta.icon}</div>
-        <div class="pstat-tower-info">
-          <span class="pstat-tower-name" style="color:${meta.color}">${meta.name}</span>
-          <span class="pstat-tower-sub">Mejor run</span>
-        </div>
-      </div>`
-    : `<div class="pstat-card pstat-card--wide">
-        <span class="pstat-val">—</span>
-        <span class="pstat-lbl">Mejor personaje</span>
-      </div>`;
+  const champsCardHtml = `<div class="pstat-champs-card">
+    <div class="pstat-champ-item">
+      <span class="pstat-champ-icon">🏆</span>
+      <div>
+        <span class="pstat-champ-n">${s.championships.league}</span>
+        <span class="pstat-champ-lbl">Ligas ganadas</span>
+      </div>
+    </div>
+    <div class="pstat-champ-item">
+      <span class="pstat-champ-icon">🥇</span>
+      <div>
+        <span class="pstat-champ-n">${s.championships.tournament}</span>
+        <span class="pstat-champ-lbl">Torneos ganados</span>
+      </div>
+    </div>
+  </div>`;
 
-  const wins = s.wins?.tower ?? 0;
-  const winsCard = `
-    <div class="pstat-card pstat-card--wide">
-      <span class="pstat-val">${wins}</span>
-      <span class="pstat-lbl">Victorias</span>
-    </div>`;
-
-  return `<div class="pstat-tower-row">${floorCard}${charCard}${winsCard}</div>`;
+  _profileStatsEl.innerHTML = `
+    <div class="pstat-stat-row">
+      <div class="pstat-pill">
+        <span class="pstat-pill-val">${totalG}</span>
+        <span class="pstat-pill-lbl">Partidas</span>
+      </div>
+      <div class="pstat-pill pstat-pill--win">
+        <span class="pstat-pill-val">${totalW}</span>
+        <span class="pstat-pill-lbl">Victorias</span>
+      </div>
+      <div class="pstat-pill pstat-pill--loss">
+        <span class="pstat-pill-val">${totalL}</span>
+        <span class="pstat-pill-lbl">Derrotas</span>
+      </div>
+    </div>
+    <div class="pstat-winrate-wrap">
+      <div class="pstat-winrate-track">
+        <div class="pstat-winrate-fill" style="width:${winRate}%"></div>
+      </div>
+      <span class="pstat-winrate-label">${winRate}% win rate · ${totalD} empate${totalD !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="pstat-section">
+      <div class="pstat-section-hd">Victorias por modo</div>
+      <div class="pstat-mode-bars">${modeBarsHtml}</div>
+    </div>
+    ${charHtml}
+    <div class="pstat-bottom-row">${towerCardHtml}${champsCardHtml}</div>
+  `;
 }
 
 function _closeProfile() {
