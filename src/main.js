@@ -652,19 +652,13 @@ function _buildProfileStats() {
   </div>`;
 
   const champsCardHtml = `<div class="pstat-champs-card">
-    <div class="pstat-champ-item">
-      <div class="pstat-champ-badge pstat-champ-badge--liga">LG</div>
-      <div>
-        <span class="pstat-champ-n">${s.championships.league}</span>
-        <span class="pstat-champ-lbl">Ligas ganadas</span>
-      </div>
+    <div class="pstat-champ-item pstat-champ-item--liga">
+      <span class="pstat-champ-n">${s.championships.league}</span>
+      <span class="pstat-champ-lbl">Ligas ganadas</span>
     </div>
-    <div class="pstat-champ-item">
-      <div class="pstat-champ-badge pstat-champ-badge--torneo">TR</div>
-      <div>
-        <span class="pstat-champ-n">${s.championships.tournament}</span>
-        <span class="pstat-champ-lbl">Torneos ganados</span>
-      </div>
+    <div class="pstat-champ-item pstat-champ-item--torneo">
+      <span class="pstat-champ-n">${s.championships.tournament}</span>
+      <span class="pstat-champ-lbl">Torneos ganados</span>
     </div>
   </div>`;
 

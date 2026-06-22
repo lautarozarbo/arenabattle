@@ -1220,36 +1220,22 @@ html, body {
   to   { transform: translateY(110%); }
 }
 
+.profile-top-bar {
+  position: relative;
+  padding: 12px 0 6px;
+}
+
 .profile-drag-handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   background: rgba(255,255,255,0.12);
-  margin: 12px auto 0;
-}
-
-/* ── Profile hero ────────────────────────────────────────────────────────── */
-.profile-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0 24px;
-  margin-bottom: 6px;
-}
-.profile-hero::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -20px; right: -20px; bottom: 0;
-  background: linear-gradient(180deg, rgba(124,157,255,0.06) 0%, transparent 80%);
-  border-radius: 0 0 24px 24px;
-  pointer-events: none;
+  margin: 0 auto;
 }
 
 .profile-close-btn {
   position: absolute;
-  top: 10px; right: 0;
+  top: 6px; right: 0;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 50%;
@@ -1263,6 +1249,16 @@ html, body {
   transition: background 0.15s, color 0.15s;
 }
 .profile-close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ── Profile hero ────────────────────────────────────────────────────────── */
+.profile-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 24px;
+  margin-bottom: 6px;
+}
 
 .profile-avatar-wrap { margin-bottom: 2px; }
 .profile-avatar-circle {
@@ -1541,17 +1537,16 @@ html, body {
   padding: 13px;
   display: flex; flex-direction: column; gap: 10px; justify-content: center;
 }
-.pstat-champ-item { display: flex; align-items: center; gap: 10px; }
-.pstat-champ-badge {
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em;
-  flex-shrink: 0;
+.pstat-champ-item {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-left: 10px;
+  border-left: 2px solid transparent;
 }
-.pstat-champ-badge--liga    { background: rgba(251,191,36,0.14);  color: #fbbf24; }
-.pstat-champ-badge--torneo  { background: rgba(192,132,252,0.14); color: #c084fc; }
-.pstat-champ-n { font-size: 1.1rem; font-weight: 800; color: #fff; line-height: 1; display: block; }
+.pstat-champ-item--liga   { border-color: #fbbf24; }
+.pstat-champ-item--torneo { border-color: #c084fc; }
+.pstat-champ-n { font-size: 1.1rem; font-weight: 800; line-height: 1; display: block; }
+.pstat-champ-item--liga   .pstat-champ-n { color: #fbbf24; }
+.pstat-champ-item--torneo .pstat-champ-n { color: #c084fc; }
 .pstat-champ-lbl { font-size: 0.63rem; color: rgba(255,255,255,0.32); display: block; }
 
 /* ── Floating navigation bar ────────────────────────── */
@@ -3591,7 +3586,11 @@ td.rank {
   display: flex;
   flex-direction: column;
 }
-.user-profile-modal .auth-modal-header { padding: 16px 20px 18px; }
+.up-modal-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px 0;
+}
 .user-profile-scroll {
   overflow-y: auto;
   flex: 1;
@@ -3610,7 +3609,7 @@ td.rank {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 10px 0 22px;
+  padding: 4px 0 22px;
   margin-bottom: 6px;
   position: relative;
 }
@@ -3709,17 +3708,16 @@ td.rank {
   border-radius: 14px; padding: 13px;
   display: flex; flex-direction: column; gap: 10px; justify-content: center;
 }
-.up-champ-item { display: flex; align-items: center; gap: 10px; }
-.up-champ-badge {
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em;
-  flex-shrink: 0;
+.up-champ-item {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-left: 10px;
+  border-left: 2px solid transparent;
 }
-.up-champ-badge--liga    { background: rgba(251,191,36,0.14);  color: #fbbf24; }
-.up-champ-badge--torneo  { background: rgba(192,132,252,0.14); color: #c084fc; }
-.up-champ-n { font-size: 1.1rem; font-weight: 800; color: #fff; line-height: 1; display: block; }
+.up-champ-item--liga   { border-color: #fbbf24; }
+.up-champ-item--torneo { border-color: #c084fc; }
+.up-champ-n { font-size: 1.1rem; font-weight: 800; line-height: 1; display: block; }
+.up-champ-item--liga   .up-champ-n { color: #fbbf24; }
+.up-champ-item--torneo .up-champ-n { color: #c084fc; }
 .up-champ-lbl { font-size: 0.63rem; color: rgba(255,255,255,0.32); display: block; }
 
 /* ── User Profile: last seen + friend button ──────────────────────────────── */

@@ -124,13 +124,13 @@ export async function openUserProfile(userId) {
     <div class="up-bottom-row">
       ${towerCardHtml}
       <div class="up-champs-card">
-        <div class="up-champ-item">
-          <div class="up-champ-badge up-champ-badge--liga">LG</div>
-          <div><span class="up-champ-n">${champs.league}</span><span class="up-champ-lbl">Ligas ganadas</span></div>
+        <div class="up-champ-item up-champ-item--liga">
+          <span class="up-champ-n">${champs.league}</span>
+          <span class="up-champ-lbl">Ligas ganadas</span>
         </div>
-        <div class="up-champ-item">
-          <div class="up-champ-badge up-champ-badge--torneo">TR</div>
-          <div><span class="up-champ-n">${champs.tournament}</span><span class="up-champ-lbl">Torneos ganados</span></div>
+        <div class="up-champ-item up-champ-item--torneo">
+          <span class="up-champ-n">${champs.tournament}</span>
+          <span class="up-champ-lbl">Torneos ganados</span>
         </div>
       </div>
     </div>
