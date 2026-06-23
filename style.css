@@ -5126,180 +5126,385 @@ td.rank {
 /* ── Name badges ─────────────────────────────────────────────────────────────── */
 .badge-wrap { display: inline-flex; align-items: center; }
 .badge-name { display: inline-block; border-radius: 5px; padding: 1px 6px; }
-
 .badge--none {}
-
-/* Base: contexto de posición para pseudo-elementos en username y preview */
 .badge-name, .ms-badge-preview { position: relative; isolation: isolate; }
 
-/* ── Bronce ×5 ── */
+/* ════════════════════════════════════════════════════════════
+   BRONCE ×5 — Forja Ardiente
+   Metal recién sacado de la forja. Calor que sube desde abajo.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--bronce {
-  background: radial-gradient(ellipse at 50% 150%, #3d1500 0%, #110800 55%, #0c0e1b 100%);
-  border: 2px solid #cd7f32; color: #ffd080;
-  animation: bronce-forge 2.5s ease-in-out infinite alternate;
+  background: linear-gradient(170deg, #140800 0%, #2e1000 60%, #140800 100%);
+  border: 2px solid #cd7f32;
+  color: #ffb84d;
+  animation: bronce-forge 2.4s ease-in-out infinite alternate;
+}
+:is(.badge-name, .ms-badge-preview).badge--bronce::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse 100% 55% at 50% 115%, #ff5500 0%, #ff2200 25%, transparent 65%);
+  opacity: 0.22;
+  animation: bronce-heat 2.4s ease-in-out infinite alternate;
 }
 :is(.badge-name, .ms-badge-preview).badge--bronce::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(ellipse at 30% 80%, #ff950030 0%, transparent 60%),
-              radial-gradient(ellipse at 70% 80%, #cd7f3228 0%, transparent 50%);
-  animation: bronce-embers 3s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle 3px at 18% 82%, #ff8800 0%, transparent 100%),
+    radial-gradient(circle 2px at 45% 88%, #ff6600 0%, transparent 100%),
+    radial-gradient(circle 2.5px at 72% 78%, #ffaa00 0%, transparent 100%),
+    radial-gradient(circle 2px at 85% 85%, #ff4400 0%, transparent 100%),
+    radial-gradient(circle 3px at 30% 92%, #ff7700 0%, transparent 100%);
+  animation: bronce-embers 2s ease-in-out infinite alternate;
 }
 @keyframes bronce-forge {
-  from { border-color:#8B4513; box-shadow:0 0 6px #cd7f3266,inset 0 0 6px #3d150033; text-shadow:0 0 6px #cd7f3299; }
-  to   { border-color:#ffb347; box-shadow:0 0 14px #ff9500bb,inset 0 0 10px #8B451344; text-shadow:0 0 12px #ffb347dd; }
+  from { border-color:#6b3a0f; box-shadow:0 0 7px #cd7f3255,inset 0 0 10px #3d150044; text-shadow:0 0 6px #cd7f3288; }
+  to   { border-color:#ffaa44; box-shadow:0 0 20px #ff6600cc,0 0 36px #ff440033,inset 0 0 16px #ff440022; text-shadow:0 0 14px #ffaa44ee,0 0 28px #ff660055; }
+}
+@keyframes bronce-heat {
+  from { opacity:0.1; transform:scaleY(0.6) translateY(2px); }
+  to   { opacity:0.38; transform:scaleY(1.4) translateY(-2px); }
 }
 @keyframes bronce-embers {
-  from { opacity:0.4; transform:scaleY(0.9); }
-  to   { opacity:1;   transform:scaleY(1.1); }
+  from { opacity:0.5; transform:translateY(0px); }
+  to   { opacity:1;   transform:translateY(-3px); }
 }
 
-/* ── Plata ×10 ── */
+/* ════════════════════════════════════════════════════════════
+   PLATA ×10 — Acero Espejo
+   Oscuro y frío. Un rayo de luz cegador lo cruza cada 3s.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--plata {
-  background: linear-gradient(105deg, #0c0e1b 0%, #1a1e30 40%, #0c0e1b 100%);
-  border: 2px solid #aaa; color: #fff;
-  animation: plata-steel 2.2s ease-in-out infinite;
+  background: linear-gradient(140deg, #090c18 0%, #131828 50%, #090c18 100%);
+  border: 2px solid #556677;
+  color: #a0b8cc;
+  animation: plata-rest 3s ease-in-out infinite;
+}
+:is(.badge-name, .ms-badge-preview).badge--plata::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, transparent 15%, rgba(255,255,255,0.06) 50%, transparent 85%);
+  background-size: 300% 100%;
+  background-position: -200% 0;
+  animation: plata-ambient 3s ease-in-out infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--plata::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.20) 50%, transparent 80%);
-  background-size: 200% 100%;
-  animation: plata-sweep 2.2s ease-in-out infinite;
+  background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 67%, transparent 100%);
+  background-size: 300% 100%;
+  background-position: -200% 0;
+  animation: plata-flash 3s ease-in-out infinite;
 }
-@keyframes plata-steel {
-  0%,100% { border-color:#555; box-shadow:0 0 4px #88888855; color:#bbb; text-shadow:none; }
-  48%     { border-color:#ccc; box-shadow:0 0 8px #aaaaaa77; color:#ddd; }
-  50%     { border-color:#fff; box-shadow:0 0 16px #ffffffcc,0 0 5px #fff; color:#fff; text-shadow:0 0 10px #ffffffee; }
-  52%     { border-color:#ccc; box-shadow:0 0 8px #aaaaaa77; color:#ddd; }
+@keyframes plata-rest {
+  0%,38% { border-color:#334455; box-shadow:0 0 3px #44556622; color:#7090a8; text-shadow:none; }
+  50%    { border-color:#ffffff; box-shadow:0 0 26px #ffffffee,0 0 8px #fff; color:#fff; text-shadow:0 0 14px #fff,0 0 28px #ccddee; }
+  62%,100%{ border-color:#334455; box-shadow:0 0 3px #44556622; color:#7090a8; text-shadow:none; }
 }
-@keyframes plata-sweep {
-  0%,40%  { background-position:-100% 0; opacity:0; }
-  50%     { background-position: 100% 0; opacity:1; }
-  60%,100%{ background-position: 200% 0; opacity:0; }
+@keyframes plata-ambient {
+  0%,35%  { background-position:-200% 0; opacity:0; }
+  50%     { background-position:100% 0; opacity:1; }
+  65%,100%{ background-position:300% 0; opacity:0; }
+}
+@keyframes plata-flash {
+  0%,40%  { background-position:-200% 0; opacity:0; }
+  50%     { background-position:100% 0; opacity:1; }
+  60%,100%{ background-position:300% 0; opacity:0; }
 }
 
-/* ── Esmeralda ×15 ── */
+/* ════════════════════════════════════════════════════════════
+   ESMERALDA ×15 — Bioluminiscencia
+   Dos orbes de luz viva que se mueven y respiran por dentro.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--esmeralda {
-  background: radial-gradient(ellipse at 50% 150%, #0a3d1a 0%, #051a0c 50%, #0c0e1b 100%);
-  border: 2px solid #2ecc71; color: #80ffbe;
-  animation: esmeralda-bio 2.8s ease-in-out infinite alternate;
+  background: linear-gradient(160deg, #030e06 0%, #06180a 65%, #030e06 100%);
+  border: 2px solid #1a7a45;
+  color: #5effa0;
+  animation: esmeralda-breathe 3.5s ease-in-out infinite alternate;
+}
+:is(.badge-name, .ms-badge-preview).badge--esmeralda::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(circle 22px at 28% 65%, #2ecc7155 0%, transparent 100%),
+    radial-gradient(circle 16px at 72% 35%, #00ff7740 0%, transparent 100%);
+  animation: esmeralda-orb-a 3.5s ease-in-out infinite alternate;
 }
 :is(.badge-name, .ms-badge-preview).badge--esmeralda::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(circle at 25% 60%, #2ecc7128 0%, transparent 40%),
-              radial-gradient(circle at 75% 40%, #00ff8820 0%, transparent 35%);
-  animation: esmeralda-orbs 2.8s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle 12px at 55% 78%, #00ff8838 0%, transparent 100%),
+    radial-gradient(circle 9px at 18% 38%, #2ecc7128 0%, transparent 100%);
+  animation: esmeralda-orb-b 4.8s ease-in-out infinite alternate;
 }
-@keyframes esmeralda-bio {
-  from { border-color:#0d5c2e; box-shadow:0 0 6px #2ecc7155,inset 0 0 6px #0a3d1a44; text-shadow:0 0 6px #2ecc7188; }
-  to   { border-color:#2ecc71; box-shadow:0 0 16px #2ecc71cc,inset 0 0 12px #2ecc7133; text-shadow:0 0 14px #80ffbeee; }
+@keyframes esmeralda-breathe {
+  from { border-color:#0b4a22; box-shadow:0 0 8px #2ecc7144,inset 0 0 10px #0a3d1a33; text-shadow:0 0 8px #2ecc7166; }
+  to   { border-color:#3ef086; box-shadow:0 0 22px #2ecc71cc,0 0 40px #00ff7733,inset 0 0 18px #2ecc7122; text-shadow:0 0 20px #5effaaee,0 0 36px #2ecc7155; }
 }
-@keyframes esmeralda-orbs {
-  from { opacity:0.3; transform:scale(0.9); }
-  to   { opacity:1;   transform:scale(1.1); }
+@keyframes esmeralda-orb-a {
+  from {
+    background:
+      radial-gradient(circle 22px at 28% 65%, #2ecc7155 0%, transparent 100%),
+      radial-gradient(circle 16px at 72% 35%, #00ff7740 0%, transparent 100%);
+  }
+  to {
+    background:
+      radial-gradient(circle 26px at 68% 28%, #2ecc7160 0%, transparent 100%),
+      radial-gradient(circle 13px at 18% 72%, #00ff7738 0%, transparent 100%);
+  }
+}
+@keyframes esmeralda-orb-b {
+  from {
+    background:
+      radial-gradient(circle 12px at 55% 78%, #00ff8838 0%, transparent 100%),
+      radial-gradient(circle 9px at 18% 38%, #2ecc7128 0%, transparent 100%);
+  }
+  to {
+    background:
+      radial-gradient(circle 14px at 35% 22%, #00ff8842 0%, transparent 100%),
+      radial-gradient(circle 11px at 82% 72%, #2ecc7135 0%, transparent 100%);
+  }
 }
 
-/* ── Oro ×20 ── */
+/* ════════════════════════════════════════════════════════════
+   ORO ×20 — Oro Líquido
+   Shimmer diagonal elegante que barre la superficie. Sin giros.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--oro {
-  background: radial-gradient(ellipse at 50% 120%, #2a1a00 0%, #180e00 50%, #0c0e1b 100%);
-  border: 2px solid #ffd700; color: #fff3a0;
-  animation: oro-sun 1.8s ease-in-out infinite;
+  background: linear-gradient(170deg, #130a00 0%, #231300 70%, #130a00 100%);
+  border: 2px solid #c8900a;
+  color: #ffe088;
+  animation: oro-glow 2.8s ease-in-out infinite;
+}
+:is(.badge-name, .ms-badge-preview).badge--oro::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse 110% 65% at 50% 120%, #ff8c0048 0%, #ffd70028 35%, transparent 68%);
+  animation: oro-pool 2.8s ease-in-out infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--oro::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: repeating-conic-gradient(from 0deg, #ffd70015 0deg 20deg, transparent 20deg 40deg);
-  animation: oro-rays 6s linear infinite;
+  background: linear-gradient(115deg, transparent 0%, #ffd70000 28%, #ffd70070 50%, #ffd70000 72%, transparent 100%);
+  background-size: 300% 100%;
+  background-position: -200% 0;
+  animation: oro-shimmer 2.8s ease-in-out infinite;
 }
-@keyframes oro-sun {
-  0%,100% { border-color:#b8860b; box-shadow:0 0 6px #ffd70044,inset 0 0 6px #2a1a0033; text-shadow:0 0 6px #ffd70077; }
-  50%     { border-color:#ffe566; box-shadow:0 0 20px #ffd700ee,0 0 8px #ffd700,inset 0 0 12px #ffd70022; text-shadow:0 0 16px #fff3a0ff; }
+@keyframes oro-glow {
+  0%,100%{ border-color:#7a5500; box-shadow:0 0 6px #ffd70033; text-shadow:0 0 5px #ffd70044; color:#d4a030; }
+  50%    { border-color:#ffd700; box-shadow:0 0 24px #ffd700cc,0 0 44px #ff8c0033,inset 0 0 12px #ffd70011; text-shadow:0 0 16px #ffe570ee,0 0 32px #ffd70055; color:#fff8c0; }
 }
-@keyframes oro-rays { to { transform:rotate(360deg); } }
+@keyframes oro-pool {
+  0%,100%{ opacity:0.25; transform:scaleY(0.7); }
+  50%    { opacity:0.65; transform:scaleY(1.3); }
+}
+@keyframes oro-shimmer {
+  0%,18%    { background-position:-200% 0; opacity:0; }
+  50%       { background-position:60% 0; opacity:1; }
+  82%,100%  { background-position:300% 0; opacity:0; }
+}
 
-/* ── Zafiro ×25 ── */
+/* ════════════════════════════════════════════════════════════
+   ZAFIRO ×25 — Tormenta Eléctrica
+   Carga → doble relámpago → silencio. Dramático e impredecible.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--zafiro {
-  background: radial-gradient(ellipse at 50% 150%, #001035 0%, #000820 55%, #0c0e1b 100%);
-  border: 2px solid #4f9dff; color: #a8d4ff;
-  animation: zafiro-bolt 2.5s ease-in-out infinite;
+  background: linear-gradient(160deg, #000818 0%, #001030 65%, #000818 100%);
+  border: 2px solid #1a3a7a;
+  color: #5090e0;
+  animation: zafiro-storm 3.2s ease-in-out infinite;
+}
+:is(.badge-name, .ms-badge-preview).badge--zafiro::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(135deg, transparent 10%, #4f9dff0e 50%, transparent 90%);
+  background-size: 200% 200%;
+  animation: zafiro-charge 3.2s ease-in-out infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--zafiro::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(45deg, transparent 30%, #4f9dff18 50%, transparent 70%);
-  background-size: 200% 200%;
-  animation: zafiro-charge 2.5s ease-in-out infinite;
+  background: linear-gradient(80deg, transparent 25%, #ffffff99 50%, transparent 75%);
+  background-size: 300% 100%;
+  background-position: -200% 0;
+  opacity: 0;
+  animation: zafiro-bolt 3.2s ease-in-out infinite;
 }
-@keyframes zafiro-bolt {
-  0%,100% { border-color:#0a2e8c; box-shadow:0 0 4px #4f9dff33; text-shadow:none; color:#7eb8ff; }
-  55%     { border-color:#4f9dff; box-shadow:0 0 8px #4f9dff88; }
-  60%     { border-color:#a8d4ff; box-shadow:0 0 18px #4f9dffee,0 0 5px #fff; text-shadow:0 0 10px #a8d4ffee; color:#d0eaff; }
-  63%     { border-color:#4f9dff; box-shadow:0 0 8px #4f9dff88; }
-  66%     { border-color:#a8d4ff; box-shadow:0 0 14px #4f9dffcc; text-shadow:0 0 8px #a8d4ffcc; color:#d0eaff; }
-  70%     { border-color:#4f9dff; box-shadow:0 0 5px #4f9dff55; color:#7eb8ff; }
+@keyframes zafiro-storm {
+  0%,48%  { border-color:#1a3a7a; box-shadow:0 0 4px #4f9dff22; color:#4070c0; text-shadow:none; }
+  56%     { border-color:#a8d4ff; box-shadow:0 0 28px #ffffffdd,0 0 10px #a8d4ff; color:#fff; text-shadow:0 0 14px #fff,0 0 28px #a8d4ffaa; }
+  60%     { border-color:#3060b0; box-shadow:0 0 8px #4f9dff66; color:#80b0e0; }
+  64%     { border-color:#c0e0ff; box-shadow:0 0 22px #c0e0ffbb,0 0 8px #fff; color:#fff; text-shadow:0 0 12px #ffffffdd; }
+  70%     { border-color:#4f9dff; box-shadow:0 0 10px #4f9dff88; color:#6aacff; text-shadow:0 0 6px #4f9dff66; }
+  100%    { border-color:#1a3a7a; box-shadow:0 0 4px #4f9dff22; color:#4070c0; text-shadow:none; }
 }
 @keyframes zafiro-charge {
-  0%,100%  { background-position:-100% -100%; opacity:0; }
-  55%,75%  { opacity:1; }
-  60%      { background-position:100% 100%; }
+  0%,48%  { background-position:-100% -100%; opacity:0.2; }
+  54%     { background-position:50% 50%; opacity:0.9; }
+  72%,100%{ background-position:200% 200%; opacity:0; }
+}
+@keyframes zafiro-bolt {
+  0%,52%  { background-position:-200% 0; opacity:0; }
+  56%     { background-position:50% 0; opacity:0.95; }
+  60%     { background-position:200% 0; opacity:0; }
+  62%     { background-position:-200% 0; opacity:0; }
+  65%     { background-position:60% 0; opacity:0.7; }
+  70%,100%{ background-position:300% 0; opacity:0; }
 }
 
-/* ── Diamante ×30 ── */
+/* ════════════════════════════════════════════════════════════
+   DIAMANTE ×30 — Prisma Cristal
+   Luz interna que rota lentamente + sparkles en posiciones cambiantes.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--diamante {
-  background: linear-gradient(135deg, #001824 0%, #002233 50%, #001020 100%);
-  border: 2px solid #b9f2ff; color: #fff;
-  animation: diamante-facet 0.9s ease-in-out infinite alternate;
+  background: linear-gradient(135deg, #001020 0%, #001a2e 50%, #001020 100%);
+  border: 2px solid #50b8d8;
+  color: #c0eeff;
+  animation: diamante-cycle 5s linear infinite;
+}
+:is(.badge-name, .ms-badge-preview).badge--diamante::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(255,255,255,0.10) 50deg,
+    rgba(185,242,255,0.16) 80deg,
+    transparent 110deg,
+    rgba(255,255,255,0.06) 190deg,
+    rgba(100,210,255,0.12) 230deg,
+    transparent 265deg,
+    rgba(255,255,255,0.08) 330deg,
+    transparent 360deg
+  );
+  animation: diamante-prism 7s linear infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--diamante::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 40%, rgba(185,242,255,0.10) 60%, transparent 100%);
-  animation: diamante-glint 0.9s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle 2.5px at 20% 28%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(circle 2px   at 76% 64%, rgba(185,242,255,0.85) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 52% 22%, rgba(255,255,255,0.75) 0%, transparent 100%);
+  animation: diamante-sparkle 2.5s ease-in-out infinite;
 }
-@keyframes diamante-facet {
-  0%   { border-color:#70ddff; box-shadow:0 0 6px #b9f2ff55,inset 0 0 5px #b9f2ff22; text-shadow:0 0 5px #b9f2ff77; color:#b9f2ff; }
-  100% { border-color:#ffffff; box-shadow:0 0 18px #ffffffee,0 0 6px #b9f2ff,inset 0 0 10px #b9f2ff33; text-shadow:0 0 14px #ffffffee; color:#fff; }
+@keyframes diamante-cycle {
+  0%   { border-color:#3090b0; box-shadow:0 0 7px #60c8e855,inset 0 0 10px #60c8e822; text-shadow:0 0 7px #60c8e877; color:#90d8f0; }
+  25%  { border-color:#c8f4ff; box-shadow:0 0 22px #ffffffcc,0 0 10px #b9f2ff; color:#fff; text-shadow:0 0 16px #fff; }
+  50%  { border-color:#4878d8; box-shadow:0 0 10px #4878d888; color:#b0c8ff; text-shadow:0 0 8px #4878d855; }
+  75%  { border-color:#70e8c8; box-shadow:0 0 18px #70e8c8aa; color:#d0fff5; text-shadow:0 0 14px #70e8c8aa; }
+  100% { border-color:#3090b0; box-shadow:0 0 7px #60c8e855,inset 0 0 10px #60c8e822; text-shadow:0 0 7px #60c8e877; color:#90d8f0; }
 }
-@keyframes diamante-glint { from{opacity:0.3} to{opacity:1} }
+@keyframes diamante-prism { to { transform: rotate(360deg); } }
+@keyframes diamante-sparkle {
+  0%    { opacity:0.35;
+    background:
+      radial-gradient(circle 2.5px at 20% 28%, rgba(255,255,255,0.95) 0%, transparent 100%),
+      radial-gradient(circle 2px   at 76% 64%, rgba(185,242,255,0.85) 0%, transparent 100%),
+      radial-gradient(circle 1.5px at 52% 22%, rgba(255,255,255,0.75) 0%, transparent 100%);
+  }
+  33%   { opacity:1;
+    background:
+      radial-gradient(circle 2.5px at 82% 72%, rgba(255,255,255,0.95) 0%, transparent 100%),
+      radial-gradient(circle 2px   at 22% 55%, rgba(185,242,255,0.85) 0%, transparent 100%),
+      radial-gradient(circle 1.5px at 60% 82%, rgba(255,255,255,0.75) 0%, transparent 100%);
+  }
+  66%   { opacity:0.6;
+    background:
+      radial-gradient(circle 2.5px at 44% 18%, rgba(255,255,255,0.95) 0%, transparent 100%),
+      radial-gradient(circle 2px   at 88% 38%, rgba(185,242,255,0.85) 0%, transparent 100%),
+      radial-gradient(circle 1.5px at 14% 74%, rgba(255,255,255,0.75) 0%, transparent 100%);
+  }
+  100%  { opacity:0.35;
+    background:
+      radial-gradient(circle 2.5px at 20% 28%, rgba(255,255,255,0.95) 0%, transparent 100%),
+      radial-gradient(circle 2px   at 76% 64%, rgba(185,242,255,0.85) 0%, transparent 100%),
+      radial-gradient(circle 1.5px at 52% 22%, rgba(255,255,255,0.75) 0%, transparent 100%);
+  }
+}
 
-/* ── Amatista ×40 ── */
+/* ════════════════════════════════════════════════════════════
+   AMATISTA ×40 — Vacío Cósmico
+   Estrellas visibles que titilan + nebulosa en movimiento lento.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--amatista {
-  background: radial-gradient(ellipse at 50% 50%, #1a0035 0%, #0d0020 55%, #0c0e1b 100%);
-  border: 2px solid #c084fc; color: #e8c0ff;
-  animation: amatista-void 4s ease-in-out infinite alternate;
+  background: radial-gradient(ellipse at 40% 40%, #160030 0%, #0a0018 55%, #060010 100%);
+  border: 2px solid #5a1080;
+  color: #cc99ff;
+  animation: amatista-void 5s ease-in-out infinite alternate;
+}
+:is(.badge-name, .ms-badge-preview).badge--amatista::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(circle 1.5px at 14% 28%, #ffffff 0%, transparent 100%),
+    radial-gradient(circle 1px   at 38% 18%, #c084fc 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 68% 14%, #ffffff 0%, transparent 100%),
+    radial-gradient(circle 1px   at 84% 52%, #e0b0ff 0%, transparent 100%),
+    radial-gradient(circle 1px   at 22% 68%, #ffffff 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 58% 78%, #c084fc 0%, transparent 100%),
+    radial-gradient(circle 1px   at 90% 22%, #ffffff 0%, transparent 100%),
+    radial-gradient(circle 1px   at 46% 48%, #e0c0ff 0%, transparent 100%),
+    radial-gradient(circle 1px   at 76% 86%, #ffffff 0%, transparent 100%);
+  animation: amatista-stars 3.5s ease-in-out infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--amatista::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, #c084fc22 0%, transparent 60%);
-  animation: amatista-pulse 4s ease-in-out infinite alternate;
+  animation: amatista-nebula 5s ease-in-out infinite alternate;
 }
 @keyframes amatista-void {
-  from { border-color:#3a0070; box-shadow:0 0 4px #c084fc22,inset 0 0 6px #3a007033; text-shadow:0 0 5px #c084fc55; color:#c090f0; }
-  to   { border-color:#e0b0ff; box-shadow:0 0 16px #c084fccc,0 0 28px #c084fc44,inset 0 0 14px #c084fc33; text-shadow:0 0 14px #e8c0ffee; color:#f5e0ff; }
+  from { border-color:#2d0055; box-shadow:0 0 8px #8b00ff33,inset 0 0 12px #1a002833; text-shadow:0 0 7px #c084fc44; color:#b888e0; }
+  to   { border-color:#dd99ff; box-shadow:0 0 28px #c084fccc,0 0 50px #8b00ff44,inset 0 0 20px #c084fc22; text-shadow:0 0 22px #e8c0ffee,0 0 44px #c084fc66; color:#f4e0ff; }
 }
-@keyframes amatista-pulse { from{transform:scale(0.7);opacity:0.2} to{transform:scale(1.3);opacity:0.8} }
+@keyframes amatista-stars {
+  0%   { opacity:0.35; }
+  20%  { opacity:1;    }
+  40%  { opacity:0.5;  }
+  60%  { opacity:0.9;  }
+  80%  { opacity:0.4;  }
+  100% { opacity:1;    }
+}
+@keyframes amatista-nebula {
+  from {
+    background:
+      radial-gradient(ellipse 75% 65% at 28% 38%, #8b00ff28 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 78% 72%, #c084fc1c 0%, transparent 65%);
+  }
+  to {
+    background:
+      radial-gradient(ellipse 65% 55% at 68% 62%, #c084fc30 0%, transparent 65%),
+      radial-gradient(ellipse 75% 55% at 22% 28%, #8b00ff1e 0%, transparent 65%);
+  }
+}
 
-/* ── Legendario ×50 ── */
+/* ════════════════════════════════════════════════════════════
+   LEGENDARIO ×50 — Holográfico Total
+   Rainbow border + color-shift acelerado + shine diagonal.
+   ════════════════════════════════════════════════════════════ */
 :is(.badge-name, .ms-badge-preview).badge--legendario {
-  border: 2px solid transparent; background: #0c0e1b;
-  animation: legendario-text 3s linear infinite;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #07000e 0%, #0a0018 50%, #07000e 100%);
+  animation: legendario-text 1.8s linear infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--legendario::before {
   content: ''; position: absolute; inset: -2px; border-radius: 7px; z-index: -1;
-  background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe400,#00ff88,#00c8ff,#a800ff,#ff0080);
+  background: linear-gradient(90deg, #ff0080, #ff4400, #ffe400, #00ff88, #00c8ff, #a800ff, #ff0080);
   background-size: 300% 100%;
-  animation: badge-rainbow-sweep 2s linear infinite;
+  animation: badge-rainbow-sweep 1.4s linear infinite;
 }
 :is(.badge-name, .ms-badge-preview).badge--legendario::after {
   content: ''; position: absolute; inset: 0; border-radius: 5px; pointer-events: none;
-  background: linear-gradient(90deg,#ff008015,#ff8c0015,#ffe40015,#00ff8815,#00c8ff15,#a800ff15,#ff008015);
-  background-size: 300% 100%;
-  animation: badge-rainbow-sweep 2s linear infinite;
+  background:
+    linear-gradient(90deg, #ff008014, #ff440014, #ffe40014, #00ff8814, #00c8ff14, #a800ff14, #ff008014),
+    linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
+  background-size: 300% 100%, 300% 100%;
+  background-position: 0% 0, -200% 0;
+  animation: legendario-combo 3.5s linear infinite;
 }
 @keyframes legendario-text {
-  0%   { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
-  25%  { color:#ffe490; text-shadow:0 0 8px #ff8c0099; box-shadow:0 0 8px #ff8c0044; }
-  50%  { color:#90ffc8; text-shadow:0 0 8px #00ff8899; box-shadow:0 0 8px #00ff8844; }
-  75%  { color:#90d8ff; text-shadow:0 0 8px #00c8ff99; box-shadow:0 0 8px #00c8ff44; }
-  100% { color:#ff8c9e; text-shadow:0 0 8px #ff008099; box-shadow:0 0 8px #ff008044; }
+  0%   { color:#ff90a8; text-shadow:0 0 12px #ff008099,0 0 24px #ff003344; box-shadow:0 0 12px #ff008055; }
+  16%  { color:#ffd080; text-shadow:0 0 12px #ff880099,0 0 24px #ff440033; box-shadow:0 0 12px #ff880044; }
+  33%  { color:#f8ff88; text-shadow:0 0 12px #ffdd0099; box-shadow:0 0 12px #ffdd0044; }
+  50%  { color:#88ffcc; text-shadow:0 0 12px #00ff8899,0 0 24px #00ff4433; box-shadow:0 0 12px #00ff8855; }
+  66%  { color:#88ddff; text-shadow:0 0 12px #00aaff99,0 0 24px #0066ff33; box-shadow:0 0 12px #00aaff44; }
+  83%  { color:#dd88ff; text-shadow:0 0 12px #aa00ff99,0 0 24px #6600ff33; box-shadow:0 0 12px #aa00ff44; }
+  100% { color:#ff90a8; text-shadow:0 0 12px #ff008099,0 0 24px #ff003344; box-shadow:0 0 12px #ff008055; }
 }
-@keyframes badge-rainbow-sweep { to { background-position:300% 0%; } }
+@keyframes legendario-combo {
+  0%     { background-position: 0% 0, -200% 0; }
+  38%    { background-position: 114% 0, -200% 0; }
+  55%    { background-position: 171% 0, 100% 0; }
+  72%    { background-position: 228% 0, 400% 0; }
+  100%   { background-position: 300% 0, 400% 0; }
+}
+@keyframes badge-rainbow-sweep { to { background-position: 300% 0%; } }
 
 /* ── Chips de hitos con color del marco ── */
 .ms-badge-chip.badge--bronce    { background:#3d150033; border-color:#cd7f32; color:#f0a855; }
