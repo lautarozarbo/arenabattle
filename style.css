@@ -5611,39 +5611,39 @@ td.rank {
 
 /* ── NEÓN ── */
 body[data-profile-theme="neon"] .profile-sheet-wrap { background: #0e0020; }
-body[data-profile-theme="neon"] .pstat-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] .pstat-winrate-fill { background: linear-gradient(90deg, #c084fc, #e879f9); }
-body[data-profile-theme="neon"] .pstat-mode-fill { background: linear-gradient(90deg, #c084fc, #a855f7); }
-body[data-profile-theme="neon"] .pstat-tower-big { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] .pstat-fav-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] .pstat-champs-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+body[data-profile-theme="neon"] #profile-panel .pstat-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+body[data-profile-theme="neon"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #c084fc, #e879f9); }
+body[data-profile-theme="neon"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #c084fc, #a855f7); }
+body[data-profile-theme="neon"] #profile-panel .pstat-tower-big { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+body[data-profile-theme="neon"] #profile-panel .pstat-fav-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+body[data-profile-theme="neon"] #profile-panel .pstat-champs-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
 
 /* ── BOSQUE ── */
 body[data-profile-theme="forest"] .profile-sheet-wrap { background: #060e08; }
-body[data-profile-theme="forest"] .pstat-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] .pstat-winrate-fill { background: linear-gradient(90deg, #2ecc71, #22c55e); }
-body[data-profile-theme="forest"] .pstat-mode-fill { background: linear-gradient(90deg, #2ecc71, #16a34a); }
-body[data-profile-theme="forest"] .pstat-tower-big { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] .pstat-fav-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] .pstat-champs-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+body[data-profile-theme="forest"] #profile-panel .pstat-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+body[data-profile-theme="forest"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #2ecc71, #22c55e); }
+body[data-profile-theme="forest"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #2ecc71, #16a34a); }
+body[data-profile-theme="forest"] #profile-panel .pstat-tower-big { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+body[data-profile-theme="forest"] #profile-panel .pstat-fav-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+body[data-profile-theme="forest"] #profile-panel .pstat-champs-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
 
 /* ── FUEGO ── */
 body[data-profile-theme="fire"] .profile-sheet-wrap { background: #100600; }
-body[data-profile-theme="fire"] .pstat-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] .pstat-winrate-fill { background: linear-gradient(90deg, #ff6600, #ff3300); }
-body[data-profile-theme="fire"] .pstat-mode-fill { background: linear-gradient(90deg, #ff8844, #ff5500); }
-body[data-profile-theme="fire"] .pstat-tower-big { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] .pstat-fav-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] .pstat-champs-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+body[data-profile-theme="fire"] #profile-panel .pstat-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+body[data-profile-theme="fire"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #ff6600, #ff3300); }
+body[data-profile-theme="fire"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #ff8844, #ff5500); }
+body[data-profile-theme="fire"] #profile-panel .pstat-tower-big { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+body[data-profile-theme="fire"] #profile-panel .pstat-fav-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+body[data-profile-theme="fire"] #profile-panel .pstat-champs-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
 
 /* ── ÁRTICO ── */
 body[data-profile-theme="arctic"] .profile-sheet-wrap { background: #04080e; }
-body[data-profile-theme="arctic"] .pstat-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] .pstat-winrate-fill { background: linear-gradient(90deg, #60c8e8, #40a8c8); }
-body[data-profile-theme="arctic"] .pstat-mode-fill { background: linear-gradient(90deg, #60c8e8, #2090b8); }
-body[data-profile-theme="arctic"] .pstat-tower-big { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] .pstat-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #60c8e8, #40a8c8); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #60c8e8, #2090b8); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-tower-big { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+body[data-profile-theme="arctic"] #profile-panel .pstat-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    PUBLIC PROFILE THEMES — scoped to .user-profile-modal[data-theme]
