@@ -1,15 +1,11 @@
-import { loadMissions, setActiveBadge } from '../persistence/missionsSave.js';
+import { loadMissions } from '../persistence/missionsSave.js';
 import {
   MISSION_CATEGORIES, STREAK_MILESTONES, BADGES,
   getCategoryMission, CAT_LEVELS_COUNT,
+  getCategoryWinMission, WIN_CAT_LEVELS_COUNT, PROFILE_SKINS, SKIN_REWARD_BY_CAT,
 } from '../missions/definitions.js';
-import { applyBadgeToElement } from './badge.js';
-
-let _onBadgeChange = null;
 
 export function initMissionsUI({ onBadgeChange }) {
-  _onBadgeChange = onBadgeChange;
-
   document.getElementById('btn-misiones').addEventListener('click', () => {
     openMissions();
   });
@@ -39,35 +35,57 @@ const CAT_ABBR = {
   'Invocación':      'IN',
 };
 
+function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
+  const isDone  = cp.level >= levelsCount;
+  const mission = isDone ? null : getMission(cat, cp.level);
+  const count   = isDone ? (getMission(cat, levelsCount - 1)?.target ?? 0) : cp.count;
+  const target  = isDone ? (getMission(cat, levelsCount - 1)?.target ?? 0) : mission.target;
+  const pct     = isDone ? 100 : Math.min(100, Math.round((count / target) * 100));
+  const levelLabel = isDone ? `${levelsCount}/${levelsCount}` : `Niv. ${cp.level + 1}/${levelsCount}`;
+
+  let rewardHtml = '';
+  if (!isDone && mission) {
+    rewardHtml = `<span class="ms-xp-reward">+${mission.xp} XP</span>`;
+  }
+  if (type === 'win') {
+    const skinId   = SKIN_REWARD_BY_CAT[cat];
+    const skinMeta = skinId ? PROFILE_SKINS[skinId] : null;
+    if (isDone) {
+      rewardHtml = skinMeta ? `<span class="ms-skin-reward ms-skin-reward--done">✓ Skin "${skinMeta.name}" desbloqueado</span>` : '';
+    } else if (cp.level === levelsCount - 1 && mission) {
+      rewardHtml += skinMeta ? `<span class="ms-skin-reward">🎨 Recompensa: Skin "${skinMeta.name}"</span>` : '';
+    }
+  }
+
+  return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}" style="--cat-color:${color}">
+    <div class="ms-mission-header">
+      <span class="ms-cat-abbr" style="background:${color}22;color:${color};border-color:${color}44">${abbr}</span>
+      <span class="ms-cat-name">${cat}</span>
+      <span class="ms-level-tag">${levelLabel}</span>
+    </div>
+    <div class="ms-mission-label">${isDone ? 'Todas las misiones completadas' : mission.label}</div>
+    <div class="ms-progress-row">
+      <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="ms-progress-text">${isDone ? 'Completado' : `${count}/${target}`}</span>
+    </div>
+    ${rewardHtml}
+  </div>`;
+}
+
 function _render() {
   const state = loadMissions();
   const modal = document.getElementById('missions-modal');
 
-  // ── Category missions ────────────────────────────────────────────────────
-  const catHtml = MISSION_CATEGORIES.map(cat => {
-    const cp      = state.categoryPlay[cat] ?? { level: 0, count: 0 };
-    const isDone  = cp.level >= CAT_LEVELS_COUNT;
-    const mission = isDone ? null : getCategoryMission(cat, cp.level);
-    const count   = isDone ? (getCategoryMission(cat, CAT_LEVELS_COUNT - 1)?.target ?? 0) : cp.count;
-    const target  = isDone ? (getCategoryMission(cat, CAT_LEVELS_COUNT - 1)?.target ?? 0) : mission.target;
-    const pct     = isDone ? 100 : Math.min(100, Math.round((count / target) * 100));
-    const color   = CAT_COLOR[cat] ?? '#7c9dff';
-    const abbr    = CAT_ABBR[cat]  ?? '??';
-    const levelLabel = isDone ? `${CAT_LEVELS_COUNT}/${CAT_LEVELS_COUNT}` : `Niv. ${cp.level + 1}/${CAT_LEVELS_COUNT}`;
+  // ── Category play ────────────────────────────────────────────────────────
+  const catPlayHtml = MISSION_CATEGORIES.map(cat => {
+    const cp    = state.categoryPlay[cat] ?? { level: 0, count: 0 };
+    return _missionCardHtml(cat, cp, getCategoryMission, CAT_LEVELS_COUNT, CAT_COLOR[cat] ?? '#7c9dff', CAT_ABBR[cat] ?? '??', 'play');
+  }).join('');
 
-    return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}" style="--cat-color:${color}">
-      <div class="ms-mission-header">
-        <span class="ms-cat-abbr" style="background:${color}22;color:${color};border-color:${color}44">${abbr}</span>
-        <span class="ms-cat-name">${cat}</span>
-        <span class="ms-level-tag">${levelLabel}</span>
-      </div>
-      <div class="ms-mission-label">${isDone ? 'Todas las misiones completadas' : mission.label}</div>
-      <div class="ms-progress-row">
-        <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%;background:${color}"></div></div>
-        <span class="ms-progress-text">${isDone ? 'Completado' : `${count}/${target}`}</span>
-      </div>
-      ${!isDone ? `<span class="ms-xp-reward">+${mission.xp} XP</span>` : ''}
-    </div>`;
+  // ── Category win ─────────────────────────────────────────────────────────
+  const catWinHtml = MISSION_CATEGORIES.map(cat => {
+    const cw    = state.categoryWin?.[cat] ?? { level: 0, count: 0 };
+    return _missionCardHtml(cat, cw, getCategoryWinMission, WIN_CAT_LEVELS_COUNT, CAT_COLOR[cat] ?? '#7c9dff', CAT_ABBR[cat] ?? '??', 'win');
   }).join('');
 
   // ── Streak missions ───────────────────────────────────────────────────────
@@ -93,22 +111,6 @@ function _render() {
     </div>`;
   }).join('');
 
-  // ── Badge selector ───────────────────────────────────────────────────────
-  const unlocked = state.unlockedBadges ?? [];
-  const active   = state.activeBadge;
-  const badgeHtml = unlocked.length === 0
-    ? `<p class="ms-empty">Completá misiones de racha para desbloquear marcos.</p>`
-    : `<div class="ms-badge-grid">${
-        [null, ...unlocked].map(bid => {
-          const isActive = bid === active;
-          const meta = bid ? BADGES[bid] : null;
-          return `<button class="ms-badge-btn ${isActive ? 'ms-badge-btn--active' : ''}" data-badge="${bid ?? ''}">
-            <span class="ms-badge-preview ${bid ? `badge--${bid.replace('badge_', '')}` : 'badge--none'}">Aa</span>
-            <span class="ms-badge-name">${meta ? meta.name : 'Sin marco'}</span>
-          </button>`;
-        }).join('')
-      }</div>`;
-
   modal.querySelector('#missions-content').innerHTML = `
     <div class="ms-streak-counter">
       <div class="ms-streak-number">${curStreak}</div>
@@ -120,27 +122,17 @@ function _render() {
 
     <div class="ms-section">
       <div class="ms-section-header">Partidas por categoría</div>
-      <div class="ms-missions-list">${catHtml}</div>
+      <div class="ms-missions-list">${catPlayHtml}</div>
+    </div>
+
+    <div class="ms-section">
+      <div class="ms-section-header">Victorias por categoría</div>
+      <div class="ms-missions-list">${catWinHtml}</div>
     </div>
 
     <div class="ms-section">
       <div class="ms-section-header">Victorias seguidas</div>
       <div class="ms-missions-list">${streakHtml}</div>
     </div>
-
-    <div class="ms-section">
-      <div class="ms-section-header">Marcos de nombre</div>
-      ${badgeHtml}
-    </div>
   `;
-
-  // Badge selection
-  modal.querySelectorAll('.ms-badge-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const bid = btn.dataset.badge || null;
-      setActiveBadge(bid);
-      _onBadgeChange?.(bid);
-      _render();
-    });
-  });
 }

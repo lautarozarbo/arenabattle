@@ -24,6 +24,39 @@ export function getCategoryMission(category, level) {
 
 export const CAT_LEVELS_COUNT = CAT_TARGETS.length;
 
+// Category WIN ladder — 5 levels, final level unlocks a profile skin
+const WIN_TARGETS = [5, 20, 50, 100, 200];
+const WIN_XP      = [30, 80, 150, 300, 600];
+export const WIN_CAT_LEVELS_COUNT = WIN_TARGETS.length;
+
+export function getCategoryWinMission(category, level) {
+  if (level >= WIN_TARGETS.length) return null;
+  return {
+    id:     `catwin_${_catKey(category)}_${level}`,
+    type:   'category_win',
+    category,
+    level,
+    target: WIN_TARGETS[level],
+    xp:     WIN_XP[level],
+    label:  `Ganar ${WIN_TARGETS[level]} partidas con ${category}`,
+  };
+}
+
+// Profile skins unlocked by completing all 5 win levels per category
+export const PROFILE_SKINS = {
+  skin_cuerpo:      { name: 'Sangre',   category: 'Cuerpo a cuerpo', cssTheme: 'skin_cuerpo',      color: '#8b0000' },
+  skin_proyectiles: { name: 'Galaxia',  category: 'Proyectiles',     cssTheme: 'skin_proyectiles', color: '#0a1a4a' },
+  skin_zona:        { name: 'Abismo',   category: 'Control de zona', cssTheme: 'skin_zona',        color: '#060608' },
+  skin_invocacion:  { name: 'Raíces',   category: 'Invocación',      cssTheme: 'skin_invocacion',  color: '#1a2e0a' },
+};
+
+export const SKIN_REWARD_BY_CAT = {
+  'Cuerpo a cuerpo': 'skin_cuerpo',
+  'Proyectiles':     'skin_proyectiles',
+  'Control de zona': 'skin_zona',
+  'Invocación':      'skin_invocacion',
+};
+
 // Win streak milestones
 export const STREAK_MILESTONES = [
   { target:  5, xp:   50, badge: 'badge_bronce'     },

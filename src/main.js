@@ -1671,7 +1671,7 @@ initTournamentUI(_sharedDeps);
 
 // ── Missions & Customization ──────────────────────────────────────────────────
 initMissionsUI({ onBadgeChange: _applyPlayerBadge });
-initCustomizeUI();
+initCustomizeUI({ onBadgeChange: _applyPlayerBadge });
 syncMissionsFromCloud().then(() => _applyPlayerBadge(loadMissions().activeBadge));
 
 function _applyPlayerBadge(badgeId) {

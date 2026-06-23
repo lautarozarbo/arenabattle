@@ -5,7 +5,11 @@
  */
 
 import { supabase } from '../supabase.js';
-import { MISSION_CATEGORIES, STREAK_MILESTONES, getCategoryMission, CAT_LEVELS_COUNT } from '../missions/definitions.js';
+import {
+  MISSION_CATEGORIES, STREAK_MILESTONES,
+  getCategoryMission, CAT_LEVELS_COUNT,
+  getCategoryWinMission, WIN_CAT_LEVELS_COUNT, SKIN_REWARD_BY_CAT,
+} from '../missions/definitions.js';
 
 const LS_KEY = 'arena_missions';
 
@@ -13,13 +17,17 @@ const LS_KEY = 'arena_missions';
 
 function _defaultState() {
   const categoryPlay = {};
+  const categoryWin  = {};
   for (const cat of MISSION_CATEGORIES) {
     categoryPlay[cat] = { level: 0, count: 0 };
+    categoryWin[cat]  = { level: 0, count: 0 };
   }
   return {
     categoryPlay,
+    categoryWin,
     winStreak: { current: 0, completed: [] },
     unlockedBadges: [],
+    unlockedSkins: [],
     activeBadge: null,
   };
 }
@@ -34,9 +42,11 @@ export function loadMissions() {
     // Merge so new fields from _defaultState are always present
     const def = _defaultState();
     return {
-      categoryPlay:   { ...def.categoryPlay,   ...(parsed.categoryPlay   ?? {}) },
-      winStreak:      { ...def.winStreak,       ...(parsed.winStreak      ?? {}) },
+      categoryPlay:   { ...def.categoryPlay,  ...(parsed.categoryPlay  ?? {}) },
+      categoryWin:    { ...def.categoryWin,   ...(parsed.categoryWin   ?? {}) },
+      winStreak:      { ...def.winStreak,     ...(parsed.winStreak     ?? {}) },
       unlockedBadges: parsed.unlockedBadges ?? [],
+      unlockedSkins:  parsed.unlockedSkins  ?? [],
       activeBadge:    parsed.activeBadge    ?? null,
     };
   } catch { return _defaultState(); }
@@ -84,24 +94,28 @@ export async function syncMissionsFromCloud() {
 }
 
 function _mergeStates(a, b) {
-  // Take whichever has more progress per field
   const categoryPlay = {};
+  const categoryWin  = {};
   for (const cat of MISSION_CATEGORIES) {
-    const ac = a.categoryPlay?.[cat] ?? { level: 0, count: 0 };
-    const bc = b.categoryPlay?.[cat] ?? { level: 0, count: 0 };
-    categoryPlay[cat] = (bc.level > ac.level || (bc.level === ac.level && bc.count > ac.count)) ? bc : ac;
+    const _best = (ac, bc) =>
+      (bc.level > ac.level || (bc.level === ac.level && bc.count > ac.count)) ? bc : ac;
+    categoryPlay[cat] = _best(a.categoryPlay?.[cat] ?? { level:0, count:0 }, b.categoryPlay?.[cat] ?? { level:0, count:0 });
+    categoryWin[cat]  = _best(a.categoryWin?.[cat]  ?? { level:0, count:0 }, b.categoryWin?.[cat]  ?? { level:0, count:0 });
   }
   const aStreak = a.winStreak ?? { current: 0, completed: [] };
   const bStreak = b.winStreak ?? { current: 0, completed: [] };
   const completedSet = new Set([...(aStreak.completed ?? []), ...(bStreak.completed ?? [])]);
   const badgeSet = new Set([...(a.unlockedBadges ?? []), ...(b.unlockedBadges ?? [])]);
+  const skinSet  = new Set([...(a.unlockedSkins  ?? []), ...(b.unlockedSkins  ?? [])]);
   return {
     categoryPlay,
+    categoryWin,
     winStreak: {
       current:   Math.max(aStreak.current ?? 0, bStreak.current ?? 0),
       completed: [...completedSet],
     },
     unlockedBadges: [...badgeSet],
+    unlockedSkins:  [...skinSet],
     activeBadge:    b.activeBadge ?? a.activeBadge ?? null,
   };
 }
@@ -128,6 +142,28 @@ export function recordMissionEvent(charCategory, won) {
         rewards.push({ type: 'category', label: mission.label, xp: mission.xp });
         cp.level++;
         cp.count = 0;
+      }
+    }
+  }
+
+  // ── Category win ───────────────────────────────────────────────────────────
+  if (won === true && charCategory && state.categoryWin[charCategory] !== undefined) {
+    const cw = state.categoryWin[charCategory];
+    if (cw.level < WIN_CAT_LEVELS_COUNT) {
+      cw.count++;
+      const mission = getCategoryWinMission(charCategory, cw.level);
+      if (cw.count >= mission.target) {
+        const reward = { type: 'category_win', label: mission.label, xp: mission.xp };
+        cw.level++;
+        cw.count = 0;
+        if (cw.level >= WIN_CAT_LEVELS_COUNT) {
+          const skinId = SKIN_REWARD_BY_CAT[charCategory];
+          if (skinId && !state.unlockedSkins.includes(skinId)) {
+            state.unlockedSkins.push(skinId);
+            reward.skin = skinId;
+          }
+        }
+        rewards.push(reward);
       }
     }
   }
