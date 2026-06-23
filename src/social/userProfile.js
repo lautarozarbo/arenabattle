@@ -4,11 +4,14 @@ import { refreshFriendsBadge } from './friends.js';
 import { loadComments, renderCommentsSection, wireComments, clearProfileCommentsBadge } from './profileComments.js';
 import { showConfirm } from '../ui/confirmDialog.js';
 import { badgeNameHtml } from '../ui/badge.js';
+import { applyThemeToModal } from '../ui/customizeUI.js';
 
 export async function openUserProfile(userId) {
   const modal   = document.getElementById('user-profile-modal');
+  const panel   = modal.querySelector('.user-profile-modal');
   const content = document.getElementById('user-profile-content');
   modal.classList.remove('hidden');
+  delete panel.dataset.theme; // clear previous user's theme while loading
   content.innerHTML = '<div class="up-loading">Cargando...</div>';
 
   const [{ data: profile }, { data: stats }, { data: sessionData }] = await Promise.all([
@@ -114,6 +117,8 @@ export async function openUserProfile(userId) {
   const comments = await loadComments(userId);
   const lastSeenHtml = _formatLastSeen(profile.last_seen);
   const friendBtnHtml = _renderFriendBtn(rel, myId, userId);
+
+  applyThemeToModal(panel, s.missions_progress?.profileTheme ?? '');
 
   content.innerHTML = `
     <div class="up-hero">

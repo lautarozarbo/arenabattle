@@ -5644,3 +5644,48 @@ body[data-profile-theme="arctic"] .pstat-mode-fill { background: linear-gradient
 body[data-profile-theme="arctic"] .pstat-tower-big { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 body[data-profile-theme="arctic"] .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 body[data-profile-theme="arctic"] .pstat-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PUBLIC PROFILE THEMES — scoped to .user-profile-modal[data-theme]
+   Applied per-user when opening their profile. No bleed to rest of the page.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── NEÓN ── */
+.user-profile-modal[data-theme="neon"] { background: #0e0020; }
+.user-profile-modal[data-theme="neon"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #2d0060 0%, transparent 70%); }
+.user-profile-modal[data-theme="neon"] .up-pill { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+.user-profile-modal[data-theme="neon"] .up-winrate-fill { background: linear-gradient(90deg, #c084fc, #e879f9); }
+.user-profile-modal[data-theme="neon"] .up-mode-fill { background: linear-gradient(90deg, #c084fc, #a855f7); }
+.user-profile-modal[data-theme="neon"] .pstat-tower-big { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+.user-profile-modal[data-theme="neon"] .pstat-fav-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+.user-profile-modal[data-theme="neon"] .up-champs-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
+
+/* ── BOSQUE ── */
+.user-profile-modal[data-theme="forest"] { background: #060e08; }
+.user-profile-modal[data-theme="forest"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #0d3016 0%, transparent 70%); }
+.user-profile-modal[data-theme="forest"] .up-pill { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+.user-profile-modal[data-theme="forest"] .up-winrate-fill { background: linear-gradient(90deg, #2ecc71, #22c55e); }
+.user-profile-modal[data-theme="forest"] .up-mode-fill { background: linear-gradient(90deg, #2ecc71, #16a34a); }
+.user-profile-modal[data-theme="forest"] .pstat-tower-big { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+.user-profile-modal[data-theme="forest"] .pstat-fav-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+.user-profile-modal[data-theme="forest"] .up-champs-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
+
+/* ── FUEGO ── */
+.user-profile-modal[data-theme="fire"] { background: #100600; }
+.user-profile-modal[data-theme="fire"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #3d0c00 0%, transparent 70%); }
+.user-profile-modal[data-theme="fire"] .up-pill { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+.user-profile-modal[data-theme="fire"] .up-winrate-fill { background: linear-gradient(90deg, #ff6600, #ff3300); }
+.user-profile-modal[data-theme="fire"] .up-mode-fill { background: linear-gradient(90deg, #ff8844, #ff5500); }
+.user-profile-modal[data-theme="fire"] .pstat-tower-big { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+.user-profile-modal[data-theme="fire"] .pstat-fav-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+.user-profile-modal[data-theme="fire"] .up-champs-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
+
+/* ── ÁRTICO ── */
+.user-profile-modal[data-theme="arctic"] { background: #04080e; }
+.user-profile-modal[data-theme="arctic"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #001828 0%, transparent 70%); }
+.user-profile-modal[data-theme="arctic"] .up-pill { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+.user-profile-modal[data-theme="arctic"] .up-winrate-fill { background: linear-gradient(90deg, #60c8e8, #40a8c8); }
+.user-profile-modal[data-theme="arctic"] .up-mode-fill { background: linear-gradient(90deg, #60c8e8, #2090b8); }
+.user-profile-modal[data-theme="arctic"] .pstat-tower-big { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+.user-profile-modal[data-theme="arctic"] .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
+.user-profile-modal[data-theme="arctic"] .up-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
