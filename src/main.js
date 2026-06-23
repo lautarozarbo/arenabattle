@@ -121,6 +121,7 @@ import { loadLeagueCloud, loadTournamentCloud } from "./persistence/competitionS
 import { summarizeUpgrades } from "./modes/tower/TowerUpgrades.js";
 import { recordMissionEvent, loadMissions, syncMissionsFromCloud } from "./persistence/missionsSave.js";
 import { initMissionsUI } from "./ui/missionsUI.js";
+import { initCustomizeUI } from "./ui/customizeUI.js";
 import { applyBadgeToElement } from "./ui/badge.js";
 import { POWER_CATEGORIES } from "./powers/registry.js";
 
@@ -1668,8 +1669,9 @@ const _sharedDeps = {
 initLeagueUI(_sharedDeps);
 initTournamentUI(_sharedDeps);
 
-// ── Missions ──────────────────────────────────────────────────────────────────
+// ── Missions & Customization ──────────────────────────────────────────────────
 initMissionsUI({ onBadgeChange: _applyPlayerBadge });
+initCustomizeUI();
 syncMissionsFromCloud().then(() => _applyPlayerBadge(loadMissions().activeBadge));
 
 function _applyPlayerBadge(badgeId) {

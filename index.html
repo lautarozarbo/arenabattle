@@ -155,7 +155,10 @@
         <!-- Center overlay: logo + XP bar -->
         <div class="menu-overlay">
           <div class="menu-logo-block">
-            <button id="btn-misiones">Misiones</button>
+            <div class="menu-top-btns">
+              <button id="btn-misiones">Misiones</button>
+              <button id="btn-personalizacion">Personalización</button>
+            </div>
             <span class="menu-app-name">ARENA</span>
             <div class="xp-bar-wrap" id="xp-bar-wrap">
               <div class="xp-track-group">
@@ -1342,6 +1345,48 @@
             Iniciar sesión
           </button>
         </form>
+      </div>
+    </div>
+
+    <!-- ── Personalización Modal ──────────────────────── -->
+    <div id="customize-modal" class="hidden">
+      <div class="cz-panel">
+        <div class="cz-header">
+          <span class="cz-title">Personalización</span>
+          <button class="cz-close" id="btn-customize-close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="cz-section-label">Tema del perfil</div>
+        <div class="cz-themes" id="cz-themes-grid">
+          <div class="cz-theme-card" data-theme="">
+            <div class="cz-theme-swatch cz-swatch-default"></div>
+            <div class="cz-theme-name">Predeterminado</div>
+            <div class="cz-theme-desc">Azul oscuro clásico</div>
+          </div>
+          <div class="cz-theme-card" data-theme="neon">
+            <div class="cz-theme-swatch cz-swatch-neon"></div>
+            <div class="cz-theme-name">Neón</div>
+            <div class="cz-theme-desc">Violeta y púrpura vibrante</div>
+          </div>
+          <div class="cz-theme-card" data-theme="forest">
+            <div class="cz-theme-swatch cz-swatch-forest"></div>
+            <div class="cz-theme-name">Bosque</div>
+            <div class="cz-theme-desc">Verde oscuro natural</div>
+          </div>
+          <div class="cz-theme-card" data-theme="fire">
+            <div class="cz-theme-swatch cz-swatch-fire"></div>
+            <div class="cz-theme-name">Fuego</div>
+            <div class="cz-theme-desc">Rojo y naranja ardiente</div>
+          </div>
+          <div class="cz-theme-card" data-theme="arctic">
+            <div class="cz-theme-swatch cz-swatch-arctic"></div>
+            <div class="cz-theme-name">Ártico</div>
+            <div class="cz-theme-desc">Azul hielo frío</div>
+          </div>
+        </div>
       </div>
     </div>
 
