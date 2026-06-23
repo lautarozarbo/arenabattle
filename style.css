@@ -4994,44 +4994,35 @@ td.rank {
 
 /* shared base for both top buttons */
 .menu-top-btns button {
-  position: relative; isolation: isolate;
-  background: rgba(10,12,24,0.88);
-  background-clip: padding-box;
-  border: 1px solid transparent;
+  background: rgba(10,12,24,0.70);
   border-radius: 20px;
   padding: 4px 12px;
   cursor: pointer;
   font-size: 0.60rem; font-weight: 700; letter-spacing: 0.10em;
   text-transform: uppercase;
-  transition: color 0.2s;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
   pointer-events: auto;
 }
 
-/* ── Missions button — animated gradient border ── */
-#btn-misiones { color: rgba(124,157,255,0.85); }
-#btn-misiones::before {
-  content: '';
-  position: absolute; inset: -1px; border-radius: 21px; z-index: -1;
-  background: linear-gradient(90deg, #7c9dff, #c084fc, #f472b6, #7c9dff);
-  background-size: 300% 100%;
-  animation: missions-border-run 2.5s linear infinite;
+#btn-misiones {
+  border: 1.5px solid rgba(124,157,255,0.45);
+  color: rgba(124,157,255,0.80);
 }
-#btn-misiones:hover { color: #c8d8ff; }
-@keyframes missions-border-run {
-  from { background-position: 0% 0; }
-  to   { background-position: 300% 0; }
+#btn-misiones:hover {
+  border-color: rgba(124,157,255,0.80);
+  color: #7c9dff;
+  background: rgba(124,157,255,0.10);
 }
 
-/* ── Personalización button — static gold-green gradient border ── */
-#btn-personalizacion { color: rgba(250,196,100,0.85); }
-#btn-personalizacion::before {
-  content: '';
-  position: absolute; inset: -1px; border-radius: 21px; z-index: -1;
-  background: linear-gradient(90deg, #fbbf24, #34d399, #a78bfa, #fbbf24);
-  background-size: 300% 100%;
-  animation: missions-border-run 4s linear infinite reverse;
+#btn-personalizacion {
+  border: 1.5px solid rgba(251,191,36,0.45);
+  color: rgba(251,191,36,0.80);
 }
-#btn-personalizacion:hover { color: #fde68a; }
+#btn-personalizacion:hover {
+  border-color: rgba(251,191,36,0.80);
+  color: #fbbf24;
+  background: rgba(251,191,36,0.08);
+}
 
 /* ── Missions panel ──────────────────────────────────────────────────────────── */
 .ms-panel {
@@ -5614,73 +5605,42 @@ td.rank {
 
 /* ══════════════════════════════════════════════════════════════════════════════
    PROFILE THEMES — overrides applied via body[data-profile-theme="X"]
-   Targets: own profile sheet + public profile modal
+   Solo afectan el perfil PROPIO (#profile-panel / .profile-sheet-wrap, pstat-*)
+   NO tocan el modal de perfil público (#user-profile-modal / up-*)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 /* ── NEÓN ── */
 body[data-profile-theme="neon"] .profile-sheet-wrap { background: #0e0020; }
-body[data-profile-theme="neon"] .profile-hero { background: radial-gradient(ellipse at 50% 0%, #2d0060 0%, transparent 70%); }
 body[data-profile-theme="neon"] .pstat-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] .pstat-stat-row { background: rgba(176,0,255,0.06); border-color: rgba(192,132,252,0.12); }
 body[data-profile-theme="neon"] .pstat-winrate-fill { background: linear-gradient(90deg, #c084fc, #e879f9); }
 body[data-profile-theme="neon"] .pstat-mode-fill { background: linear-gradient(90deg, #c084fc, #a855f7); }
 body[data-profile-theme="neon"] .pstat-tower-big { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
 body[data-profile-theme="neon"] .pstat-fav-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
 body[data-profile-theme="neon"] .pstat-champs-card { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] #user-profile-modal { background: #0e0020; }
-body[data-profile-theme="neon"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #2d0060 0%, transparent 70%); }
-body[data-profile-theme="neon"] .up-pill { background: rgba(176,0,255,0.09); border-color: rgba(192,132,252,0.22); }
-body[data-profile-theme="neon"] .up-winrate-fill { background: linear-gradient(90deg, #c084fc, #e879f9); }
-body[data-profile-theme="neon"] .up-mode-fill { background: linear-gradient(90deg, #c084fc, #a855f7); }
-body[data-profile-theme="neon"] .up-section { border-color: rgba(192,132,252,0.10); }
 
 /* ── BOSQUE ── */
 body[data-profile-theme="forest"] .profile-sheet-wrap { background: #060e08; }
-body[data-profile-theme="forest"] .profile-hero { background: radial-gradient(ellipse at 50% 0%, #0d3016 0%, transparent 70%); }
 body[data-profile-theme="forest"] .pstat-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] .pstat-stat-row { background: rgba(46,204,113,0.05); border-color: rgba(46,204,113,0.10); }
 body[data-profile-theme="forest"] .pstat-winrate-fill { background: linear-gradient(90deg, #2ecc71, #22c55e); }
 body[data-profile-theme="forest"] .pstat-mode-fill { background: linear-gradient(90deg, #2ecc71, #16a34a); }
 body[data-profile-theme="forest"] .pstat-tower-big { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
 body[data-profile-theme="forest"] .pstat-fav-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
 body[data-profile-theme="forest"] .pstat-champs-card { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] #user-profile-modal { background: #060e08; }
-body[data-profile-theme="forest"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #0d3016 0%, transparent 70%); }
-body[data-profile-theme="forest"] .up-pill { background: rgba(46,204,113,0.07); border-color: rgba(46,204,113,0.18); }
-body[data-profile-theme="forest"] .up-winrate-fill { background: linear-gradient(90deg, #2ecc71, #22c55e); }
-body[data-profile-theme="forest"] .up-mode-fill { background: linear-gradient(90deg, #2ecc71, #16a34a); }
-body[data-profile-theme="forest"] .up-section { border-color: rgba(46,204,113,0.10); }
 
 /* ── FUEGO ── */
 body[data-profile-theme="fire"] .profile-sheet-wrap { background: #100600; }
-body[data-profile-theme="fire"] .profile-hero { background: radial-gradient(ellipse at 50% 0%, #3d0c00 0%, transparent 70%); }
 body[data-profile-theme="fire"] .pstat-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] .pstat-stat-row { background: rgba(255,80,0,0.05); border-color: rgba(255,100,0,0.12); }
 body[data-profile-theme="fire"] .pstat-winrate-fill { background: linear-gradient(90deg, #ff6600, #ff3300); }
 body[data-profile-theme="fire"] .pstat-mode-fill { background: linear-gradient(90deg, #ff8844, #ff5500); }
 body[data-profile-theme="fire"] .pstat-tower-big { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
 body[data-profile-theme="fire"] .pstat-fav-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
 body[data-profile-theme="fire"] .pstat-champs-card { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] #user-profile-modal { background: #100600; }
-body[data-profile-theme="fire"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #3d0c00 0%, transparent 70%); }
-body[data-profile-theme="fire"] .up-pill { background: rgba(255,80,0,0.08); border-color: rgba(255,120,0,0.22); }
-body[data-profile-theme="fire"] .up-winrate-fill { background: linear-gradient(90deg, #ff6600, #ff3300); }
-body[data-profile-theme="fire"] .up-mode-fill { background: linear-gradient(90deg, #ff8844, #ff5500); }
-body[data-profile-theme="fire"] .up-section { border-color: rgba(255,100,0,0.10); }
 
 /* ── ÁRTICO ── */
 body[data-profile-theme="arctic"] .profile-sheet-wrap { background: #04080e; }
-body[data-profile-theme="arctic"] .profile-hero { background: radial-gradient(ellipse at 50% 0%, #001828 0%, transparent 70%); }
 body[data-profile-theme="arctic"] .pstat-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] .pstat-stat-row { background: rgba(96,200,232,0.04); border-color: rgba(96,200,232,0.10); }
 body[data-profile-theme="arctic"] .pstat-winrate-fill { background: linear-gradient(90deg, #60c8e8, #40a8c8); }
 body[data-profile-theme="arctic"] .pstat-mode-fill { background: linear-gradient(90deg, #60c8e8, #2090b8); }
 body[data-profile-theme="arctic"] .pstat-tower-big { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 body[data-profile-theme="arctic"] .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 body[data-profile-theme="arctic"] .pstat-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] #user-profile-modal { background: #04080e; }
-body[data-profile-theme="arctic"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #001828 0%, transparent 70%); }
-body[data-profile-theme="arctic"] .up-pill { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
-body[data-profile-theme="arctic"] .up-winrate-fill { background: linear-gradient(90deg, #60c8e8, #40a8c8); }
-body[data-profile-theme="arctic"] .up-mode-fill { background: linear-gradient(90deg, #60c8e8, #2090b8); }
-body[data-profile-theme="arctic"] .up-section { border-color: rgba(96,200,232,0.10); }
