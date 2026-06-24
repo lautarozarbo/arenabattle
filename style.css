@@ -5005,23 +5005,23 @@ td.rank {
 }
 
 #btn-misiones {
-  border: 1.5px solid rgba(124,157,255,0.45);
-  color: rgba(124,157,255,0.80);
+  border: 1.5px solid rgba(167,100,255,0.50);
+  color: rgba(167,100,255,0.85);
 }
 #btn-misiones:hover {
-  border-color: rgba(124,157,255,0.80);
-  color: #7c9dff;
-  background: rgba(124,157,255,0.10);
+  border-color: rgba(167,100,255,0.90);
+  color: #a764ff;
+  background: rgba(167,100,255,0.12);
 }
 
 #btn-personalizacion {
-  border: 1.5px solid rgba(251,191,36,0.45);
-  color: rgba(251,191,36,0.80);
+  border: 1.5px solid rgba(255,120,30,0.50);
+  color: rgba(255,120,30,0.85);
 }
 #btn-personalizacion:hover {
-  border-color: rgba(251,191,36,0.80);
-  color: #fbbf24;
-  background: rgba(251,191,36,0.08);
+  border-color: rgba(255,120,30,0.90);
+  color: #ff781e;
+  background: rgba(255,120,30,0.10);
 }
 
 /* ── Missions panel ──────────────────────────────────────────────────────────── */
@@ -5115,6 +5115,8 @@ td.rank {
 .ms-xp-reward     { font-size: 0.68rem; color: #a5f3af; margin-top: 5px; display: block; }
 .ms-skin-reward   { font-size: 0.68rem; color: #fbbf24; margin-top: 4px; display: block; }
 .ms-skin-reward--done { color: #4ade80; }
+.ms-skin-reward--epic { color: #e879f9; font-weight: 600; }
+.ms-skin-reward--epic.ms-skin-reward--done { color: #a855f7; }
 .ms-badge-chip {
   margin-left: auto; font-size: 0.60rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
   background: rgba(124,157,255,0.10); border: 1px solid rgba(124,157,255,0.25); color: #7c9dff;
@@ -5551,7 +5553,7 @@ td.rank {
 .cz-panel {
   background: #0e1022; border: 1px solid rgba(255,255,255,0.10);
   border-radius: 20px; width: 100%; max-width: 380px;
-  max-height: 80vh; overflow-y: auto;
+  height: 80vh; display: flex; flex-direction: column;
   box-shadow: 0 16px 60px rgba(0,0,0,0.6);
 }
 .cz-header {
@@ -5566,6 +5568,38 @@ td.rank {
   border-radius: 6px; transition: color 0.15s;
 }
 .cz-close:hover { color: #fff; }
+
+/* ── Tabs ── */
+#cz-modal-content {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.cz-tabs {
+  display: flex; gap: 0;
+  padding: 14px 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0; position: relative;
+}
+.cz-tab-btn {
+  flex: 1; background: none; border: none; cursor: pointer;
+  padding: 8px 0 10px;
+  font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.40);
+  transition: color 0.18s;
+  border-radius: 6px 6px 0 0;
+}
+.cz-tab-btn:hover { color: rgba(255,255,255,0.75); }
+.cz-tab-btn--active { color: #fff; }
+.cz-tab-indicator {
+  position: absolute; bottom: 0; left: 0;
+  width: 33.333%; height: 2px;
+  background: #7c9dff; border-radius: 2px 2px 0 0;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.cz-tab-content { flex: 1; overflow-y: auto; padding-top: 14px; }
+.cz-tab-hidden { display: none; }
+.cz-tab-marcos { padding: 12px 0 4px; }
+
 .cz-section-label {
   font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em;
   text-transform: uppercase; color: rgba(255,255,255,0.35);
@@ -5597,6 +5631,16 @@ td.rank {
 .cz-theme-swatch, .cz-theme-preview {
   height: 36px; border-radius: 8px; width: 100%;
 }
+/* Mission skin previews replicate the animated background */
+.cz-theme-preview--mission { overflow: hidden; position: relative; }
+.cz-theme-preview--mission[data-mission-theme="skin_cuerpo"]     { background: repeating-linear-gradient(58deg, transparent 0, transparent 14px, rgba(240,40,20,0.12) 14px, rgba(240,40,20,0.12) 16px), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(200,15,15,0.55) 0%, transparent 65%), #0c0303; background-size: 32px 32px, auto, auto; animation: combate-lines 6s linear infinite; }
+.cz-theme-preview--mission[data-mission-theme="skin_proyectiles"] { background-image: radial-gradient(1px 1px at 12% 20%, rgba(255,255,255,0.95) 100%, transparent), radial-gradient(1px 1px at 55% 60%, rgba(200,220,255,0.85) 100%, transparent), radial-gradient(1px 1px at 82% 38%, rgba(255,255,255,0.88) 100%, transparent), radial-gradient(1px 1px at 35% 85%, rgba(180,215,255,0.78) 100%, transparent), radial-gradient(1.5px 1.5px at 70% 12%, rgba(255,255,255,0.90) 100%, transparent), radial-gradient(1.5px 1.5px at 8% 65%, rgba(210,230,255,0.82) 100%, transparent), radial-gradient(ellipse 70% 50% at 25% 70%, rgba(20,40,200,0.28) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 80% 20%, rgba(90,20,190,0.22) 0%, transparent 55%), linear-gradient(#000514, #000514); background-size: 55px 55px,55px 55px,55px 55px,55px 55px, 80px 80px,80px 80px, auto,auto,auto; animation: galaxia-drift 45s linear infinite, galaxia-twinkle 4s ease-in-out infinite alternate; }
+.cz-theme-preview--mission[data-mission-theme="skin_zona"]        { background: repeating-radial-gradient(circle at 50% 108%, transparent 0%,transparent 7%, rgba(100,0,160,0.20) 8%,rgba(100,0,160,0.20) 9.5%, transparent 10%,transparent 19%, rgba(75,0,120,0.14) 20%,rgba(75,0,120,0.14) 21.5%, transparent 22%,transparent 31%, rgba(55,0,90,0.10) 32%,rgba(55,0,90,0.10) 33.5%, transparent 34%,transparent 100%), radial-gradient(ellipse 90% 60% at 50% 110%, rgba(90,0,140,0.65) 0%, transparent 55%), #02010a; animation: abismo-pulse 6s ease-in-out infinite alternate; }
+.cz-theme-preview--mission[data-mission-theme="skin_invocacion"]  { background: repeating-radial-gradient(circle at 50% 60%, transparent 0%, transparent 14%, rgba(48,200,28,0.14) 16%, rgba(48,200,28,0.14) 17%, transparent 18%, transparent 30%, rgba(38,180,22,0.09) 32%, rgba(38,180,22,0.09) 33%, transparent 34%, transparent 100%), radial-gradient(ellipse 90% 90% at 50% 50%, rgba(18,140,8,0.35) 0%, transparent 65%), #020d03; animation: invocacion-pulse 4s ease-in-out infinite alternate; }
+.cz-theme-preview--mission[data-mission-theme="skin_cc_acero"]    { background: linear-gradient(155deg, #070910 0%, #0a0d18 55%, #070910 100%); }
+.cz-theme-preview--mission[data-mission-theme="skin_pr_plasma"]   { background: conic-gradient(from 0deg at 50% 50%, rgba(210,50,255,0.22) 0deg, rgba(90,10,200,0.08) 60deg, rgba(250,100,255,0.26) 120deg, rgba(80,5,180,0.06) 180deg, rgba(200,40,250,0.22) 240deg, rgba(70,5,170,0.06) 300deg, rgba(210,50,255,0.22) 360deg), radial-gradient(ellipse 90% 90% at 50% 50%, rgba(150,30,230,0.38) 0%, transparent 62%), #040010; animation: preview-plasma-pulse 3s ease-in-out infinite alternate; }
+.cz-theme-preview--mission[data-mission-theme="skin_cz_toxico"]   { background: repeating-linear-gradient(180deg, rgba(28,200,18,0.14) 0px, rgba(28,200,18,0.14) 1px, transparent 1px, transparent 22px, rgba(20,180,12,0.09) 22px, rgba(20,180,12,0.09) 23px, transparent 23px, transparent 55px), radial-gradient(circle at 50% 0%, rgba(28,190,18,0.42) 0%, transparent 60%), #010902; background-size: 100% 55px, auto, auto; animation: toxico-drip 3.5s linear infinite; }
+.cz-theme-preview--mission[data-mission-theme="skin_in_arcano"]   { background: conic-gradient(from 0deg at 50% 50%, rgba(150,35,240,0.18) 0deg, rgba(70,8,170,0.07) 90deg, rgba(170,55,255,0.22) 180deg, rgba(70,8,170,0.07) 270deg, rgba(150,35,240,0.18) 360deg), radial-gradient(ellipse 90% 90% at 50% 50%, rgba(120,35,220,0.40) 0%, transparent 60%), #040010; animation: preview-arcano-pulse 4s ease-in-out infinite alternate; }
 .cz-skin-card--locked { opacity: 0.55; cursor: default; }
 .cz-skin-card--locked:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 .cz-skin-lock {
@@ -5606,8 +5650,30 @@ td.rank {
   pointer-events: none;
 }
 .cz-skin-lock small { font-size: 0.6rem; color: rgba(255,255,255,0.35); text-align: center; line-height: 1.2; }
+.cz-epic-info .cz-skin-hint { padding: 0; font-size: 0.60rem; text-align: center; }
 .cz-skin-hint {
   font-size: 0.65rem; color: rgba(255,255,255,0.30); padding: 0 20px 8px; line-height: 1.4; margin: 0;
+}
+.cz-skin-hint--unlocked { color: #4ade80; padding: 0 8px 6px; font-weight: 600; }
+#cz-epic-grid { grid-template-columns: repeat(2, 155px); justify-content: center; }
+.cz-skin-card--epic { cursor: default; padding: 0 0 10px 0; gap: 0; }
+.cz-skin-card--epic:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.10); }
+.cz-epic-canvas-wrap {
+  position: relative; width: 100%; border-radius: 12px 12px 0 0; overflow: hidden;
+  background: rgba(0,0,0,0.40);
+}
+.cz-epic-canvas { display: block; width: 100%; height: 110px; }
+.cz-epic-lock-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.52); font-size: 1.2rem;
+}
+.cz-epic-info {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 7px 8px 0; gap: 2px; text-align: center;
+}
+.cz-epic-info .cz-theme-name { font-size: 0.78rem; }
+.cz-epic-charname {
+  font-size: 0.62rem; color: rgba(255,255,255,0.35); letter-spacing: 0.02em;
 }
 .cz-theme-name {
   font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.85);
@@ -5665,38 +5731,307 @@ body[data-profile-theme="arctic"] #profile-panel .pstat-tower-big { background: 
 body[data-profile-theme="arctic"] #profile-panel .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 body[data-profile-theme="arctic"] #profile-panel .pstat-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 
-/* ── SKINS DESBLOQUEABLES (propias) ── */
-body[data-profile-theme="skin_cuerpo"] .profile-sheet-wrap { background: #140000; }
-body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-card { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
+/* ── SKINS DESBLOQUEABLES (propias) — setup compartido ── */
+body[data-profile-theme^="skin_"] .profile-sheet-wrap {
+  overflow: hidden;
+  isolation: isolate; /* crea stacking context para contener el ::before */
+}
+body[data-profile-theme^="skin_"] .profile-sheet-wrap::before {
+  content: ''; position: absolute; inset: 0;
+  z-index: -1; /* queda detrás de todo el contenido del wrap */
+  pointer-events: none;
+}
+
+/* ── COMBATE (skin_cuerpo) CC L2 — grietas de energía roja ── */
+body[data-profile-theme="skin_cuerpo"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 110%, rgba(200,15,15,0.38) 0%, transparent 60%),
+    radial-gradient(circle at 12% 18%, rgba(150,8,8,0.22) 0%, transparent 50%),
+    #0c0303;
+}
+body[data-profile-theme="skin_cuerpo"] .profile-sheet-wrap::before {
+  background:
+    repeating-linear-gradient(58deg, transparent 0, transparent 14px, rgba(240,40,20,0.09) 14px, rgba(240,40,20,0.09) 16px),
+    repeating-linear-gradient(-72deg, transparent 0, transparent 20px, rgba(200,25,12,0.06) 20px, rgba(200,25,12,0.06) 22px);
+  background-size: 32px 32px, 44px 44px;
+  animation: combate-lines 6s linear infinite, combate-glow 3.5s ease-in-out infinite alternate;
+}
+body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-card { background: rgba(139,0,0,0.15); border-color: rgba(220,40,40,0.32); }
 body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #dc2626, #991b1b); }
 body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #ef4444, #b91c1c); }
-body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-tower-big { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
-body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-fav-card { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
-body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-champs-card { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
+body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-tower-big { background: rgba(139,0,0,0.15); border-color: rgba(220,40,40,0.32); }
+body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-fav-card { background: rgba(139,0,0,0.15); border-color: rgba(220,40,40,0.32); }
+body[data-profile-theme="skin_cuerpo"] #profile-panel .pstat-champs-card { background: rgba(139,0,0,0.15); border-color: rgba(220,40,40,0.32); }
 
-body[data-profile-theme="skin_proyectiles"] .profile-sheet-wrap { background: #020818; }
-body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-card { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
+/* ── GALAXIA (skin_proyectiles) PR L2 — campo estelar ── */
+body[data-profile-theme="skin_proyectiles"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 65% 45% at 25% 65%, rgba(20,40,200,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 78% 22%, rgba(90,20,190,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 55% 92%, rgba(10,25,160,0.20) 0%, transparent 50%),
+    #000514;
+}
+body[data-profile-theme="skin_proyectiles"] .profile-sheet-wrap::before {
+  background-image:
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.92) 100%, transparent),
+    radial-gradient(1px 1px at 55% 65%, rgba(200,220,255,0.78) 100%, transparent),
+    radial-gradient(1px 1px at 80% 40%, rgba(255,255,255,0.82) 100%, transparent),
+    radial-gradient(1px 1px at 38% 88%, rgba(180,215,255,0.72) 100%, transparent),
+    radial-gradient(1px 1px at 70% 14%, rgba(255,255,255,0.86) 100%, transparent),
+    radial-gradient(1px 1px at 22% 52%, rgba(200,235,255,0.68) 100%, transparent),
+    radial-gradient(1px 1px at 90% 76%, rgba(255,255,255,0.76) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 8% 35%, rgba(255,255,255,0.88) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 62% 82%, rgba(210,230,255,0.82) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 84% 10%, rgba(255,255,255,0.80) 100%, transparent),
+    radial-gradient(2px 2px at 45% 30%, rgba(255,255,255,0.70) 100%, transparent),
+    radial-gradient(2px 2px at 18% 78%, rgba(200,220,255,0.65) 100%, transparent);
+  background-size:
+    70px 70px, 70px 70px, 70px 70px, 70px 70px,
+    95px 95px, 95px 95px, 95px 95px,
+    130px 130px, 130px 130px, 130px 130px,
+    180px 180px, 180px 180px;
+  animation: galaxia-drift 45s linear infinite, galaxia-twinkle 4s ease-in-out infinite alternate;
+}
+body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-card { background: rgba(6,12,45,0.72); border-color: rgba(60,110,255,0.40); }
 body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
 body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #60a5fa, #2563eb); }
-body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-tower-big { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
-body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-fav-card { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
-body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-champs-card { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
+body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-tower-big { background: rgba(6,12,45,0.72); border-color: rgba(60,110,255,0.40); }
+body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-fav-card { background: rgba(6,12,45,0.72); border-color: rgba(60,110,255,0.40); }
+body[data-profile-theme="skin_proyectiles"] #profile-panel .pstat-champs-card { background: rgba(6,12,45,0.72); border-color: rgba(60,110,255,0.40); }
 
-body[data-profile-theme="skin_zona"] .profile-sheet-wrap { background: #040404; }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-card { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #6b7280, #374151); }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #9ca3af, #4b5563); }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-tower-big { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-fav-card { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-body[data-profile-theme="skin_zona"] #profile-panel .pstat-champs-card { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
+/* ── ABISMO (skin_zona) CZ L2 — void con anillos concéntricos ── */
+body[data-profile-theme="skin_zona"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 85% 55% at 50% 108%, rgba(90,0,140,0.55) 0%, transparent 55%),
+    radial-gradient(circle at 22% 82%, rgba(50,0,80,0.22) 0%, transparent 42%),
+    radial-gradient(circle at 76% 88%, rgba(60,0,90,0.18) 0%, transparent 36%),
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(15,0,30,0.60) 0%, transparent 70%),
+    #02010a;
+}
+body[data-profile-theme="skin_zona"] .profile-sheet-wrap::before {
+  background: repeating-radial-gradient(circle at 50% 108%,
+    transparent 0%, transparent 7%,
+    rgba(100,0,160,0.16) 8%, rgba(100,0,160,0.16) 9.5%,
+    transparent 10%, transparent 19%,
+    rgba(75,0,120,0.11) 20%, rgba(75,0,120,0.11) 21.5%,
+    transparent 22%, transparent 31%,
+    rgba(55,0,90,0.08) 32%, rgba(55,0,90,0.08) 33.5%,
+    transparent 34%, transparent 43%,
+    rgba(40,0,65,0.06) 44%, rgba(40,0,65,0.06) 45.5%,
+    transparent 46%, transparent 100%
+  );
+  animation: abismo-pulse 6s ease-in-out infinite alternate, abismo-breathe 14s ease-in-out infinite;
+}
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-card { background: rgba(50,0,80,0.28); border-color: rgba(120,0,180,0.32); }
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #7c3aed, #4c1d95); }
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #9333ea, #6b21a8); }
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-tower-big { background: rgba(50,0,80,0.28); border-color: rgba(120,0,180,0.32); }
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-fav-card { background: rgba(50,0,80,0.28); border-color: rgba(120,0,180,0.32); }
+body[data-profile-theme="skin_zona"] #profile-panel .pstat-champs-card { background: rgba(50,0,80,0.28); border-color: rgba(120,0,180,0.32); }
 
-body[data-profile-theme="skin_invocacion"] .profile-sheet-wrap { background: #071004; }
-body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-card { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
+/* ── INVOCACIÓN (skin_invocacion) IN L2 — círculos de invocación pulsantes ── */
+body[data-profile-theme="skin_invocacion"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(18,140,8,0.22) 0%, transparent 65%),
+    radial-gradient(circle at 22% 88%, rgba(12,110,6,0.16) 0%, transparent 48%),
+    #020d03;
+}
+body[data-profile-theme="skin_invocacion"] .profile-sheet-wrap::before {
+  background: repeating-radial-gradient(circle at 50% 55%,
+    transparent 0%, transparent 14%,
+    rgba(48,200,28,0.10) 16%, rgba(48,200,28,0.10) 17%,
+    transparent 18%, transparent 30%,
+    rgba(38,180,22,0.07) 32%, rgba(38,180,22,0.07) 33%,
+    transparent 34%, transparent 47%,
+    rgba(30,165,18,0.05) 49%, rgba(30,165,18,0.05) 50%,
+    transparent 51%, transparent 65%,
+    rgba(25,150,15,0.04) 66.5%, rgba(25,150,15,0.04) 67.5%,
+    transparent 68.5%, transparent 100%
+  );
+  animation: invocacion-pulse 4s ease-in-out infinite alternate, invocacion-expand 9s ease-in-out infinite;
+}
+body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-card { background: rgba(20,50,10,0.32); border-color: rgba(60,180,30,0.32); }
 body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #65a30d, #3f6212); }
 body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #84cc16, #4d7c0f); }
-body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-tower-big { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
-body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-fav-card { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
-body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-champs-card { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
+body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-tower-big { background: rgba(20,50,10,0.32); border-color: rgba(60,180,30,0.32); }
+body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-fav-card { background: rgba(20,50,10,0.32); border-color: rgba(60,180,30,0.32); }
+body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-champs-card { background: rgba(20,50,10,0.32); border-color: rgba(60,180,30,0.32); }
+
+/* Tormenta */
+body[data-profile-theme="tormenta"] .profile-sheet-wrap { background: #040810; }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-card { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #6b7fc7, #3b4f9b); }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #8ba3e0, #4a63b4); }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-tower-big { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-fav-card { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+body[data-profile-theme="tormenta"] #profile-panel .pstat-champs-card { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+
+/* ── ACERO (skin_cc_acero) CC L4 — destello metálico diagonal ── */
+body[data-profile-theme="skin_cc_acero"] .profile-sheet-wrap {
+  background: linear-gradient(155deg, #070910 0%, #0a0d18 55%, #070910 100%);
+}
+body[data-profile-theme="skin_cc_acero"] .profile-sheet-wrap::before {
+  /* ::before = static base, ::after = animated shimmer */
+  background: linear-gradient(155deg, #070910 0%, #0a0d18 55%, #070910 100%);
+}
+body[data-profile-theme="skin_cc_acero"] .profile-sheet-wrap::after {
+  content: ''; position: absolute; pointer-events: none; z-index: -1;
+  width: 300%; height: 100%; top: 0; left: -100%;
+  background: linear-gradient(108deg,
+    transparent 0%, transparent 34%,
+    rgba(120,145,210,0.06) 41%, rgba(175,200,255,0.22) 50%,
+    rgba(120,145,210,0.06) 59%,
+    transparent 66%, transparent 100%
+  );
+  animation: acero-shimmer 5s ease-in-out infinite;
+}
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-card { background: rgba(55,68,100,0.20); border-color: rgba(140,165,230,0.35); }
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #94a3b8, #475569); }
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #cbd5e1, #64748b); }
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-tower-big { background: rgba(55,68,100,0.20); border-color: rgba(140,165,230,0.35); }
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-fav-card { background: rgba(55,68,100,0.20); border-color: rgba(140,165,230,0.35); }
+body[data-profile-theme="skin_cc_acero"] #profile-panel .pstat-champs-card { background: rgba(55,68,100,0.20); border-color: rgba(140,165,230,0.35); }
+
+/* ── PLASMA (skin_pr_plasma) PR L4 — plasma eléctrico rotante ── */
+body[data-profile-theme="skin_pr_plasma"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 75% 75% at 50% 50%, rgba(150,30,230,0.24) 0%, transparent 62%),
+    #040010;
+}
+body[data-profile-theme="skin_pr_plasma"] .profile-sheet-wrap::before {
+  /* 2x tamaño para que la rotación nunca exponga esquinas transparentes */
+  inset: -50%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(210,50,255,0.16) 0deg,
+    rgba(90,10,200,0.06) 60deg,
+    rgba(250,100,255,0.20) 120deg,
+    rgba(80,5,180,0.05) 180deg,
+    rgba(200,40,250,0.16) 240deg,
+    rgba(70,5,170,0.05) 300deg,
+    rgba(210,50,255,0.16) 360deg
+  );
+  animation: plasma-spin 5.5s linear infinite;
+}
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-card { background: rgba(80,20,120,0.22); border-color: rgba(200,80,255,0.36); }
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #c026d3, #7e22ce); }
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #e879f9, #a21caf); }
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-tower-big { background: rgba(80,20,120,0.22); border-color: rgba(200,80,255,0.36); }
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-fav-card { background: rgba(80,20,120,0.22); border-color: rgba(200,80,255,0.36); }
+body[data-profile-theme="skin_pr_plasma"] #profile-panel .pstat-champs-card { background: rgba(80,20,120,0.22); border-color: rgba(200,80,255,0.36); }
+
+/* ── TÓXICO (skin_cz_toxico) CZ L4 — goteo tóxico verde ── */
+body[data-profile-theme="skin_cz_toxico"] .profile-sheet-wrap {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(28,190,18,0.26) 0%, transparent 55%),
+    radial-gradient(circle at 15% 90%, rgba(18,160,10,0.16) 0%, transparent 45%),
+    radial-gradient(circle at 82% 55%, rgba(22,175,14,0.14) 0%, transparent 42%),
+    #010902;
+}
+body[data-profile-theme="skin_cz_toxico"] .profile-sheet-wrap::before {
+  background: repeating-linear-gradient(180deg,
+    rgba(28,200,18,0.12) 0px, rgba(28,200,18,0.12) 1px,
+    transparent 1px, transparent 22px,
+    rgba(20,180,12,0.07) 22px, rgba(20,180,12,0.07) 23px,
+    transparent 23px, transparent 55px
+  );
+  background-size: 100% 55px;
+  animation: toxico-drip 3.5s linear infinite, toxico-glow 4.5s ease-in-out infinite alternate;
+}
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-card { background: rgba(18,80,8,0.25); border-color: rgba(80,230,40,0.34); }
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #4ade80, #16a34a); }
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #86efac, #15803d); }
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-tower-big { background: rgba(18,80,8,0.25); border-color: rgba(80,230,40,0.34); }
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-fav-card { background: rgba(18,80,8,0.25); border-color: rgba(80,230,40,0.34); }
+body[data-profile-theme="skin_cz_toxico"] #profile-panel .pstat-champs-card { background: rgba(18,80,8,0.25); border-color: rgba(80,230,40,0.34); }
+
+/* ── ARCANO (skin_in_arcano) IN L4 — cónico arcano + orbe orbitante ── */
+body[data-profile-theme="skin_in_arcano"] .profile-sheet-wrap {
+  background:
+    radial-gradient(ellipse 70% 70% at 50% 50%, rgba(120,35,220,0.22) 0%, transparent 60%),
+    #040010;
+}
+body[data-profile-theme="skin_in_arcano"] .profile-sheet-wrap::before {
+  /* 2x tamaño para que la rotación nunca exponga esquinas transparentes */
+  inset: -50%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(150,35,240,0.12) 0deg,
+    rgba(70,8,170,0.05) 90deg,
+    rgba(170,55,255,0.14) 180deg,
+    rgba(70,8,170,0.05) 270deg,
+    rgba(150,35,240,0.12) 360deg
+  );
+  animation: arcano-spin 8s linear infinite;
+}
+body[data-profile-theme="skin_in_arcano"] .profile-sheet-wrap::after {
+  content: '';
+  position: absolute;
+  width: 45%; height: 45%;
+  top: 50%; left: 50%;
+  margin: -22.5% 0 0 -22.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(190,90,255,0.28) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+  animation: arcano-orb 6s linear infinite;
+}
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-card { background: rgba(60,10,80,0.25); border-color: rgba(180,140,255,0.34); }
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-winrate-fill { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-mode-fill { background: linear-gradient(90deg, #c084fc, #9333ea); }
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-tower-big { background: rgba(60,10,80,0.25); border-color: rgba(180,140,255,0.34); }
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-fav-card { background: rgba(60,10,80,0.25); border-color: rgba(180,140,255,0.34); }
+body[data-profile-theme="skin_in_arcano"] #profile-panel .pstat-champs-card { background: rgba(60,10,80,0.25); border-color: rgba(180,140,255,0.34); }
+
+/* ── @keyframes ── */
+@keyframes combate-lines {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 32px 32px, -44px 44px; }
+}
+@keyframes combate-glow { from{opacity:0.60} to{opacity:1} }
+@keyframes proyectiles-streak {
+  from { background-position: 0 0; }
+  to   { background-position: -198px 198px; }
+}
+@keyframes galaxia-drift {
+  from { background-position: 0 0,0 0,0 0,0 0, 0 0,0 0,0 0, 0 0,0 0,0 0, 0 0,0 0; }
+  to   { background-position: 70px 35px,-35px 70px,35px -70px,-70px -35px, -95px 48px,48px -95px,95px 48px, -130px -65px,65px 130px,130px -65px, -180px 90px,90px -180px; }
+}
+@keyframes galaxia-twinkle { from{opacity:0.60} to{opacity:1} }
+@keyframes abismo-pulse  { from{opacity:0.40} to{opacity:1} }
+@keyframes abismo-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+@keyframes zona-pulse { from{opacity:0.45} to{opacity:1} }
+@keyframes zona-shift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 48px 24px, -48px 24px, 0 48px; }
+}
+@keyframes invocacion-pulse { from{opacity:0.50} to{opacity:1} }
+@keyframes invocacion-expand {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.12); }
+}
+@keyframes acero-shimmer {
+  0%, 15%   { transform: translateX(-35%); }
+  85%, 100% { transform: translateX(75%); }
+}
+@keyframes plasma-spin { to { transform: rotate(360deg); } }
+@keyframes pub-plasma-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes pub-arcano-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes preview-plasma-pulse { from{opacity:0.70} to{opacity:1} }
+@keyframes preview-arcano-pulse { from{opacity:0.65} to{opacity:1} }
+@keyframes toxico-drip {
+  from { background-position: 0 -55px; }
+  to   { background-position: 0 0; }
+}
+@keyframes toxico-glow { from{opacity:0.55} to{opacity:1} }
+@keyframes arcano-spin { to { transform: rotate(360deg); } }
+@keyframes arcano-orb {
+  from { transform: rotate(0deg) translateX(55%) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(55%) rotate(-360deg); }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    PUBLIC PROFILE THEMES — scoped to .user-profile-modal[data-theme]
@@ -5743,9 +6078,27 @@ body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-champs-card { b
 .user-profile-modal[data-theme="arctic"] .pstat-fav-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 .user-profile-modal[data-theme="arctic"] .up-champs-card { background: rgba(96,200,232,0.07); border-color: rgba(96,200,232,0.18); }
 
-/* ── SKINS DESBLOQUEABLES (perfil público) ── */
-.user-profile-modal[data-theme="skin_cuerpo"] { background: #140000; }
-.user-profile-modal[data-theme="skin_cuerpo"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #4a0000 0%, transparent 70%); }
+/* ── SKINS DESBLOQUEABLES (perfil público) — setup compartido ── */
+.user-profile-modal[data-theme^="skin_"] { overflow: hidden; isolation: isolate; }
+.user-profile-modal[data-theme^="skin_"]::before {
+  content: ''; position: absolute; inset: 0;
+  z-index: -1; pointer-events: none;
+}
+
+/* Sangre (skin_cuerpo) */
+.user-profile-modal[data-theme="skin_cuerpo"] {
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 110%, rgba(200,15,15,0.38) 0%, transparent 60%),
+    radial-gradient(circle at 12% 18%, rgba(150,8,8,0.22) 0%, transparent 50%),
+    #0c0303;
+}
+.user-profile-modal[data-theme="skin_cuerpo"]::before {
+  background:
+    repeating-linear-gradient(58deg, transparent 0, transparent 14px, rgba(240,40,20,0.09) 14px, rgba(240,40,20,0.09) 16px),
+    repeating-linear-gradient(-72deg, transparent 0, transparent 20px, rgba(200,25,12,0.06) 20px, rgba(200,25,12,0.06) 22px);
+  background-size: 32px 32px, 44px 44px;
+  animation: combate-lines 6s linear infinite, combate-glow 3.5s ease-in-out infinite alternate;
+}
 .user-profile-modal[data-theme="skin_cuerpo"] .up-pill { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
 .user-profile-modal[data-theme="skin_cuerpo"] .up-winrate-fill { background: linear-gradient(90deg, #dc2626, #991b1b); }
 .user-profile-modal[data-theme="skin_cuerpo"] .up-mode-fill { background: linear-gradient(90deg, #ef4444, #b91c1c); }
@@ -5753,29 +6106,223 @@ body[data-profile-theme="skin_invocacion"] #profile-panel .pstat-champs-card { b
 .user-profile-modal[data-theme="skin_cuerpo"] .pstat-fav-card { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
 .user-profile-modal[data-theme="skin_cuerpo"] .up-champs-card { background: rgba(139,0,0,0.12); border-color: rgba(220,40,40,0.28); }
 
-.user-profile-modal[data-theme="skin_proyectiles"] { background: #020818; }
-.user-profile-modal[data-theme="skin_proyectiles"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #0a1a60 0%, transparent 70%); }
-.user-profile-modal[data-theme="skin_proyectiles"] .up-pill { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
+/* Galaxia (skin_proyectiles) */
+.user-profile-modal[data-theme="skin_proyectiles"] {
+  background:
+    radial-gradient(ellipse 65% 45% at 25% 65%, rgba(20,40,200,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 78% 22%, rgba(90,20,190,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 55% 92%, rgba(10,25,160,0.20) 0%, transparent 50%),
+    #000514;
+}
+.user-profile-modal[data-theme="skin_proyectiles"]::before {
+  background-image:
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.92) 100%, transparent),
+    radial-gradient(1px 1px at 55% 65%, rgba(200,220,255,0.78) 100%, transparent),
+    radial-gradient(1px 1px at 80% 40%, rgba(255,255,255,0.82) 100%, transparent),
+    radial-gradient(1px 1px at 38% 88%, rgba(180,215,255,0.72) 100%, transparent),
+    radial-gradient(1px 1px at 70% 14%, rgba(255,255,255,0.86) 100%, transparent),
+    radial-gradient(1px 1px at 22% 52%, rgba(200,235,255,0.68) 100%, transparent),
+    radial-gradient(1px 1px at 90% 76%, rgba(255,255,255,0.76) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 8% 35%, rgba(255,255,255,0.88) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 62% 82%, rgba(210,230,255,0.82) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 84% 10%, rgba(255,255,255,0.80) 100%, transparent),
+    radial-gradient(2px 2px at 45% 30%, rgba(255,255,255,0.70) 100%, transparent),
+    radial-gradient(2px 2px at 18% 78%, rgba(200,220,255,0.65) 100%, transparent);
+  background-size:
+    70px 70px, 70px 70px, 70px 70px, 70px 70px,
+    95px 95px, 95px 95px, 95px 95px,
+    130px 130px, 130px 130px, 130px 130px,
+    180px 180px, 180px 180px;
+  animation: galaxia-drift 45s linear infinite, galaxia-twinkle 4s ease-in-out infinite alternate;
+}
+.user-profile-modal[data-theme="skin_proyectiles"] .up-pill { background: rgba(6,12,45,0.70); border-color: rgba(60,110,255,0.40); }
 .user-profile-modal[data-theme="skin_proyectiles"] .up-winrate-fill { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
 .user-profile-modal[data-theme="skin_proyectiles"] .up-mode-fill { background: linear-gradient(90deg, #60a5fa, #2563eb); }
-.user-profile-modal[data-theme="skin_proyectiles"] .pstat-tower-big { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
-.user-profile-modal[data-theme="skin_proyectiles"] .pstat-fav-card { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
-.user-profile-modal[data-theme="skin_proyectiles"] .up-champs-card { background: rgba(14,30,90,0.25); border-color: rgba(60,100,255,0.28); }
+.user-profile-modal[data-theme="skin_proyectiles"] .pstat-tower-big { background: rgba(6,12,45,0.70); border-color: rgba(60,110,255,0.40); }
+.user-profile-modal[data-theme="skin_proyectiles"] .pstat-fav-card { background: rgba(6,12,45,0.70); border-color: rgba(60,110,255,0.40); }
+.user-profile-modal[data-theme="skin_proyectiles"] .up-champs-card { background: rgba(6,12,45,0.70); border-color: rgba(60,110,255,0.40); }
 
-.user-profile-modal[data-theme="skin_zona"] { background: #040404; }
-.user-profile-modal[data-theme="skin_zona"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #1a1a1a 0%, transparent 70%); }
-.user-profile-modal[data-theme="skin_zona"] .up-pill { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-.user-profile-modal[data-theme="skin_zona"] .up-winrate-fill { background: linear-gradient(90deg, #6b7280, #374151); }
-.user-profile-modal[data-theme="skin_zona"] .up-mode-fill { background: linear-gradient(90deg, #9ca3af, #4b5563); }
-.user-profile-modal[data-theme="skin_zona"] .pstat-tower-big { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-.user-profile-modal[data-theme="skin_zona"] .pstat-fav-card { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
-.user-profile-modal[data-theme="skin_zona"] .up-champs-card { background: rgba(30,30,30,0.60); border-color: rgba(120,120,120,0.22); }
+/* Abismo (skin_zona) */
+.user-profile-modal[data-theme="skin_zona"] {
+  background:
+    radial-gradient(ellipse 85% 55% at 50% 108%, rgba(90,0,140,0.55) 0%, transparent 55%),
+    radial-gradient(circle at 22% 82%, rgba(50,0,80,0.22) 0%, transparent 42%),
+    radial-gradient(circle at 76% 88%, rgba(60,0,90,0.18) 0%, transparent 36%),
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(15,0,30,0.60) 0%, transparent 70%),
+    #02010a;
+}
+.user-profile-modal[data-theme="skin_zona"]::before {
+  background: repeating-radial-gradient(circle at 50% 108%,
+    transparent 0%, transparent 7%,
+    rgba(100,0,160,0.16) 8%, rgba(100,0,160,0.16) 9.5%,
+    transparent 10%, transparent 19%,
+    rgba(75,0,120,0.11) 20%, rgba(75,0,120,0.11) 21.5%,
+    transparent 22%, transparent 31%,
+    rgba(55,0,90,0.08) 32%, rgba(55,0,90,0.08) 33.5%,
+    transparent 34%, transparent 43%,
+    rgba(40,0,65,0.06) 44%, rgba(40,0,65,0.06) 45.5%,
+    transparent 46%, transparent 100%
+  );
+  animation: abismo-pulse 6s ease-in-out infinite alternate, abismo-breathe 14s ease-in-out infinite;
+}
+.user-profile-modal[data-theme="skin_zona"] .up-pill { background: rgba(50,0,80,0.30); border-color: rgba(120,0,180,0.35); }
+.user-profile-modal[data-theme="skin_zona"] .up-winrate-fill { background: linear-gradient(90deg, #7c3aed, #4c1d95); }
+.user-profile-modal[data-theme="skin_zona"] .up-mode-fill { background: linear-gradient(90deg, #9333ea, #6b21a8); }
+.user-profile-modal[data-theme="skin_zona"] .pstat-tower-big { background: rgba(50,0,80,0.30); border-color: rgba(120,0,180,0.35); }
+.user-profile-modal[data-theme="skin_zona"] .pstat-fav-card { background: rgba(50,0,80,0.30); border-color: rgba(120,0,180,0.35); }
+.user-profile-modal[data-theme="skin_zona"] .up-champs-card { background: rgba(50,0,80,0.30); border-color: rgba(120,0,180,0.35); }
 
-.user-profile-modal[data-theme="skin_invocacion"] { background: #071004; }
-.user-profile-modal[data-theme="skin_invocacion"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #1a3a0a 0%, transparent 70%); }
-.user-profile-modal[data-theme="skin_invocacion"] .up-pill { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
+/* Raíces (skin_invocacion) */
+.user-profile-modal[data-theme="skin_invocacion"] {
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(18,140,8,0.22) 0%, transparent 65%),
+    radial-gradient(circle at 22% 88%, rgba(12,110,6,0.16) 0%, transparent 48%),
+    #020d03;
+}
+.user-profile-modal[data-theme="skin_invocacion"]::before {
+  background: repeating-radial-gradient(circle at 50% 55%,
+    transparent 0%, transparent 14%,
+    rgba(48,200,28,0.10) 16%, rgba(48,200,28,0.10) 17%,
+    transparent 18%, transparent 30%,
+    rgba(38,180,22,0.07) 32%, rgba(38,180,22,0.07) 33%,
+    transparent 34%, transparent 47%,
+    rgba(30,165,18,0.05) 49%, rgba(30,165,18,0.05) 50%,
+    transparent 51%, transparent 100%
+  );
+  animation: invocacion-pulse 4s ease-in-out infinite alternate, invocacion-expand 9s ease-in-out infinite;
+}
+.user-profile-modal[data-theme="skin_invocacion"] .up-pill { background: rgba(20,50,10,0.30); border-color: rgba(60,180,30,0.28); }
 .user-profile-modal[data-theme="skin_invocacion"] .up-winrate-fill { background: linear-gradient(90deg, #65a30d, #3f6212); }
 .user-profile-modal[data-theme="skin_invocacion"] .up-mode-fill { background: linear-gradient(90deg, #84cc16, #4d7c0f); }
-.user-profile-modal[data-theme="skin_invocacion"] .pstat-tower-big { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
-.user-profile-modal[data-theme="skin_invocacion"] .pstat-fav-card { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
-.user-profile-modal[data-theme="skin_invocacion"] .up-champs-card { background: rgba(20,50,10,0.30); border-color: rgba(60,120,30,0.28); }
+.user-profile-modal[data-theme="skin_invocacion"] .pstat-tower-big { background: rgba(20,50,10,0.30); border-color: rgba(60,180,30,0.28); }
+.user-profile-modal[data-theme="skin_invocacion"] .pstat-fav-card { background: rgba(20,50,10,0.30); border-color: rgba(60,180,30,0.28); }
+.user-profile-modal[data-theme="skin_invocacion"] .up-champs-card { background: rgba(20,50,10,0.30); border-color: rgba(60,180,30,0.28); }
+
+/* Tormenta — público */
+.user-profile-modal[data-theme="tormenta"] { background: #040810; }
+.user-profile-modal[data-theme="tormenta"] .up-hero { background: radial-gradient(ellipse at 50% 0%, #1a2a60 0%, transparent 70%); }
+.user-profile-modal[data-theme="tormenta"] .up-pill { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+.user-profile-modal[data-theme="tormenta"] .up-winrate-fill { background: linear-gradient(90deg, #6b7fc7, #3b4f9b); }
+.user-profile-modal[data-theme="tormenta"] .up-mode-fill { background: linear-gradient(90deg, #8ba3e0, #4a63b4); }
+.user-profile-modal[data-theme="tormenta"] .pstat-tower-big { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+.user-profile-modal[data-theme="tormenta"] .pstat-fav-card { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+.user-profile-modal[data-theme="tormenta"] .up-champs-card { background: rgba(30,50,100,0.18); border-color: rgba(80,120,220,0.28); }
+
+/* Acero (skin_cc_acero) */
+.user-profile-modal[data-theme="skin_cc_acero"] {
+  background: linear-gradient(155deg, #070910 0%, #0a0d18 55%, #070910 100%);
+}
+.user-profile-modal[data-theme="skin_cc_acero"]::before {
+  background: linear-gradient(155deg, #070910 0%, #0a0d18 55%, #070910 100%);
+}
+.user-profile-modal[data-theme="skin_cc_acero"]::after {
+  content: ''; position: absolute; pointer-events: none; z-index: -1;
+  width: 300%; height: 100%; top: 0; left: -100%;
+  background: linear-gradient(108deg,
+    transparent 0%, transparent 34%,
+    rgba(120,145,210,0.06) 41%, rgba(175,200,255,0.22) 50%,
+    rgba(120,145,210,0.06) 59%,
+    transparent 66%, transparent 100%
+  );
+  animation: acero-shimmer 5s ease-in-out infinite;
+}
+.user-profile-modal[data-theme="skin_cc_acero"] .up-pill { background: rgba(60,70,100,0.18); border-color: rgba(140,160,220,0.30); }
+.user-profile-modal[data-theme="skin_cc_acero"] .up-winrate-fill { background: linear-gradient(90deg, #94a3b8, #475569); }
+.user-profile-modal[data-theme="skin_cc_acero"] .up-mode-fill { background: linear-gradient(90deg, #cbd5e1, #64748b); }
+.user-profile-modal[data-theme="skin_cc_acero"] .pstat-tower-big { background: rgba(60,70,100,0.18); border-color: rgba(140,160,220,0.30); }
+.user-profile-modal[data-theme="skin_cc_acero"] .pstat-fav-card { background: rgba(60,70,100,0.18); border-color: rgba(140,160,220,0.30); }
+.user-profile-modal[data-theme="skin_cc_acero"] .up-champs-card { background: rgba(60,70,100,0.18); border-color: rgba(140,160,220,0.30); }
+
+/* Plasma (skin_pr_plasma) */
+.user-profile-modal[data-theme="skin_pr_plasma"] {
+  background:
+    radial-gradient(ellipse 75% 75% at 50% 50%, rgba(150,30,230,0.24) 0%, transparent 62%),
+    #040010;
+}
+.user-profile-modal[data-theme="skin_pr_plasma"]::before {
+  /* Círculo grande centrado: sin esquinas que exponer al girar */
+  inset: auto;
+  top: 50%; left: 50%;
+  width: 250%; height: 250%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(210,50,255,0.16) 0deg,
+    rgba(90,10,200,0.06) 60deg,
+    rgba(250,100,255,0.20) 120deg,
+    rgba(80,5,180,0.05) 180deg,
+    rgba(200,40,250,0.16) 240deg,
+    rgba(70,5,170,0.05) 300deg,
+    rgba(210,50,255,0.16) 360deg
+  );
+  animation: pub-plasma-spin 5.5s linear infinite;
+}
+.user-profile-modal[data-theme="skin_pr_plasma"] .up-pill { background: rgba(80,20,120,0.20); border-color: rgba(200,80,255,0.32); }
+.user-profile-modal[data-theme="skin_pr_plasma"] .up-winrate-fill { background: linear-gradient(90deg, #c026d3, #7e22ce); }
+.user-profile-modal[data-theme="skin_pr_plasma"] .up-mode-fill { background: linear-gradient(90deg, #e879f9, #a21caf); }
+.user-profile-modal[data-theme="skin_pr_plasma"] .pstat-tower-big { background: rgba(80,20,120,0.20); border-color: rgba(200,80,255,0.32); }
+.user-profile-modal[data-theme="skin_pr_plasma"] .pstat-fav-card { background: rgba(80,20,120,0.20); border-color: rgba(200,80,255,0.32); }
+.user-profile-modal[data-theme="skin_pr_plasma"] .up-champs-card { background: rgba(80,20,120,0.20); border-color: rgba(200,80,255,0.32); }
+
+/* Tóxico (skin_cz_toxico) */
+.user-profile-modal[data-theme="skin_cz_toxico"] {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(28,190,18,0.26) 0%, transparent 55%),
+    radial-gradient(circle at 15% 90%, rgba(18,160,10,0.16) 0%, transparent 45%),
+    radial-gradient(circle at 82% 55%, rgba(22,175,14,0.14) 0%, transparent 42%),
+    #010902;
+}
+.user-profile-modal[data-theme="skin_cz_toxico"]::before {
+  background: repeating-linear-gradient(180deg,
+    rgba(28,200,18,0.12) 0px, rgba(28,200,18,0.12) 1px,
+    transparent 1px, transparent 22px,
+    rgba(20,180,12,0.07) 22px, rgba(20,180,12,0.07) 23px,
+    transparent 23px, transparent 55px
+  );
+  background-size: 100% 55px;
+  animation: toxico-drip 3.5s linear infinite, toxico-glow 4.5s ease-in-out infinite alternate;
+}
+.user-profile-modal[data-theme="skin_cz_toxico"] .up-pill { background: rgba(20,80,10,0.22); border-color: rgba(80,220,40,0.30); }
+.user-profile-modal[data-theme="skin_cz_toxico"] .up-winrate-fill { background: linear-gradient(90deg, #4ade80, #16a34a); }
+.user-profile-modal[data-theme="skin_cz_toxico"] .up-mode-fill { background: linear-gradient(90deg, #86efac, #15803d); }
+.user-profile-modal[data-theme="skin_cz_toxico"] .pstat-tower-big { background: rgba(20,80,10,0.22); border-color: rgba(80,220,40,0.30); }
+.user-profile-modal[data-theme="skin_cz_toxico"] .pstat-fav-card { background: rgba(20,80,10,0.22); border-color: rgba(80,220,40,0.30); }
+.user-profile-modal[data-theme="skin_cz_toxico"] .up-champs-card { background: rgba(20,80,10,0.22); border-color: rgba(80,220,40,0.30); }
+
+/* Arcano (skin_in_arcano) */
+.user-profile-modal[data-theme="skin_in_arcano"] {
+  background:
+    radial-gradient(ellipse 70% 70% at 50% 50%, rgba(120,35,220,0.22) 0%, transparent 60%),
+    #040010;
+}
+.user-profile-modal[data-theme="skin_in_arcano"]::before {
+  /* Círculo grande centrado: sin esquinas que exponer al girar */
+  inset: auto;
+  top: 50%; left: 50%;
+  width: 250%; height: 250%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(150,35,240,0.12) 0deg,
+    rgba(70,8,170,0.05) 90deg,
+    rgba(170,55,255,0.14) 180deg,
+    rgba(70,8,170,0.05) 270deg,
+    rgba(150,35,240,0.12) 360deg
+  );
+  animation: pub-arcano-spin 8s linear infinite;
+}
+.user-profile-modal[data-theme="skin_in_arcano"]::after {
+  content: '';
+  position: absolute;
+  width: 45%; height: 45%;
+  top: 50%; left: 50%;
+  margin: -22.5% 0 0 -22.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(190,90,255,0.28) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+  animation: arcano-orb 6s linear infinite;
+}
+.user-profile-modal[data-theme="skin_in_arcano"] .up-pill { background: rgba(60,10,80,0.22); border-color: rgba(180,140,255,0.30); }
+.user-profile-modal[data-theme="skin_in_arcano"] .up-winrate-fill { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+.user-profile-modal[data-theme="skin_in_arcano"] .up-mode-fill { background: linear-gradient(90deg, #c084fc, #9333ea); }
+.user-profile-modal[data-theme="skin_in_arcano"] .pstat-tower-big { background: rgba(60,10,80,0.22); border-color: rgba(180,140,255,0.30); }
+.user-profile-modal[data-theme="skin_in_arcano"] .pstat-fav-card { background: rgba(60,10,80,0.22); border-color: rgba(180,140,255,0.30); }
+.user-profile-modal[data-theme="skin_in_arcano"] .up-champs-card { background: rgba(60,10,80,0.22); border-color: rgba(180,140,255,0.30); }

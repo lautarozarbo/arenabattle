@@ -30,10 +30,12 @@ export class DuoPower extends BasePower {
   constructor(owner) {
     super(owner);
 
-    // Each unit has 50 HP; respect saved HP when swapping back in
-    const savedOwnerHp = Math.min(owner.hp, 50);
-    const savedCompHp  = owner._duoCompHp ?? 50;
-    owner.maxHp = 50;
+    // Each unit has 50 HP base + half of any tower hpBonus upgrade
+    const hpBonus      = Math.round((owner.towerMods?.hpBonus ?? 0) / 2);
+    const unitMaxHp    = 50 + hpBonus;
+    const savedOwnerHp = Math.min(owner.hp, unitMaxHp);
+    const savedCompHp  = owner._duoCompHp ?? unitMaxHp;
+    owner.maxHp = unitMaxHp;
     owner.hp    = savedOwnerHp;
 
     this._comp = {
@@ -42,7 +44,7 @@ export class DuoPower extends BasePower {
       vx: -(owner.vx ?? 0) * 0.85 + 40,
       vy: (owner.vy ?? 0) * 0.85 - 40,
       hp: savedCompHp,
-      maxHp: 50,
+      maxHp: unitMaxHp,
       isAlive: savedCompHp > 0,
       radius: owner.radius,
       _flashTimer: 0,

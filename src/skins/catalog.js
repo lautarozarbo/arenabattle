@@ -8,6 +8,7 @@ export const CHAR_SKINS = {
   angel: [
     { id: "default", name: "Default", color: null },
     { id: "wings", name: "Alas de Ángel", color: "#fff3e0" },
+    { id: "serafin", name: "Serafín", color: "#0a0c1a", labelColor: "#d4c090", missionOnly: true },
   ],
   ninja: [
     { id: "default", name: "Default", color: null },
@@ -87,6 +88,15 @@ export const CHAR_SKINS = {
   cursedwall: [
     { id: "default", name: "Default", color: null },
     { id: "ladrillos", name: "Ladrillos", color: "#8B4513" },
+    { id: "maldito", name: "Maldito", color: "#050008", labelColor: "#9040ff", missionOnly: true },
+  ],
+  assassin: [
+    { id: "default", name: "Default", color: null },
+    { id: "sombra", name: "Sombra", color: "#03030a", labelColor: "#8833ee", missionOnly: true },
+  ],
+  bloodshard: [
+    { id: "default", name: "Default", color: null },
+    { id: "crista", name: "Cristal Rojo", color: "#080002", labelColor: "#dc1a30", missionOnly: true },
   ],
   archer: [
     { id: "default", name: "Default", color: null },
@@ -103,9 +113,14 @@ export const CHAR_SKINS = {
     { id: "default", name: "Default", color: null },
     { id: "quasar", name: "Quásar", color: "#010d1a" },
   ],
+  domainexpansion: [
+    { id: "default", name: "Default", color: null },
+    { id: "oscuro", name: "Dominio Oscuro", color: "#000000", labelColor: "#8b00ff" },
+  ],
   serpiente: [
     { id: "default", name: "Default", color: null },
     { id: "cascabel", name: "Cascabel", color: "#0d1a08" },
+    { id: "ancestral", name: "Serpiente Ancestral", color: "#020c08", labelColor: "#c8a420" },
   ],
   earthquake: [
     { id: "default", name: "Default", color: null },
@@ -138,7 +153,7 @@ export const CHAR_SKINS = {
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
-export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo', 'quasar', 'cascabel', 'tectonico', 'eclipse', 'simbionte', 'mech', 'singularidad', 'cronos', 'prisma']);
+export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo', 'quasar', 'cascabel', 'tectonico', 'eclipse', 'simbionte', 'mech', 'singularidad', 'cronos', 'prisma', 'oscuro', 'ancestral', 'serafin', 'maldito', 'crista', 'sombra']);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 

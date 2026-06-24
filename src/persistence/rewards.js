@@ -120,6 +120,14 @@ export function claimMasteryMilestone(charId, games) {
   return { xp: milestone.xp, chests: milestone.chests, effect: milestone.effect };
 }
 
+export function unlockMissionSkin(charId, skinId) {
+  const d = { ..._cache };
+  const unlocked = { ...(d.unlocked ?? {}) };
+  unlocked[charId] = { ...(unlocked[charId] ?? {}), [skinId]: true };
+  d.unlocked = unlocked;
+  _persist(d);
+}
+
 export function openChest() {
   const d = { ..._cache };
   if ((d.chests ?? 0) <= 0) return null;
@@ -131,7 +139,7 @@ export function openChest() {
 
   for (const [charId, skins] of Object.entries(CHAR_SKINS)) {
     for (const skin of skins) {
-      if (skin.id !== 'default' && !unlocked[charId]?.[skin.id]) {
+      if (skin.id !== 'default' && !skin.missionOnly && !unlocked[charId]?.[skin.id]) {
         locked.push({ type: 'skin', charId, skinId: skin.id, skinName: skin.name });
       }
     }

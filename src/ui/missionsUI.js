@@ -2,7 +2,8 @@ import { loadMissions } from '../persistence/missionsSave.js';
 import {
   MISSION_CATEGORIES, STREAK_MILESTONES, BADGES,
   getCategoryMission, CAT_LEVELS_COUNT,
-  getCategoryWinMission, WIN_CAT_LEVELS_COUNT, PROFILE_SKINS, SKIN_REWARD_BY_CAT,
+  getCategoryWinMission, WIN_CAT_LEVELS_COUNT,
+  PROFILE_SKINS, CATEGORY_WIN_REWARDS,
 } from '../missions/definitions.js';
 
 export function initMissionsUI({ onBadgeChange }) {
@@ -35,6 +36,37 @@ const CAT_ABBR = {
   'Invocación':      'IN',
 };
 
+// Returns the reward badge HTML for a given win mission level
+function _winRewardBadge(cat, levelIdx, isDone) {
+  const catRew = CATEGORY_WIN_REWARDS[cat];
+  if (!catRew) return '';
+  const mission = getCategoryWinMission(cat, levelIdx);
+  if (!mission) return '';
+
+  if (mission.rewardType === 'profile_skin_a') {
+    const skin = PROFILE_SKINS[catRew.skinA];
+    if (!skin) return '';
+    return isDone
+      ? `<span class="ms-skin-reward ms-skin-reward--done">✓ Skin de perfil "${skin.name}"</span>`
+      : `<span class="ms-skin-reward">Skin de perfil: <b>${skin.name}</b></span>`;
+  }
+  if (mission.rewardType === 'profile_skin_b') {
+    const skin = PROFILE_SKINS[catRew.skinB];
+    if (!skin) return '';
+    return isDone
+      ? `<span class="ms-skin-reward ms-skin-reward--done">✓ Skin de perfil "${skin.name}"</span>`
+      : `<span class="ms-skin-reward">Skin de perfil: <b>${skin.name}</b></span>`;
+  }
+  if (mission.rewardType === 'char_skin') {
+    const cs = catRew.charSkin;
+    if (!cs) return '';
+    return isDone
+      ? `<span class="ms-skin-reward ms-skin-reward--done ms-skin-reward--epic">✓ Skin: ${cs.name}</span>`
+      : `<span class="ms-skin-reward ms-skin-reward--epic">Skin: <b>${cs.name}</b></span>`;
+  }
+  return '';
+}
+
 function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
   const isDone  = cp.level >= levelsCount;
   const mission = isDone ? null : getMission(cat, cp.level);
@@ -44,17 +76,21 @@ function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
   const levelLabel = isDone ? `${levelsCount}/${levelsCount}` : `Niv. ${cp.level + 1}/${levelsCount}`;
 
   let rewardHtml = '';
-  if (!isDone && mission) {
-    rewardHtml = `<span class="ms-xp-reward">+${mission.xp} XP</span>`;
-  }
   if (type === 'win') {
-    const skinId   = SKIN_REWARD_BY_CAT[cat];
-    const skinMeta = skinId ? PROFILE_SKINS[skinId] : null;
     if (isDone) {
-      rewardHtml = skinMeta ? `<span class="ms-skin-reward ms-skin-reward--done">✓ Skin "${skinMeta.name}" desbloqueado</span>` : '';
-    } else if (cp.level === levelsCount - 1 && mission) {
-      rewardHtml += skinMeta ? `<span class="ms-skin-reward">🎨 Recompensa: Skin "${skinMeta.name}"</span>` : '';
+      // Show the final (level 4 = index 4) reward as done
+      rewardHtml = _winRewardBadge(cat, levelsCount - 1, true);
+    } else {
+      const xpLine = mission.xp > 0
+        ? `<span class="ms-xp-reward">+${mission.xp} XP</span>`
+        : '';
+      const specialReward = _winRewardBadge(cat, cp.level, false);
+      rewardHtml = xpLine + specialReward;
     }
+  } else {
+    rewardHtml = !isDone && mission
+      ? `<span class="ms-xp-reward">+${mission.xp} XP</span>`
+      : '';
   }
 
   return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}" style="--cat-color:${color}">
