@@ -6,10 +6,10 @@ import {
   PROFILE_SKINS, CATEGORY_WIN_REWARDS,
 } from '../missions/definitions.js';
 
+let _activeTab = 'partidas';
+
 export function initMissionsUI({ onBadgeChange }) {
-  document.getElementById('btn-misiones').addEventListener('click', () => {
-    openMissions();
-  });
+  document.getElementById('btn-misiones').addEventListener('click', () => openMissions());
   document.getElementById('missions-close').addEventListener('click', () => {
     document.getElementById('missions-modal').classList.add('hidden');
   });
@@ -36,7 +36,6 @@ const CAT_ABBR = {
   'Invocación':      'IN',
 };
 
-// Returns the reward badge HTML for a given win mission level
 function _winRewardBadge(cat, levelIdx, isDone) {
   const catRew = CATEGORY_WIN_REWARDS[cat];
   if (!catRew) return '';
@@ -78,7 +77,6 @@ function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
   let rewardHtml = '';
   if (type === 'win') {
     if (isDone) {
-      // Show the final (level 4 = index 4) reward as done
       rewardHtml = _winRewardBadge(cat, levelsCount - 1, true);
     } else {
       const xpLine = mission.xp > 0
@@ -110,26 +108,35 @@ function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
 
 function _render() {
   const state = loadMissions();
-  const modal = document.getElementById('missions-modal');
+  const container = document.getElementById('missions-content');
 
-  // ── Category play ────────────────────────────────────────────────────────
+  // ── Partidas ─────────────────────────────────────────────────────────────
   const catPlayHtml = MISSION_CATEGORIES.map(cat => {
-    const cp    = state.categoryPlay[cat] ?? { level: 0, count: 0 };
+    const cp = state.categoryPlay[cat] ?? { level: 0, count: 0 };
     return _missionCardHtml(cat, cp, getCategoryMission, CAT_LEVELS_COUNT, CAT_COLOR[cat] ?? '#7c9dff', CAT_ABBR[cat] ?? '??', 'play');
   }).join('');
 
-  // ── Category win ─────────────────────────────────────────────────────────
+  // ── Victorias ─────────────────────────────────────────────────────────────
   const catWinHtml = MISSION_CATEGORIES.map(cat => {
-    const cw    = state.categoryWin?.[cat] ?? { level: 0, count: 0 };
+    const cw = state.categoryWin?.[cat] ?? { level: 0, count: 0 };
     return _missionCardHtml(cat, cw, getCategoryWinMission, WIN_CAT_LEVELS_COUNT, CAT_COLOR[cat] ?? '#7c9dff', CAT_ABBR[cat] ?? '??', 'win');
   }).join('');
 
-  // ── Streak missions ───────────────────────────────────────────────────────
+  // ── Racha ─────────────────────────────────────────────────────────────────
   const curStreak  = state.winStreak?.current ?? 0;
   const completed  = new Set(state.winStreak?.completed ?? []);
   const nextStreak = STREAK_MILESTONES.find(ms => !completed.has(ms.target));
 
-  const streakHtml = STREAK_MILESTONES.map(ms => {
+  const streakCounterHtml = `
+    <div class="ms-streak-counter">
+      <div class="ms-streak-number">${curStreak}</div>
+      <div class="ms-streak-info">
+        <span class="ms-streak-title">Racha actual</span>
+        <span class="ms-streak-sub">${nextStreak ? `Próximo hito: ×${nextStreak.target} victorias` : 'Todos los hitos completados'}</span>
+      </div>
+    </div>`;
+
+  const streakCardsHtml = STREAK_MILESTONES.map(ms => {
     const done   = completed.has(ms.target);
     const isNext = nextStreak && ms.target === nextStreak.target;
     const pct    = done ? 100 : isNext ? Math.min(100, Math.round((curStreak / ms.target) * 100)) : 0;
@@ -147,28 +154,49 @@ function _render() {
     </div>`;
   }).join('');
 
-  modal.querySelector('#missions-content').innerHTML = `
-    <div class="ms-streak-counter">
-      <div class="ms-streak-number">${curStreak}</div>
-      <div class="ms-streak-info">
-        <span class="ms-streak-title">Racha actual</span>
-        <span class="ms-streak-sub">${nextStreak ? `Próximo hito: ×${nextStreak.target} victorias` : 'Todos los hitos completados'}</span>
-      </div>
+  const t = _activeTab;
+  const tabIndex = t === 'victorias' ? 1 : t === 'racha' ? 2 : 0;
+
+  container.innerHTML = `
+    <div class="ms-tabs">
+      <button class="ms-tab-btn ${t === 'partidas'  ? 'ms-tab-btn--active' : ''}" data-tab="partidas">Partidas</button>
+      <button class="ms-tab-btn ${t === 'victorias' ? 'ms-tab-btn--active' : ''}" data-tab="victorias">Victorias</button>
+      <button class="ms-tab-btn ${t === 'racha'     ? 'ms-tab-btn--active' : ''}" data-tab="racha">Racha</button>
+      <div class="ms-tab-indicator" style="transform:translateX(${tabIndex * 100}%)"></div>
     </div>
 
-    <div class="ms-section">
-      <div class="ms-section-header">Partidas por categoría</div>
+    <div class="ms-tab-content${t === 'partidas' ? '' : ' ms-tab-hidden'}">
       <div class="ms-missions-list">${catPlayHtml}</div>
     </div>
 
-    <div class="ms-section">
-      <div class="ms-section-header">Victorias por categoría</div>
+    <div class="ms-tab-content${t === 'victorias' ? '' : ' ms-tab-hidden'}">
       <div class="ms-missions-list">${catWinHtml}</div>
     </div>
 
-    <div class="ms-section">
-      <div class="ms-section-header">Victorias seguidas</div>
-      <div class="ms-missions-list">${streakHtml}</div>
+    <div class="ms-tab-content${t === 'racha' ? '' : ' ms-tab-hidden'}">
+      ${streakCounterHtml}
+      <div class="ms-missions-list">${streakCardsHtml}</div>
     </div>
   `;
+
+  container.addEventListener('click', e => {
+    const tabBtn = e.target.closest('.ms-tab-btn');
+    if (tabBtn) _switchTab(tabBtn.dataset.tab, container);
+  });
+}
+
+function _switchTab(tab, container) {
+  _activeTab = tab;
+  const tabIndex = tab === 'victorias' ? 1 : tab === 'racha' ? 2 : 0;
+
+  container.querySelectorAll('.ms-tab-btn').forEach(btn => {
+    btn.classList.toggle('ms-tab-btn--active', btn.dataset.tab === tab);
+  });
+
+  const indicator = container.querySelector('.ms-tab-indicator');
+  if (indicator) indicator.style.transform = `translateX(${tabIndex * 100}%)`;
+
+  const contents = container.querySelectorAll('.ms-tab-content');
+  const order = ['partidas', 'victorias', 'racha'];
+  contents.forEach((el, i) => el.classList.toggle('ms-tab-hidden', order[i] !== tab));
 }
