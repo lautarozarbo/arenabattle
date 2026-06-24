@@ -82,9 +82,11 @@ export function renderCommentsSection(comments, myId, profileUserId) {
     : comments.map(c => _renderComment(c, myId, profileUserId)).join('');
 
   return `
-    <div class="up-section-label">Comentarios</div>
-    ${inputHtml}
-    <div class="up-comment-list" id="up-comment-list">${listHtml}</div>
+    <div class="up-comments-section">
+      <div class="up-comments-hd">Comentarios</div>
+      ${inputHtml}
+      <div class="up-comment-list" id="up-comment-list">${listHtml}</div>
+    </div>
   `;
 }
 

@@ -185,6 +185,38 @@ export const ARENA_SKINS = [
     obsInner: 'rgba(80,70,160,0.22)', obsOuter: 'rgba(20,15,60,0.65)',
     obsRing: 'rgba(100,90,200,0.50)', obsGlow: false,
   },
+  {
+    id: 'magma', name: 'Magma',
+    bg: '#0c0400', bgGrad: ['#0c0400', '#180600'],
+    gridColor: 'rgba(255,80,0,0.18)', gridStyle: 'magma', animated: true,
+    borderColor: '#8a3000', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(255,90,10,0.35)', obsOuter: 'rgba(140,30,0,0.65)',
+    obsRing: 'rgba(255,120,20,0.75)', obsGlow: true,
+  },
+  {
+    id: 'matrix', name: 'Matrix',
+    bg: '#000a00', bgGrad: null,
+    gridColor: 'rgba(0,220,80,0.15)', gridStyle: 'matrix', animated: true,
+    borderColor: '#004400', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(0,180,60,0.22)', obsOuter: 'rgba(0,60,20,0.60)',
+    obsRing: 'rgba(0,220,80,0.75)', obsGlow: true,
+  },
+  {
+    id: 'cristal_arena', name: 'Cristal',
+    bg: '#040810', bgGrad: ['#040810', '#060c18'],
+    gridColor: 'rgba(140,200,255,0.15)', gridStyle: 'cristal', animated: true,
+    borderColor: '#1a4a80', borderWidth: 3, borderGlow: false,
+    obsInner: 'rgba(100,180,255,0.28)', obsOuter: 'rgba(20,60,140,0.65)',
+    obsRing: 'rgba(140,210,255,0.65)', obsGlow: false,
+  },
+  {
+    id: 'vacio', name: 'Vacío',
+    bg: '#010008', bgGrad: ['#010008', '#020010'],
+    gridColor: 'rgba(100,0,200,0.12)', gridStyle: 'void', animated: true,
+    borderColor: '#3a008a', borderWidth: 3, borderGlow: true,
+    obsInner: 'rgba(80,0,160,0.28)', obsOuter: 'rgba(20,0,60,0.70)',
+    obsRing: 'rgba(120,0,220,0.65)', obsGlow: true,
+  },
 ];
 
 export function getSelectedArenaSkinId() {
@@ -715,6 +747,174 @@ function _drawGrid(ctx, x, y, w, h, skin, t = 0) {
       ctx.arc(x + fx * w + drift * progress, py, size, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,${g},${b},${alpha})`;
       ctx.fill();
+    }
+    ctx.restore();
+  } else if (skin.gridStyle === 'magma') {
+    // Glowing lava-crack network on dark stone
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const cracks = 14;
+    for (let i = 0; i < cracks; i++) {
+      const hx  = Math.sin(i * 127.1) * 43758.5453;
+      const hy  = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const ha  = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+      const hl  = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+      const hph = Math.sin(i * 193.9 + 57.1) * 43758.5453;
+      const sx    = x + (hx - Math.floor(hx)) * w;
+      const sy    = y + (hy - Math.floor(hy)) * h;
+      const angle = (ha - Math.floor(ha)) * Math.PI * 2;
+      const len   = 28 + (hl - Math.floor(hl)) * 55;
+      const phase = (hph - Math.floor(hph)) * Math.PI * 2;
+      const glow  = 0.40 + 0.60 * Math.abs(Math.sin(t * 0.55 + phase));
+
+      // Build zigzag crack with 4 segments
+      const pts = [{ x: sx, y: sy }];
+      for (let s = 1; s <= 4; s++) {
+        const f   = s / 4;
+        const px  = sx + Math.cos(angle) * len * f;
+        const py  = sy + Math.sin(angle) * len * f;
+        const hzz = Math.sin((i * 100 + s) * 57.3) * 43758.5453;
+        const oz  = ((hzz - Math.floor(hzz)) - 0.5) * 16;
+        pts.push({ x: px - Math.sin(angle) * oz, y: py + Math.cos(angle) * oz });
+      }
+
+      const draw = () => {
+        ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+        for (let p = 1; p < pts.length; p++) ctx.lineTo(pts[p].x, pts[p].y);
+      };
+      // Outer glow
+      draw();
+      ctx.strokeStyle = `rgba(255,100,5,${glow * 0.22})`;
+      ctx.lineWidth   = 5; ctx.shadowColor = 'rgba(255,70,0,0.8)'; ctx.shadowBlur = 12; ctx.stroke();
+      // Core
+      draw();
+      ctx.strokeStyle = `rgba(255,170,30,${glow * 0.88})`;
+      ctx.lineWidth   = 1.3; ctx.shadowBlur = 4; ctx.stroke();
+    }
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'matrix') {
+    // Falling digital code columns
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const cols = 16;
+    const colW = w / cols;
+    for (let col = 0; col < cols; col++) {
+      const hsp  = Math.sin(col * 127.1) * 43758.5453;
+      const hph  = Math.sin(col * 311.7 + 19.3) * 43758.5453;
+      const hlen = Math.sin(col * 91.3 + 7.1) * 43758.5453;
+      const speed    = 40 + (hsp  - Math.floor(hsp))  * 80;
+      const phase    = (hph  - Math.floor(hph))  * h;
+      const trailLen = 5 + Math.floor((hlen - Math.floor(hlen)) * 8);
+      const cx2      = x + col * colW + colW * 0.5;
+      const headY    = y + ((t * speed + phase) % (h + trailLen * 14));
+
+      for (let k = 0; k < trailLen; k++) {
+        const charY = headY - k * 14;
+        if (charY < y - 14 || charY > y + h) continue;
+        const fade  = 1 - k / trailLen;
+        const alpha = k === 0 ? 0.95 : fade * 0.55;
+        const green = k === 0 ? 255 : Math.round(120 + fade * 110);
+        ctx.fillStyle = k === 0
+          ? `rgba(180,255,200,${alpha})`
+          : `rgba(0,${green},0,${alpha})`;
+        ctx.fillRect(cx2 - 3.5, charY - 6, 7, 11);
+        if (k === 0) {
+          ctx.shadowColor = 'rgba(0,255,80,0.9)'; ctx.shadowBlur = 8;
+          ctx.fillStyle = 'rgba(180,255,200,0.95)';
+          ctx.fillRect(cx2 - 3.5, charY - 6, 7, 11);
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'cristal') {
+    // Crystalline diamond shards scattered across the arena with shimmer
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const shards = 20;
+    for (let i = 0; i < shards; i++) {
+      const hx  = Math.sin(i * 127.1) * 43758.5453;
+      const hy  = Math.sin(i * 311.7 + 19.3) * 43758.5453;
+      const hl  = Math.sin(i * 91.3  + 7.1)  * 43758.5453;
+      const ha  = Math.sin(i * 57.3  + 2.7)  * 43758.5453;
+      const hph = Math.sin(i * 173.5 + 31.7) * 43758.5453;
+      const hw  = Math.sin(i * 231.1 + 41.3) * 43758.5453;
+      const sx     = x + (hx - Math.floor(hx)) * w;
+      const sy     = y + (hy - Math.floor(hy)) * h;
+      const len    = 18 + (hl - Math.floor(hl)) * 46;
+      const angle  = (ha - Math.floor(ha)) * Math.PI * 2;
+      const phase  = (hph - Math.floor(hph)) * Math.PI * 2;
+      const wid    = 4 + (hw - Math.floor(hw)) * 11;
+      const shimmer = 0.5 + 0.5 * Math.sin(t * 1.6 + phase);
+      const alpha   = 0.04 + shimmer * 0.13;
+      const ex  = sx + Math.cos(angle) * len;
+      const ey  = sy + Math.sin(angle) * len;
+      const px  = Math.cos(angle + Math.PI / 2) * wid * 0.5;
+      const py  = Math.sin(angle + Math.PI / 2) * wid * 0.5;
+      const midX = sx + Math.cos(angle) * len * 0.3;
+      const midY = sy + Math.sin(angle) * len * 0.3;
+
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(midX + px, midY + py);
+      ctx.lineTo(ex, ey);
+      ctx.lineTo(midX - px, midY - py);
+      ctx.closePath();
+      const g = ctx.createLinearGradient(sx, sy, ex, ey);
+      g.addColorStop(0,   `rgba(180,220,255,${alpha * 0.5})`);
+      g.addColorStop(0.5, `rgba(210,238,255,${alpha})`);
+      g.addColorStop(1,   `rgba(140,200,255,${alpha * 0.3})`);
+      ctx.fillStyle = g; ctx.fill();
+      if (shimmer > 0.82) {
+        ctx.strokeStyle = `rgba(220,242,255,${(shimmer - 0.82) * 0.55})`;
+        ctx.lineWidth = 0.8; ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+  } else if (skin.gridStyle === 'void') {
+    // Swirling void — multiple dark singularities with rotating arc rings
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    const voids = 3;
+    for (let v = 0; v < voids; v++) {
+      const hvx = Math.sin(v * 127.1) * 43758.5453;
+      const hvy = Math.sin(v * 311.7 + 19.3) * 43758.5453;
+      const vcx   = x + (hvx - Math.floor(hvx)) * w;
+      const vcy   = y + (hvy - Math.floor(hvy)) * h;
+      const vph   = v * Math.PI * 2 / voids;
+      const vspd  = 0.18 + v * 0.07;
+      const maxR2 = Math.min(w, h) * (0.13 + v * 0.04);
+
+      // Rotating arc rings
+      const rings = 5;
+      for (let ri = 1; ri <= rings; ri++) {
+        const frac  = ri / rings;
+        const rr    = maxR2 * frac;
+        const rot   = t * vspd * (1 - frac * 0.55) + vph;
+        const arc   = Math.PI * (0.38 + frac * 0.22);
+        const alpha = (0.07 + frac * 0.11) * (0.55 + 0.45 * Math.sin(t * 0.9 + ri));
+        ctx.beginPath(); ctx.arc(vcx, vcy, rr, rot, rot + arc);
+        ctx.strokeStyle = `rgba(80,0,180,${alpha})`;
+        ctx.lineWidth   = 0.8 + frac * 1.1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(vcx, vcy, rr, rot + Math.PI, rot + Math.PI + arc * 0.55);
+        ctx.strokeStyle = `rgba(150,0,255,${alpha * 0.45})`;
+        ctx.lineWidth   = 0.5; ctx.stroke();
+      }
+
+      // Void glow center
+      const vg    = ctx.createRadialGradient(vcx, vcy, 0, vcx, vcy, maxR2 * 0.6);
+      const pulse = 0.08 + 0.05 * Math.sin(t * 1.3 + vph);
+      vg.addColorStop(0, `rgba(40,0,100,${pulse})`);
+      vg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = vg; ctx.fillRect(x, y, w, h);
     }
     ctx.restore();
   }
