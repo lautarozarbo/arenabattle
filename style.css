@@ -5124,42 +5124,51 @@ td.rank {
   background: rgba(255,255,255,0.03);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.ms-missions-list { display: flex; flex-direction: column; padding: 8px; gap: 6px; }
+.ms-missions-list { display: flex; flex-direction: column; gap: 8px; }
 
 /* Mission cards */
 .ms-mission-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-left: 3px solid var(--cat-color, rgba(255,255,255,0.15));
-  border-radius: 8px; padding: 9px 11px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cat-color, #7c9dff) 6%, transparent) 0%, rgba(255,255,255,0.025) 100%);
+  border: 1px solid color-mix(in srgb, var(--cat-color, #ffffff) 18%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
 .ms-mission-card.ms-done {
-  opacity: 0.40;
+  opacity: 0.42;
+  filter: saturate(0.5);
 }
-.ms-mission-header {
-  display: flex; align-items: center; gap: 7px;
-  margin-bottom: 6px;
+.ms-card-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px 8px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cat-color, #7c9dff) 14%, transparent) 0%, transparent 70%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ms-card-body {
+  padding: 9px 12px 10px;
+  display: flex; flex-direction: column; gap: 7px;
 }
 .ms-cat-abbr {
-  font-size: 0.60rem; font-weight: 800; letter-spacing: 0.04em;
-  padding: 2px 6px; border-radius: 5px; border: 1px solid;
+  font-size: 0.60rem; font-weight: 800; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 5px; border: 1px solid;
   flex-shrink: 0;
 }
 .ms-streak-chip {
   font-size: 0.68rem; font-weight: 800; color: #ffa500;
-  background: rgba(255,160,0,0.12); border: 1px solid rgba(255,160,0,0.25);
-  padding: 2px 7px; border-radius: 5px; flex-shrink: 0;
+  background: rgba(255,160,0,0.14); border: 1px solid rgba(255,160,0,0.30);
+  padding: 2px 8px; border-radius: 5px; flex-shrink: 0;
 }
-.ms-cat-name { font-size: 0.80rem; font-weight: 700; }
-.ms-level-tag { margin-left: auto; font-size: 0.65rem; color: rgba(255,255,255,0.35); white-space: nowrap; }
-.ms-mission-label { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-bottom: 7px; }
+.ms-cat-name { font-size: 0.82rem; font-weight: 700; }
+.ms-level-tag { margin-left: auto; font-size: 0.64rem; color: rgba(255,255,255,0.35); white-space: nowrap; }
+.ms-mission-label { font-size: 0.76rem; color: rgba(255,255,255,0.62); line-height: 1.4; }
 .ms-progress-row { display: flex; align-items: center; gap: 8px; }
-.ms-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.09); border-radius: 4px; overflow: hidden; }
-.ms-progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; background: #7c9dff; }
+.ms-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden; }
+.ms-progress-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; background: #7c9dff; }
 .ms-fill--streak  { background: #ff9d2f; }
-.ms-progress-text { font-size: 0.68rem; color: rgba(255,255,255,0.38); white-space: nowrap; }
-.ms-xp-reward     { font-size: 0.68rem; color: #a5f3af; margin-top: 5px; display: block; }
-.ms-skin-reward   { font-size: 0.68rem; color: #fbbf24; margin-top: 4px; display: block; }
+.ms-progress-text { font-size: 0.68rem; color: rgba(255,255,255,0.40); white-space: nowrap; min-width: 28px; text-align: right; }
+.ms-reward-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ms-xp-reward  { font-size: 0.68rem; font-weight: 600; color: #86efac; }
+.ms-skin-reward { font-size: 0.68rem; color: #fbbf24; }
 .ms-skin-reward--done { color: #4ade80; }
 .ms-skin-reward--epic { color: #e879f9; font-weight: 600; }
 .ms-skin-reward--epic.ms-skin-reward--done { color: #a855f7; }
@@ -5701,25 +5710,25 @@ td.rank {
   font-size: 0.65rem; color: rgba(255,255,255,0.30); padding: 0 20px 8px; line-height: 1.4; margin: 0;
 }
 .cz-skin-hint--unlocked { color: #4ade80; padding: 0 8px 6px; font-weight: 600; }
-#cz-epic-grid { grid-template-columns: repeat(2, 155px); justify-content: center; }
+#cz-epic-grid { grid-template-columns: 1fr 1fr; }
 .cz-skin-card--epic { cursor: default; padding: 0 0 10px 0; gap: 0; }
 .cz-skin-card--epic:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.10); }
 .cz-epic-canvas-wrap {
-  position: relative; width: 100%; border-radius: 12px 12px 0 0; overflow: hidden;
+  position: relative; width: 100%; aspect-ratio: 1; border-radius: 12px 12px 0 0; overflow: hidden;
   background: rgba(0,0,0,0.40);
 }
-.cz-epic-canvas { display: block; width: 100%; height: 110px; }
+.cz-epic-canvas { display: block; width: 100%; height: 100%; }
 .cz-epic-lock-overlay {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.52); font-size: 1.2rem;
 }
 .cz-epic-info {
   display: flex; flex-direction: column; align-items: center;
-  padding: 7px 8px 0; gap: 2px; text-align: center;
+  padding: 8px 8px 0; gap: 3px; text-align: center;
 }
-.cz-epic-info .cz-theme-name { font-size: 0.78rem; }
+.cz-epic-info .cz-theme-name { font-size: 0.82rem; }
 .cz-epic-charname {
-  font-size: 0.62rem; color: rgba(255,255,255,0.35); letter-spacing: 0.02em;
+  font-size: 0.64rem; color: rgba(255,255,255,0.35); letter-spacing: 0.02em;
 }
 .cz-theme-name {
   font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.85);

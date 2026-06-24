@@ -105,7 +105,7 @@ function _renderModal() {
     const charName = EPIC_META[cs.charId]?.name ?? cs.charId;
     return `<div class="cz-theme-card cz-skin-card--epic ${!unlocked ? 'cz-skin-card--locked' : ''}">
       <div class="cz-epic-canvas-wrap">
-        <canvas class="cz-epic-canvas" data-char="${cs.charId}" data-skin="${cs.skinId}" width="120" height="110"></canvas>
+        <canvas class="cz-epic-canvas" data-char="${cs.charId}" data-skin="${cs.skinId}" width="130" height="130"></canvas>
         ${!unlocked ? `<div class="cz-epic-lock-overlay">🔒</div>` : ''}
       </div>
       <div class="cz-epic-info">
@@ -213,7 +213,7 @@ function _startEpicPreviews(container) {
   const drawAll = () => {
     for (const canvas of canvases) {
       const meta = EPIC_META[canvas.dataset.char];
-      if (meta) drawCharPreview(canvas, meta, canvas.dataset.skin, { rScale: 0.30, yScale: 0.48 });
+      if (meta) drawCharPreview(canvas, meta, canvas.dataset.skin, { rScale: 0.31, yScale: 0.50 });
     }
   };
   const hasAnim = [...canvases].some(c => ANIMATED_SKIN_IDS.has(c.dataset.skin));

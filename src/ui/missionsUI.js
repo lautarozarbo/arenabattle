@@ -92,17 +92,19 @@ function _missionCardHtml(cat, cp, getMission, levelsCount, color, abbr, type) {
   }
 
   return `<div class="ms-mission-card ${isDone ? 'ms-done' : ''}" style="--cat-color:${color}">
-    <div class="ms-mission-header">
+    <div class="ms-card-head">
       <span class="ms-cat-abbr" style="background:${color}22;color:${color};border-color:${color}44">${abbr}</span>
       <span class="ms-cat-name">${cat}</span>
       <span class="ms-level-tag">${levelLabel}</span>
     </div>
-    <div class="ms-mission-label">${isDone ? 'Todas las misiones completadas' : mission.label}</div>
-    <div class="ms-progress-row">
-      <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%;background:${color}"></div></div>
-      <span class="ms-progress-text">${isDone ? 'Completado' : `${count}/${target}`}</span>
+    <div class="ms-card-body">
+      <div class="ms-mission-label">${isDone ? '¡Todas las misiones completadas!' : mission.label}</div>
+      <div class="ms-progress-row">
+        <div class="ms-progress-bar"><div class="ms-progress-fill" style="width:${pct}%;background:${color};box-shadow:0 0 6px ${color}88"></div></div>
+        <span class="ms-progress-text">${isDone ? '✓' : `${count}/${target}`}</span>
+      </div>
+      ${rewardHtml ? `<div class="ms-reward-row">${rewardHtml}</div>` : ''}
     </div>
-    ${rewardHtml}
   </div>`;
 }
 
@@ -140,17 +142,23 @@ function _render() {
     const done   = completed.has(ms.target);
     const isNext = nextStreak && ms.target === nextStreak.target;
     const pct    = done ? 100 : isNext ? Math.min(100, Math.round((curStreak / ms.target) * 100)) : 0;
-    return `<div class="ms-mission-card ${done ? 'ms-done' : ''}">
-      <div class="ms-mission-header">
+    const rewardLine = done ? '' : [
+      ms.xp > 0 ? `<span class="ms-xp-reward">+${ms.xp} XP</span>` : '',
+      ms.badge ? `<span class="ms-skin-reward">Marco: <b>${BADGES[ms.badge].name}</b></span>` : '',
+    ].filter(Boolean).join('');
+    return `<div class="ms-mission-card ${done ? 'ms-done' : ''}" style="--cat-color:#ff9d2f">
+      <div class="ms-card-head">
         <span class="ms-streak-chip">×${ms.target}</span>
         <span class="ms-cat-name">${ms.target} victorias seguidas</span>
-        ${ms.badge ? `<span class="ms-badge-chip badge--${ms.badge.replace('badge_','')}">Marco ${BADGES[ms.badge].name}</span>` : ''}
+        ${ms.badge ? `<span class="ms-badge-chip badge--${ms.badge.replace('badge_','')}">Marco</span>` : ''}
       </div>
-      ${isNext ? `<div class="ms-progress-row">
-        <div class="ms-progress-bar"><div class="ms-progress-fill ms-fill--streak" style="width:${pct}%"></div></div>
-        <span class="ms-progress-text">${curStreak}/${ms.target}</span>
-      </div>` : done ? `<div class="ms-progress-row"><span class="ms-progress-text">Completado</span></div>` : ''}
-      <span class="ms-xp-reward">${done ? '' : `+${ms.xp} XP`}${ms.badge && !done ? ` · Marco ${BADGES[ms.badge].name}` : ''}</span>
+      <div class="ms-card-body">
+        ${isNext ? `<div class="ms-progress-row">
+          <div class="ms-progress-bar"><div class="ms-progress-fill ms-fill--streak" style="width:${pct}%;box-shadow:0 0 6px #ff9d2f88"></div></div>
+          <span class="ms-progress-text">${curStreak}/${ms.target}</span>
+        </div>` : done ? `<div class="ms-progress-row"><div class="ms-progress-bar"><div class="ms-progress-fill ms-fill--streak" style="width:100%"></div></div><span class="ms-progress-text">✓</span></div>` : ''}
+        ${rewardLine ? `<div class="ms-reward-row">${rewardLine}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 
