@@ -653,7 +653,7 @@ function _buildProfileStats() {
         </div>
         <div class="pstat-tower-big-div"></div>
         <div class="pstat-tower-big-stat">
-          <span class="pstat-tower-big-val">${totalW}</span>
+          <span class="pstat-tower-big-val">${s.wins.tower ?? 0}</span>
           <span class="pstat-tower-big-lbl">Victorias</span>
         </div>
         ${tMeta ? `

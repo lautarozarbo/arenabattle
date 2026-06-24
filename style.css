@@ -4854,10 +4854,9 @@ td.rank {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  padding: 6px 0 2px;
+  padding: 8px 0 2px;
   border-top: 1px solid rgba(255,255,255,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  margin-bottom: 4px;
+  margin-top: 8px;
 }
 .tp-buff-chip {
   font-size: 0.63rem;

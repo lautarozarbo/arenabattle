@@ -103,21 +103,6 @@ export class TowerUI {
     el.querySelector('.tp-title').textContent = `¡Piso ${floor} superado!`;
     el.querySelector('.tp-sub').textContent   = 'Elegí una mejora para continuar';
 
-    // Active buffs strip
-    const existingBufBar = el.querySelector('.tp-buffs');
-    if (existingBufBar) existingBufBar.remove();
-    if (run) {
-      const chips = _buildBuffChips(run);
-      if (chips.length > 0) {
-        const bar = document.createElement('div');
-        bar.className = 'tp-buffs';
-        bar.innerHTML = chips.map(c =>
-          `<span class="tp-buff-chip" style="color:${c.color};border-color:${c.color}33;background:${c.color}18">${c.label}</span>`
-        ).join('');
-        el.querySelector('.tp-box').insertBefore(bar, el.querySelector('.tp-cards'));
-      }
-    }
-
     const list = el.querySelector('.tp-cards');
     list.innerHTML = '';
 
@@ -135,6 +120,21 @@ export class TowerUI {
       `;
       card.addEventListener('click', () => this._selectUpgrade(upg, card));
       list.appendChild(card);
+    }
+
+    // Active buffs strip — below the upgrade cards
+    const existingBufBar = el.querySelector('.tp-buffs');
+    if (existingBufBar) existingBufBar.remove();
+    if (run) {
+      const chips = _buildBuffChips(run);
+      if (chips.length > 0) {
+        const bar = document.createElement('div');
+        bar.className = 'tp-buffs';
+        bar.innerHTML = chips.map(c =>
+          `<span class="tp-buff-chip" style="color:${c.color};border-color:${c.color}33;background:${c.color}18">${c.label}</span>`
+        ).join('');
+        el.querySelector('.tp-box').appendChild(bar);
+      }
     }
 
     el.classList.remove('tt--hidden');
