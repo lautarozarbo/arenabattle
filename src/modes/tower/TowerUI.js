@@ -94,13 +94,29 @@ export class TowerUI {
   /**
    * @param {number}    floor    — just-won floor
    * @param {Upgrade[]} upgrades — array of 3 upgrade objects
+   * @param {TowerRun}  run      — current run (optional, for showing active buffs)
    */
-  showUpgradePicker(floor, upgrades) {
+  showUpgradePicker(floor, upgrades, run) {
     this._ensurePicker();
     const el = this._picker;
 
     el.querySelector('.tp-title').textContent = `¡Piso ${floor} superado!`;
     el.querySelector('.tp-sub').textContent   = 'Elegí una mejora para continuar';
+
+    // Active buffs strip
+    const existingBufBar = el.querySelector('.tp-buffs');
+    if (existingBufBar) existingBufBar.remove();
+    if (run) {
+      const chips = _buildBuffChips(run);
+      if (chips.length > 0) {
+        const bar = document.createElement('div');
+        bar.className = 'tp-buffs';
+        bar.innerHTML = chips.map(c =>
+          `<span class="tp-buff-chip" style="color:${c.color};border-color:${c.color}33;background:${c.color}18">${c.label}</span>`
+        ).join('');
+        el.querySelector('.tp-box').insertBefore(bar, el.querySelector('.tp-cards'));
+      }
+    }
 
     const list = el.querySelector('.tp-cards');
     list.innerHTML = '';
@@ -122,7 +138,6 @@ export class TowerUI {
     }
 
     el.classList.remove('tt--hidden');
-    // Staggered card entrance
     requestAnimationFrame(() => {
       list.querySelectorAll('.tp-card').forEach((c, i) => {
         c.style.animationDelay = `${i * 90}ms`;
@@ -363,6 +378,23 @@ function _spawnParticles(container, color) {
     p.style.setProperty('--drift', `${drift}px`);
     container.appendChild(p);
   }
+}
+
+function _buildBuffChips(run) {
+  const mods  = run.playerMods;
+  const pmods = run.powerMods;
+  const chips = [];
+  if (mods.hpBonus       > 0)  chips.push({ label: `+${mods.hpBonus} HP`,                                       color: '#f87171' });
+  if (mods.regenPerSec   > 0)  chips.push({ label: `Regen +${mods.regenPerSec} HP/s`,                           color: '#f472b6' });
+  if (mods.dmgAdd        > 0)  chips.push({ label: `+${mods.dmgAdd} daño poder`,                                 color: '#a78bfa' });
+  if (mods.speedMult     > 1)  chips.push({ label: `Vel +${Math.round((mods.speedMult - 1) * 100)}%`,            color: '#22d3ee' });
+  if (mods.contactDmgAdd > 0)  chips.push({ label: `+${mods.contactDmgAdd} choque`,                              color: '#fb923c' });
+  if (mods.bleedPerSec   > 0)  chips.push({ label: `Sangrado ${+mods.bleedPerSec.toFixed(1)}/s`,                 color: '#ef4444' });
+  if (pmods.cdMult       < 1)  chips.push({ label: `CD -${Math.round((1 - pmods.cdMult) * 100)}%`,              color: '#60a5fa' });
+  if (pmods.extraProjectile > 0) chips.push({ label: `+${pmods.extraProjectile} proyectil`,                      color: '#facc15' });
+  if (pmods.extraPlacement  > 0) chips.push({ label: `+${pmods.extraPlacement} elemento`,                        color: '#4ade80' });
+  if (pmods.zoneDurationMult > 1) chips.push({ label: `Zona +${Math.round((pmods.zoneDurationMult - 1) * 100)}%`, color: '#2dd4bf' });
+  return chips;
 }
 
 function _renderArenaPreview(cvs, skinId, obstacles) {

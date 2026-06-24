@@ -4850,6 +4850,24 @@ td.rank {
   color: rgba(255,255,255,0.35);
   margin-top: -6px;
 }
+.tp-buffs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 0 2px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 4px;
+}
+.tp-buff-chip {
+  font-size: 0.63rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
 .tp-cards {
   display: flex;
   flex-direction: column;

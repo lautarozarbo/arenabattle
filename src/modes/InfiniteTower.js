@@ -87,7 +87,7 @@ export class InfiniteTower {
 
   _onFloorWon() {
     const choices = getUpgradeChoices(this._run, 3);
-    this._ui.showUpgradePicker(this._run.floor, choices);
+    this._ui.showUpgradePicker(this._run.floor, choices, this._run);
   }
 
   _onUpgradeChosen(upgrade) {

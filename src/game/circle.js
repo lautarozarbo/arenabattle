@@ -20,6 +20,7 @@ export class Circle {
     this.mass   = (cfg.radius ?? 28) ** 2;
     this.isAlive = true;
     if (cfg._duoCompHp != null) this._duoCompHp = cfg._duoCompHp;
+    this.towerMods = cfg.towerMods ?? null;
     this.power  = createPower(cfg.powerId ?? 'none', this);
     this.charId = cfg.powerId ?? null;
     this.skinId = cfg.skinId  ?? 'default';
@@ -51,7 +52,6 @@ export class Circle {
     this._healHot         = 0;   // seconds remaining for heal-over-time
     this._healHotAccum    = 0;   // accumulator for per-second ticks
     this._healHotRate     = 5;   // HP per second
-    this.towerMods        = cfg.towerMods ?? null;
     if (cfg.contactDmgAdd) this._contactDmgAdd = cfg.contactDmgAdd;
   }
 

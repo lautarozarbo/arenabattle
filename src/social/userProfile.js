@@ -30,7 +30,7 @@ export async function openUserProfile(userId) {
   const rel  = myId && myId !== userId ? await _getRelationship(myId, userId) : null;
 
   const s    = stats ?? {};
-  const wins   = s.wins          ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
+  const wins   = s.wins          ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0, tower: 0 };
   const losses = s.losses        ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
   const draws  = s.draws         ?? { quick1v1: 0, quick2v2: 0, league: 0, tournament: 0 };
   const champs = s.championships ?? { league: 0, tournament: 0 };
@@ -93,7 +93,7 @@ export async function openUserProfile(userId) {
         </div>
         <div class="pstat-tower-big-div"></div>
         <div class="pstat-tower-big-stat">
-          <span class="pstat-tower-big-val">${totalW}</span>
+          <span class="pstat-tower-big-val">${wins.tower ?? 0}</span>
           <span class="pstat-tower-big-lbl">Victorias</span>
         </div>
         ${tMeta ? `

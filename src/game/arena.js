@@ -1,5 +1,8 @@
 ﻿import { sfx } from '../audio/index.js';
-import { drawArenaBg, drawArenaObstacle } from '../skins/arenaSkins.js';
+import { drawArenaBg, drawArenaObstacle, isAnimatedArenaSkin } from '../skins/arenaSkins.js';
+
+const BG_FPS = 30;
+const BG_INTERVAL = 1000 / BG_FPS;
 
 export class Arena {
   constructor({ x, y, width, height, obstacles = [], skinId = 'default' }) {
@@ -9,6 +12,10 @@ export class Arena {
     this.height = height;
     this.obstacles = obstacles; // [{ cx, cy, r }] absolute px
     this.skinId = skinId;
+    this._bgCanvas  = null;
+    this._bgCtx     = null;
+    this._bgLastMs  = -Infinity;
+    this._bgDirty   = true;
   }
 
   get left()   { return this.x; }
@@ -101,7 +108,27 @@ export class Arena {
   }
 
   render(ctx) {
-    drawArenaBg(ctx, this.x, this.y, this.width, this.height, this.skinId, performance.now() / 1000);
+    const now = performance.now();
+    const animated = isAnimatedArenaSkin(this.skinId);
+
+    if (!this._bgCanvas || this._bgCanvas.width !== this.width || this._bgCanvas.height !== this.height) {
+      this._bgCanvas = document.createElement('canvas');
+      this._bgCanvas.width  = Math.ceil(this.width);
+      this._bgCanvas.height = Math.ceil(this.height);
+      this._bgCtx   = this._bgCanvas.getContext('2d');
+      this._bgDirty = true;
+    }
+
+    const needsRedraw = this._bgDirty || (animated && now - this._bgLastMs >= BG_INTERVAL);
+    if (needsRedraw) {
+      const t = now / 1000;
+      this._bgCtx.clearRect(0, 0, this._bgCanvas.width, this._bgCanvas.height);
+      drawArenaBg(this._bgCtx, 0, 0, this._bgCanvas.width, this._bgCanvas.height, this.skinId, t);
+      this._bgLastMs = now;
+      this._bgDirty  = false;
+    }
+
+    ctx.drawImage(this._bgCanvas, this.x, this.y);
     for (const obs of this.obstacles) {
       drawArenaObstacle(ctx, obs.cx, obs.cy, obs.r, this.skinId);
     }

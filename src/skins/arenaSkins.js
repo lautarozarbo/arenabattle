@@ -755,6 +755,8 @@ function _drawGrid(ctx, x, y, w, h, skin, t = 0) {
     ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
 
     const cracks = 14;
+    // Pre-compute crack geometry and glow values
+    const crackData = [];
     for (let i = 0; i < cracks; i++) {
       const hx  = Math.sin(i * 127.1) * 43758.5453;
       const hy  = Math.sin(i * 311.7 + 19.3) * 43758.5453;
@@ -767,8 +769,6 @@ function _drawGrid(ctx, x, y, w, h, skin, t = 0) {
       const len   = 28 + (hl - Math.floor(hl)) * 55;
       const phase = (hph - Math.floor(hph)) * Math.PI * 2;
       const glow  = 0.40 + 0.60 * Math.abs(Math.sin(t * 0.55 + phase));
-
-      // Build zigzag crack with 4 segments
       const pts = [{ x: sx, y: sy }];
       for (let s = 1; s <= 4; s++) {
         const f   = s / 4;
@@ -778,19 +778,24 @@ function _drawGrid(ctx, x, y, w, h, skin, t = 0) {
         const oz  = ((hzz - Math.floor(hzz)) - 0.5) * 16;
         pts.push({ x: px - Math.sin(angle) * oz, y: py + Math.cos(angle) * oz });
       }
+      crackData.push({ pts, glow });
+    }
 
-      const draw = () => {
-        ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
-        for (let p = 1; p < pts.length; p++) ctx.lineTo(pts[p].x, pts[p].y);
-      };
-      // Outer glow
-      draw();
+    // Pass 1: all outer glows (one shadowBlur state for all 14)
+    ctx.shadowColor = 'rgba(255,70,0,0.8)'; ctx.shadowBlur = 12; ctx.lineWidth = 5;
+    for (const { pts, glow } of crackData) {
       ctx.strokeStyle = `rgba(255,100,5,${glow * 0.22})`;
-      ctx.lineWidth   = 5; ctx.shadowColor = 'rgba(255,70,0,0.8)'; ctx.shadowBlur = 12; ctx.stroke();
-      // Core
-      draw();
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (let p = 1; p < pts.length; p++) ctx.lineTo(pts[p].x, pts[p].y);
+      ctx.stroke();
+    }
+    // Pass 2: all cores (one shadowBlur state for all 14)
+    ctx.shadowBlur = 4; ctx.lineWidth = 1.3;
+    for (const { pts, glow } of crackData) {
       ctx.strokeStyle = `rgba(255,170,30,${glow * 0.88})`;
-      ctx.lineWidth   = 1.3; ctx.shadowBlur = 4; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (let p = 1; p < pts.length; p++) ctx.lineTo(pts[p].x, pts[p].y);
+      ctx.stroke();
     }
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
     ctx.restore();
