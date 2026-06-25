@@ -4,6 +4,8 @@
 // Las entradas se muestran en orden, de arriba a abajo.
 
 export const NEWS = [
+  { badge: "MEJORA", text: "Tiempo máximo de batalla" },
+  { badge: "MEJORA", text: "Juego offline" },
   { badge: "NUEVO", text: "Nuevas misiones y skins exclusivos" },
   { badge: "NUEVO", text: "Personalización de perfiles" },
   { badge: "MEJORA", text: "Rediseño de perfiles" },

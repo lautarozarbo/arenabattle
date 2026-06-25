@@ -6,8 +6,13 @@ import { sfx } from '../audio/index.js';
 
 const _metas = getAllPowerMetas();
 
-let _tab   = 'chars';
+let _tab  = 'chars';
 let _rafId = null;
+
+// Only canvases currently visible (IntersectionObserver manages this set)
+const _visibleAnimCanvases = new Set(); // { cvs, meta, skinId } | { cvs, skinId, isArena }
+
+let _observer = null;
 
 export function openWardrobe() {
   sfx.uiClick();
@@ -16,13 +21,14 @@ export function openWardrobe() {
   document.getElementById('wardrobe-tab-chars').classList.add('active');
   document.getElementById('wardrobe-tab-arena').classList.remove('active');
   _renderContent();
-  _startAnim();
 }
 
 export function closeWardrobe() {
   sfx.uiClick();
   document.getElementById('wardrobe-modal').classList.add('hidden');
   _stopAnim();
+  _observer?.disconnect();
+  _observer = null;
 }
 
 export function switchWardrobeTab(tab) {
@@ -32,27 +38,32 @@ export function switchWardrobeTab(tab) {
   document.getElementById('wardrobe-tab-chars').classList.toggle('active', tab === 'chars');
   document.getElementById('wardrobe-tab-arena').classList.toggle('active', tab === 'arena');
   _renderContent();
-  _startAnim();
 }
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+// Only draws canvases that are currently visible — no scroll jitter.
 
 function _startAnim() {
   if (_rafId) return;
   function tick() {
+    if (_visibleAnimCanvases.size === 0) {
+      _rafId = null;
+      return; // nothing visible — stop until observer wakes us
+    }
     const t = performance.now() / 1000;
-    document.querySelectorAll('.wardrobe-skin-canvas[data-animated]').forEach(cvs => {
-      const meta = _metas.find(m => m.id === cvs.dataset.charid);
-      if (meta) drawCharPreview(cvs, meta, cvs.dataset.skinid, { rScale: 0.28, yScale: 0.5 });
-    });
-    document.querySelectorAll('.wardrobe-skin-canvas[data-animated-arena]').forEach(cvs => {
-      const skinId = cvs.dataset.skinid;
-      const ctx = cvs.getContext('2d');
-      ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(0, 0, cvs.width, cvs.height, 8);
-      ctx.clip();
-      drawArenaBg(ctx, 0, 0, cvs.width, cvs.height, skinId, t);
-      ctx.restore();
-    });
+    for (const entry of _visibleAnimCanvases) {
+      if (entry.isArena) {
+        const ctx = entry.cvs.getContext('2d');
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(0, 0, entry.cvs.width, entry.cvs.height, 8);
+        ctx.clip();
+        drawArenaBg(ctx, 0, 0, entry.cvs.width, entry.cvs.height, entry.skinId, t);
+        ctx.restore();
+      } else {
+        drawCharPreview(entry.cvs, entry.meta, entry.skinId, { rScale: 0.28, yScale: 0.5 });
+      }
+    }
     _rafId = requestAnimationFrame(tick);
   }
   _rafId = requestAnimationFrame(tick);
@@ -60,11 +71,43 @@ function _startAnim() {
 
 function _stopAnim() {
   if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+  _visibleAnimCanvases.clear();
 }
 
+// ── IntersectionObserver — starts/stops animation per-canvas ─────────────────
+
+function _observeAnimCanvas(entry) {
+  const content = document.getElementById('wardrobe-content');
+  if (!_observer) {
+    _observer = new IntersectionObserver((entries) => {
+      let changed = false;
+      for (const ie of entries) {
+        const e = ie.target._animEntry;
+        if (!e) continue;
+        if (ie.isIntersecting) {
+          _visibleAnimCanvases.add(e);
+          changed = true;
+        } else {
+          _visibleAnimCanvases.delete(e);
+        }
+      }
+      if (changed && _visibleAnimCanvases.size > 0) _startAnim();
+    }, { root: content, threshold: 0 });
+  }
+  entry.cvs._animEntry = entry;
+  _observer.observe(entry.cvs);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
 function _renderContent() {
+  _stopAnim();
+  _observer?.disconnect();
+  _observer = null;
+
   const content = document.getElementById('wardrobe-content');
   content.innerHTML = '';
+
   if (_tab === 'chars') _renderChars(content);
   else                  _renderArena(content);
 }
@@ -78,51 +121,77 @@ function _renderChars(container) {
     if (!meta) continue;
 
     const group = document.createElement('div');
-    group.className = 'wardrobe-char-group';
+    group.className = 'wd-char-group';
 
-    const label = document.createElement('div');
-    label.className = 'wardrobe-char-label';
-    label.textContent = meta.name;
-    group.appendChild(label);
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'wd-char-label';
+    groupLabel.style.color = meta.color;
+    groupLabel.textContent = meta.name;
+    group.appendChild(groupLabel);
 
-    const row = document.createElement('div');
-    row.className = 'wardrobe-skins-row';
+    const grid = document.createElement('div');
+    grid.className = 'wd-skins-grid';
 
     for (const skin of nonDefault) {
-      const owned = isSkinUnlocked(charId, skin.id);
-      const card  = document.createElement('div');
-      card.className = 'wardrobe-skin-card' + (owned ? '' : ' locked');
+      const owned     = isSkinUnlocked(charId, skin.id);
+      const nameColor = owned
+        ? (skin.labelColor ?? skin.color ?? meta.color)
+        : 'rgba(255,255,255,0.28)';
 
+      const card = document.createElement('div');
+      card.className = 'wd-skin-card' + (owned ? '' : ' wd-skin-card--locked');
+
+      // Canvas wrap
+      const wrap = document.createElement('div');
+      wrap.className = 'wd-canvas-wrap';
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 3);
       const cvs = document.createElement('canvas');
-      cvs.width  = 120;
-      cvs.height = 120;
-      cvs.className = 'wardrobe-skin-canvas wardrobe-skin-canvas--char';
+      cvs.width  = 130 * dpr;
+      cvs.height = 130 * dpr;
+      cvs.className = 'wd-skin-canvas';
+      drawCharPreview(cvs, meta, skin.id, { rScale: 0.28, yScale: 0.5 });
 
       if (ANIMATED_SKIN_IDS.has(skin.id)) {
-        cvs.dataset.animated = '1';
-        cvs.dataset.charid   = charId;
-        cvs.dataset.skinid   = skin.id;
+        _observeAnimCanvas({ cvs, meta, skinId: skin.id, isArena: false });
       }
 
-      drawCharPreview(cvs, meta, skin.id, { rScale: 0.28, yScale: 0.5 });
-      card.appendChild(cvs);
+      wrap.appendChild(cvs);
 
       if (!owned) {
-        const lock = document.createElement('span');
-        lock.className   = 'wardrobe-lock-icon';
-        lock.textContent = '🔒';
-        card.appendChild(lock);
+        const overlay = document.createElement('div');
+        overlay.className = 'wd-lock-overlay';
+        overlay.textContent = '🔒';
+        wrap.appendChild(overlay);
       }
 
-      const lbl = document.createElement('div');
-      lbl.className   = 'wardrobe-skin-label';
-      lbl.textContent = skin.name;
-      card.appendChild(lbl);
+      card.appendChild(wrap);
 
-      row.appendChild(card);
+      // Info section
+      const info = document.createElement('div');
+      info.className = 'wd-skin-info';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'wd-skin-name';
+      nameEl.style.color = nameColor;
+      nameEl.textContent = skin.name;
+      info.appendChild(nameEl);
+
+      const statusEl = document.createElement('span');
+      if (owned) {
+        statusEl.className = 'wd-skin-status wd-skin-status--owned';
+        statusEl.textContent = '✓ Desbloqueada';
+      } else {
+        statusEl.className = 'wd-skin-status';
+        statusEl.textContent = skin.missionOnly ? 'Solo misiones' : 'En cofres';
+      }
+      info.appendChild(statusEl);
+
+      card.appendChild(info);
+      grid.appendChild(card);
     }
 
-    group.appendChild(row);
+    group.appendChild(grid);
     container.appendChild(group);
   }
 }
@@ -138,16 +207,18 @@ function _renderArena(container) {
     const card = document.createElement('div');
     card.className = 'wardrobe-skin-card' + (owned ? '' : ' locked');
 
+    const dpr2 = Math.min(window.devicePixelRatio || 1, 3);
     const cvs = document.createElement('canvas');
-    cvs.width  = 200;
-    cvs.height = 120;
+    cvs.width  = 200 * dpr2;
+    cvs.height = 120 * dpr2;
     cvs.className = 'wardrobe-skin-canvas';
+
     if (isAnimatedArenaSkin(skin.id)) {
-      cvs.dataset.animatedArena = '1';
-      cvs.dataset.skinid = skin.id;
+      _observeAnimCanvas({ cvs, skinId: skin.id, isArena: true });
     } else {
       _drawArenaSkinThumb(cvs, skin);
     }
+
     card.appendChild(cvs);
 
     if (!owned) {
@@ -172,7 +243,6 @@ function _drawArenaSkinThumb(canvas, skin) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
-
   ctx.save();
   ctx.beginPath();
   ctx.roundRect(0, 0, W, H, 8);

@@ -7,19 +7,12 @@ export function buildTagHud(match) {
   const hud = document.getElementById("hud");
 
   const renderFighter = (f, idPfx) => {
-    const pct = Math.max(0, f.hp / 100);
-    const fillColor = f.eliminated ? "#333"
-      : pct > 0.5  ? "var(--hp-green)"
-      : pct > 0.25 ? "var(--hp-orange)"
-      : "var(--hp-red)";
     const cls = f.eliminated ? "tt-eliminated" : "tt-active";
     const isPlayer = idPfx === 'tta0';
     return `
       <div class="tt-fighter ${cls}" data-pfx="${idPfx}">
         <div class="tt-dot" style="background:${f.meta.color}"></div>
         <span class="tt-name" style="color:${f.meta.color}">${isPlayer ? PLAYER_ICON : ''}<span class="tt-name-text">${f.meta.name}</span></span>
-        <div class="tt-track"><div class="tt-fill" id="${idPfx}-hp"
-          style="width:${pct*100}%;background:${fillColor}"></div></div>
         <span class="tt-hp-text" id="${idPfx}-txt">
           ${f.eliminated ? '✗' : Math.ceil(f.hp)}
         </span>
@@ -27,18 +20,11 @@ export function buildTagHud(match) {
   };
 
   const renderBench = (f, idPfx) => {
-    const pct = Math.max(0, f.hp / 100);
-    const fillColor = f.eliminated ? "#333"
-      : pct > 0.5  ? "var(--hp-green)"
-      : pct > 0.25 ? "var(--hp-orange)"
-      : "var(--hp-red)";
     const cls = f.eliminated ? "tt-eliminated" : "tt-bench";
     return `
       <div class="tt-fighter ${cls}" data-pfx="${idPfx}">
         <div class="tt-dot" style="background:${f.meta.color}"></div>
         <span class="tt-name" style="color:${f.meta.color}"><span class="tt-name-text">${f.meta.name}</span></span>
-        <div class="tt-track"><div class="tt-fill" id="${idPfx}-hp"
-          style="width:${pct*100}%;background:${fillColor}"></div></div>
         <span class="tt-hp-text" id="${idPfx}-txt">
           ${f.eliminated ? '✗' : Math.ceil(f.hp)}
         </span>
@@ -85,26 +71,18 @@ export function updateTagHudLive(game, match, prevHp) {
     prevHp[i] = curr;
   }
 
-  const updateBar = (f, idPfx, snapEntry) => {
-    const fill = document.getElementById(`${idPfx}-hp`);
+  const updateTxt = (f, idPfx, snapEntry) => {
     const text = document.getElementById(`${idPfx}-txt`);
-    if (!fill || !text) return;
+    if (!text) return;
     const rawHp = snapEntry ? (snapEntry.isAlive ? snapEntry.hp : 0) : f.hp;
-    const hp    = snapEntry?._hudHp    ?? rawHp;
-    const maxHp = snapEntry?._hudMaxHp ?? 100;
-    const pct   = Math.max(0, hp / maxHp);
-    fill.style.width = `${pct * 100}%`;
-    fill.style.background = f.eliminated ? "#333"
-      : pct > 0.5  ? "var(--hp-green)"
-      : pct > 0.25 ? "var(--hp-orange)"
-      : "var(--hp-red)";
-    text.textContent = f.eliminated ? "✗" : Math.ceil(Math.max(0, hp));
+    const hp = snapEntry?._hudHp ?? rawHp;
+    text.textContent = f.eliminated ? '✗' : Math.ceil(Math.max(0, hp));
   };
 
-  updateBar(match.getActive(0), 'tta0', snap[0]);
-  updateBar(match.getBench(0),  'ttb0', null);
-  updateBar(match.getActive(1), 'tta1', snap[1]);
-  updateBar(match.getBench(1),  'ttb1', null);
+  updateTxt(match.getActive(0), 'tta0', snap[0]);
+  updateTxt(match.getActive(1), 'tta1', snap[1]);
+  updateTxt(match.getBench(0),  'ttb0', null);
+  updateTxt(match.getBench(1),  'ttb1', null);
 }
 
 export function updateTagBtn(match) {
