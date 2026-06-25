@@ -1,6 +1,10 @@
 import { supabase } from './supabase.js';
 import { syncRewardsFromCloud } from './persistence/rewards.js';
 import { syncStatsFromCloud } from './persistence/stats.js';
+import { syncCompetitionFromCloud } from './persistence/competitionSave.js';
+import { syncTowerFromCloud } from './persistence/towerSave.js';
+import { syncMissionsFromCloud } from './persistence/missionsSave.js';
+import { clearUserCaches } from './persistence/localCache.js';
 
 let _onLoginCallback  = null;
 let _onLogoutCallback = null;
@@ -54,7 +58,16 @@ async function _syncAndNotify() {
   const gen = ++_syncGen;
   let username = null;
   try {
-    await Promise.all([syncRewardsFromCloud(), syncStatsFromCloud()]);
+    // Sync all user data in parallel to warm local caches.
+    // After this resolves, all reads (stats, rewards, competition, tower, missions)
+    // are instant from localStorage — no further cloud reads needed during the session.
+    await Promise.all([
+      syncRewardsFromCloud(),
+      syncStatsFromCloud(),
+      syncCompetitionFromCloud(),
+      syncTowerFromCloud(),
+      syncMissionsFromCloud(),
+    ]);
     if (gen !== _syncGen) return;  // a newer auth event arrived; discard this sync
     username = await getUsername();
     _updateLastSeen();
@@ -165,6 +178,7 @@ export function initAuth() {
       _syncAndNotify();
     } else if (event === 'SIGNED_OUT') {
       _syncGen++;  // invalidate any in-flight sync so its callback never fires
+      clearUserCaches(); // remove user-specific data so next user starts fresh
       _setLoggedOut();
       if (_onLogoutCallback) _onLogoutCallback();
     }

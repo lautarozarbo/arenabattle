@@ -22,7 +22,6 @@ import {
   recordCharUse,
   recordTowerRun,
   getMostUsedChar,
-  syncStatsFromCloud,
 } from "./persistence/stats.js";
 import {
   ANIMATED_SKIN_IDS,
@@ -38,7 +37,6 @@ import {
   isSkinUnlocked,
   addPoints,
   openChest,
-  syncRewardsFromCloud,
   getEffectActive,
 } from "./persistence/rewards.js";
 import {
@@ -119,7 +117,7 @@ import {
 } from "./persistence/towerSave.js";
 import { loadLeagueCloud, loadTournamentCloud } from "./persistence/competitionSave.js";
 import { summarizeUpgrades } from "./modes/tower/TowerUpgrades.js";
-import { recordMissionEvent, loadMissions, syncMissionsFromCloud } from "./persistence/missionsSave.js";
+import { recordMissionEvent, loadMissions } from "./persistence/missionsSave.js";
 import { initMissionsUI } from "./ui/missionsUI.js";
 import { initCustomizeUI } from "./ui/customizeUI.js";
 import { applyBadgeToElement } from "./ui/badge.js";
@@ -733,38 +731,44 @@ function _closeProfile() {
   );
 }
 
-async function _refreshProfilePanel() {
-  _profileStatsEl.innerHTML = '<div class="pstat-loading">Cargando...</div>';
-  let friendCode = null;
-  try {
-    [, , friendCode] = await Promise.all([
-      syncStatsFromCloud(),
-      syncRewardsFromCloud(),
-      getMyFriendCode(),
-    ]);
-  } catch (err) {
-    console.warn("[profile] sync error:", err);
-  }
+function _showFriendCode(fcEl, code) {
+  fcEl.dataset.code = code;
+  fcEl.innerHTML = `<span class="pfc-label">Tu código</span><span class="pfc-code">${code}</span><span class="pfc-icon" id="pfc-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>`;
+  fcEl.classList.remove("hidden");
+}
+
+function _refreshProfilePanel() {
+  // Stats and rewards are in localStorage — show immediately, no spinner, no network wait
   _buildProfileStats();
   _updateXpBar();
+
+  // Show cached friend code instantly
   const fcEl = document.getElementById("profile-friend-code");
+  const cachedCode = localStorage.getItem("arena_friend_code");
   if (fcEl) {
-    if (friendCode) {
-      fcEl.dataset.code = friendCode;
-      fcEl.innerHTML = `<span class="pfc-label">Tu código</span><span class="pfc-code">${friendCode}</span><span class="pfc-icon" id="pfc-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>`;
-      fcEl.classList.remove("hidden");
+    if (cachedCode) _showFriendCode(fcEl, cachedCode);
+    else fcEl.classList.add("hidden");
+  }
+
+  // Background: refresh friend code (updates if changed) and background-sync stats
+  getMyFriendCode().then(code => {
+    if (!fcEl) return;
+    if (code) {
+      try { localStorage.setItem("arena_friend_code", code); } catch {}
+      _showFriendCode(fcEl, code);
     } else {
+      try { localStorage.removeItem("arena_friend_code"); } catch {}
       fcEl.classList.add("hidden");
     }
-  }
+  }).catch(() => {});
 }
 
 document
   .getElementById("btn-open-profile")
-  .addEventListener("click", async () => {
+  .addEventListener("click", () => {
     sfx.uiClick();
     _profilePanel.classList.remove("hidden");
-    await _refreshProfilePanel();
+    _refreshProfilePanel();
   });
 
 document
@@ -957,6 +961,7 @@ document.getElementById("btn-fight-back").addEventListener("click", () => {
       _stopAbilitiesLoop();
       document.getElementById("gameover-bar").classList.add("hidden");
       document.getElementById("fight-tag-area").classList.add("hidden");
+      _tower?.destroy();
       _tower = null;
       gameMode = "quickmatch";
       _refreshTowerSetupScreen();
@@ -1672,7 +1677,8 @@ initTournamentUI(_sharedDeps);
 // ── Missions & Customization ──────────────────────────────────────────────────
 initMissionsUI({ onBadgeChange: _applyPlayerBadge });
 initCustomizeUI({ onBadgeChange: _applyPlayerBadge });
-syncMissionsFromCloud().then(() => _applyPlayerBadge(loadMissions().activeBadge));
+// syncMissionsFromCloud is now called at login in auth.js — just apply badge from local state
+_applyPlayerBadge(loadMissions().activeBadge);
 
 function _applyPlayerBadge(badgeId) {
   applyBadgeToElement(_chipName, badgeId);
@@ -2130,6 +2136,8 @@ function _startBattleHudLoop() {
 let _pendingWinnerSide = -1;
 
 // ── Competition cloud sync ────────────────────────────────────────────────────
+// loadLeagueCloud / loadTournamentCloud now read from localCache (instant, no network).
+// The cache was warmed at login; on cache miss they do one lazy fetch then cache the result.
 async function _syncCompetitionFromCloud(cloudField, lsKey) {
   try {
     const loadFn = cloudField === 'league_saved' ? loadLeagueCloud : loadTournamentCloud;
@@ -2247,6 +2255,7 @@ function _startTowerRun(powerMeta, savedState = null) {
     },
     onRunEnd: (_floor) => {
       clearTowerRun();
+      _tower?.destroy(); // ensure all tower UI (stats bar, overlays) is hidden
       _tower   = null;
       gameMode = "quickmatch";
       game.stop();
@@ -2462,6 +2471,7 @@ document.getElementById("btn-restart").addEventListener("click", () => {
   }
 
   if (gameMode === "tower") {
+    _tower?.destroy(); // hides tower stats bar and all tower overlays
     _tower = null;
     gameMode = "quickmatch";
     _refreshTowerSetupScreen();

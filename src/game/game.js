@@ -1,5 +1,6 @@
 ﻿import { Arena  } from './arena.js';
 import { Circle } from './circle.js';
+import { Zone   } from './Zone.js';
 import { vec2   } from '../utils/vec2.js';
 import { sfx    } from '../audio/index.js';
 
@@ -40,6 +41,9 @@ export class Game {
     this._activeAbilities  = arenaOpts.activeAbilities  ?? false;
     this._playerSide       = arenaOpts.playerSide       ?? 0;
     this._impacts = [];
+    this._zone = arenaOpts.zone !== false
+      ? new Zone({ x: ax, y: ay, width: size, height: size })
+      : null;
     const a = this.arena;
 
     const cpad        = (cfgs[0].radius ?? 28) + 14;
@@ -103,6 +107,8 @@ export class Game {
     this.state = 'playing';
     this._last = null;
     if (this._raf) cancelAnimationFrame(this._raf);
+    this._zoneTimerEl = this._zone ? _getOrCreateZoneTimerEl() : null;
+    if (this._zoneTimerEl) this._zoneTimerEl.className = 'zone-timer';
     this._tick();
   }
 
@@ -110,6 +116,10 @@ export class Game {
     if (this._raf) cancelAnimationFrame(this._raf);
     this._raf = null;
     this.state = 'idle';
+    if (this._zoneTimerEl) {
+      this._zoneTimerEl.className = 'zone-timer zone-timer--hidden';
+      this._zoneTimerEl = null;
+    }
   }
 
   // Swap a fighter in-place: new fighter appears at the old one's position/velocity.
@@ -196,6 +206,9 @@ export class Game {
       this._impacts = this._impacts.filter(imp => imp.t < imp.maxT);
     }
 
+    // Zone: update timer + apply storm damage
+    this._zone?.update(dt, this.circles);
+
     const survivors = this.circles.filter(c => c.isAlive);
     const hasTeams  = this.circles.some(c => c.teamId != null);
     const over      = hasTeams
@@ -278,6 +291,22 @@ export class Game {
     // Phase 2: circle bodies and above-circle effects
     for (const c of this.circles) if (!this._hideDeadCircles || c.isAlive) c.render(ctx);
 
+    // Zone storm overlay (fog + border ring)
+    this._zone?.render(ctx, W, H);
+
+    // Zone timer DOM element update
+    if (this._zone && this._zoneTimerEl) {
+      const info = this._zone.getTimerInfo();
+      if (info) {
+        this._zoneTimerEl.textContent = info.text;
+        this._zoneTimerEl.className   = 'zone-timer'
+          + (info.active  ? ' zone-timer--active'  : '')
+          + (info.warning ? ' zone-timer--warning' : '');
+      } else {
+        this._zoneTimerEl.className = 'zone-timer zone-timer--hidden';
+      }
+    }
+
     // Phase 3: impact frames (manga-style radial lines on hit)
     for (const imp of this._impacts) _renderImpactFrame(ctx, imp);
   }
@@ -330,6 +359,21 @@ export class Game {
       _hudHp: c._hudHp, _hudMaxHp: c._hudMaxHp,
     }));
   }
+}
+
+// ── Zone timer DOM element ────────────────────────────────────────────────────
+
+function _getOrCreateZoneTimerEl() {
+  let el = document.getElementById('zone-timer');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'zone-timer';
+    el.className = 'zone-timer zone-timer--hidden';
+    // Insert between #hud and #arena-container
+    const hud = document.getElementById('hud');
+    if (hud?.parentNode) hud.parentNode.insertBefore(el, hud.nextSibling);
+  }
+  return el;
 }
 
 // ── Impact frame renderer (manga-style radial lines) ─────────────────────────

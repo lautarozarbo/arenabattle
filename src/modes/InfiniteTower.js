@@ -49,6 +49,11 @@ export class InfiniteTower {
     }
   }
 
+  destroy() {
+    this._ui.reset();
+    this._run = null;
+  }
+
   handleGameOver(winner, winnerSide) {
     this._ui.hideInFightStats();
     if (winnerSide === 0) this._onFloorWon();

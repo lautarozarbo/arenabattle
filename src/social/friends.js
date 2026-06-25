@@ -167,6 +167,11 @@ export async function getMyFriendCode() {
     .single();
   _friendCode    = data?.friend_code ?? null;
   _friendCodeUid = uid;
+  // Persist to localStorage so the profile panel can show it instantly on next open
+  try {
+    if (_friendCode) localStorage.setItem('arena_friend_code', _friendCode);
+    else localStorage.removeItem('arena_friend_code');
+  } catch {}
   return _friendCode;
 }
 

@@ -3105,6 +3105,123 @@ function _archerCazadorAbove(ctx, x, y, r) {
   ctx.restore();
 }
 
+// ── Archer — Cazador ─────────────────────────────────────────────────────────
+
+function _archerCazadorBelow(ctx, x, y, r, angle = 0) {
+  const t = Date.now() * 0.001;
+  ctx.save();
+
+  // Slow outer targeting ring (CW dashes)
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(t * 0.38);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 1.56, 0, Math.PI * 2);
+  ctx.setLineDash([r * 0.26, r * 0.16]);
+  ctx.strokeStyle = 'rgba(100,220,60,0.30)';
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Fast inner ring (CCW dashes)
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-t * 0.95);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 1.22, 0, Math.PI * 2);
+  ctx.setLineDash([r * 0.14, r * 0.24]);
+  ctx.strokeStyle = 'rgba(130,240,80,0.20)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // 6 orbiting arrows — all tips locked onto the enemy direction (angle)
+  for (let i = 0; i < 6; i++) {
+    const a   = (i / 6) * Math.PI * 2 + t * 0.72;
+    const orR = r * 1.36;
+    const ax  = x + Math.cos(a) * orR;
+    const ay  = y + Math.sin(a) * orR;
+    ctx.save();
+    ctx.translate(ax, ay);
+    // angle + π/2 makes local (0,-len) point in direction `angle`
+    ctx.rotate(angle + Math.PI / 2);
+    const len = r * 0.26;
+    ctx.beginPath();
+    ctx.moveTo(0, len * 0.55);
+    ctx.lineTo(0, -len);
+    ctx.strokeStyle = 'rgba(140,240,90,0.72)';
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = '#50ff20';
+    ctx.shadowBlur = 5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -len);
+    ctx.lineTo(-r * 0.065, -len + r * 0.105);
+    ctx.lineTo( r * 0.065, -len + r * 0.105);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(160,255,100,0.82)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// ── Bomb — Infernal ───────────────────────────────────────────────────────────
+
+function _bombInfernalBelow(ctx, x, y, r) {
+  const t = Date.now() * 0.001;
+  ctx.save();
+
+  // Pulsing radial glow
+  const pulse = 0.5 + 0.5 * Math.sin(t * 2.6);
+  const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.1);
+  glow.addColorStop(0, `rgba(255,80,0,${0.16 + pulse * 0.12})`);
+  glow.addColorStop(1, 'rgba(200,20,0,0)');
+  ctx.beginPath();
+  ctx.arc(x, y, r * 2.1, 0, Math.PI * 2);
+  ctx.fillStyle = glow;
+  ctx.fill();
+
+  // 2 rotating dashed danger rings
+  for (let ring = 0; ring < 2; ring++) {
+    const rot   = t * (ring === 0 ? 0.55 : -0.85);
+    const ringR = r * (1.42 + ring * 0.24);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.beginPath();
+    ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+    ctx.setLineDash([ringR * 0.22, ringR * 0.28]);
+    ctx.strokeStyle = `rgba(255,90,0,${0.28 - ring * 0.06})`;
+    ctx.lineWidth = 1.8 - ring * 0.4;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // 8 orbiting ember particles
+  for (let i = 0; i < 8; i++) {
+    const a      = (i / 8) * Math.PI * 2 + t * (i % 2 === 0 ? 0.82 : -0.65);
+    const radMul = 1.28 + 0.22 * Math.sin(t * 1.6 + i * 1.3);
+    const ex     = x + Math.cos(a) * r * radMul;
+    const ey     = y + Math.sin(a) * r * radMul;
+    const sz     = r * (0.07 + 0.04 * Math.sin(t * 3.2 + i * 0.9));
+    const alpha  = 0.50 + 0.38 * Math.sin(t * 2.8 + i * 0.8);
+    ctx.beginPath();
+    ctx.arc(ex, ey, sz, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,${70 + i * 10},0,${alpha})`;
+    ctx.shadowColor = '#ff4000';
+    ctx.shadowBlur  = sz * 4.5;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  ctx.restore();
+}
+
+
 function _magoArchimagoBelow(ctx, x, y, r) {
   const t = Date.now() * 0.001;
   ctx.save();
@@ -3301,6 +3418,8 @@ export function drawSkinDecorationBelow(
   if (charId === "mage"           && skinId === "archimago")   _magoArchimagoBelow(ctx, x, y, r);
   if (charId === "ninja"          && skinId === "shinobi")     _ninjaShiNobiBelow(ctx, x, y, r);
   if (charId === "alien"          && skinId === "galaxico")    _alienGalaxicoBelow(ctx, x, y, r);
+  if (charId === "archer"         && skinId === "cazador")     _archerCazadorBelow(ctx, x, y, r, angle);
+  if (charId === "bomb"           && skinId === "infernal")    _bombInfernalBelow(ctx, x, y, r);
 }
 
 // Called AFTER drawing the main circle (things that go in front / above it).
@@ -3350,7 +3469,6 @@ export function drawSkinDecorationAbove(
   if (charId === "cursedwall"     && skinId === "maldito")     _cursedwallMalditoAbove(ctx, x, y, r);
   if (charId === "bloodshard"     && skinId === "crista")      _bloodshardCristaAbove(ctx, x, y, r);
   if (charId === "assassin"       && skinId === "sombra")      _assassinSombraAbove(ctx, x, y, r);
-  if (charId === "archer"  && skinId === "cazador")    _archerCazadorAbove(ctx, x, y, r);
   if (charId === "ninja"   && skinId === "shinobi")    _ninjaShiNobiAbove(ctx, x, y, r);
   if (charId === "vampire" && skinId === "nobleza")    _vampireNoblezaAbove(ctx, x, y, r);
 }

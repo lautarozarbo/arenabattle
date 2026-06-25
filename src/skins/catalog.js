@@ -100,6 +100,11 @@ export const CHAR_SKINS = {
   ],
   archer: [
     { id: "default", name: "Default", color: null },
+    { id: "cazador", name: "Cazador Nocturno", color: "#091604", labelColor: "#5ddf38" },
+  ],
+  bomb: [
+    { id: "default", name: "Default", color: null },
+    { id: "infernal", name: "Infernal", color: "#100502", labelColor: "#ff5500" },
   ],
   karma: [
     { id: "default", name: "Default", color: null },
@@ -153,7 +158,7 @@ export const CHAR_SKINS = {
 };
 
 // Skin IDs whose preview requires continuous animation (rAF loop)
-export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo', 'quasar', 'cascabel', 'tectonico', 'eclipse', 'simbionte', 'mech', 'singularidad', 'cronos', 'prisma', 'oscuro', 'ancestral', 'serafin', 'maldito', 'crista', 'sombra']);
+export const ANIMATED_SKIN_IDS = new Set(['chispas', 'brasas', 'saiyan', 'alas', 'liquidglass', 'neon', 'mask', 'yinyang', 'atomo', 'quasar', 'cascabel', 'tectonico', 'eclipse', 'simbionte', 'mech', 'singularidad', 'cronos', 'prisma', 'oscuro', 'ancestral', 'serafin', 'maldito', 'crista', 'sombra', 'cazador', 'infernal']);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 

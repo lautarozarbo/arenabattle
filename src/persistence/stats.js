@@ -1,4 +1,7 @@
 import { supabase } from '../supabase.js';
+import { localCache } from './localCache.js';
+
+const LS_STATS = 'arena_stats_lc';
 
 let _cache = null;
 
@@ -16,7 +19,14 @@ function _defaults() {
 }
 
 function _get() {
-  if (!_cache) _cache = _defaults();
+  if (!_cache) {
+    // Load from localStorage so stats survive page reloads without a cloud round-trip
+    try {
+      const saved = localStorage.getItem(LS_STATS);
+      _cache = saved ? JSON.parse(saved) : null;
+    } catch {}
+    if (!_cache) _cache = _defaults();
+  }
   return _cache;
 }
 
@@ -25,22 +35,60 @@ async function _getUID() {
   return data.session?.user?.id ?? null;
 }
 
-async function _persist(s) {
+function _persist(s) {
   _cache = s;
-  const uid = await _getUID();
-  if (!uid) return;
-  supabase.from('user_stats').upsert({
-    user_id:          uid,
-    wins:             s.wins,
-    losses:           s.losses,
-    draws:            s.draws,
-    championships:    s.championships,
-    char_uses:        s.charUses,
-    favorites:        s.favorites,
-    tower_max_floor:  s.towerMaxFloor ?? 0,
-    tower_best_char:  s.towerBestChar ?? null,
-    updated_at:       new Date().toISOString(),
-  }).then(() => {});
+  // Write to localStorage immediately — survives page close, no network needed
+  try { localStorage.setItem(LS_STATS, JSON.stringify(s)); } catch {}
+  // Fire-and-forget cloud write
+  (async () => {
+    const uid = await _getUID();
+    if (!uid) return;
+    supabase.from('user_stats').upsert({
+      user_id:          uid,
+      wins:             s.wins,
+      losses:           s.losses,
+      draws:            s.draws,
+      championships:    s.championships,
+      char_uses:        s.charUses,
+      favorites:        s.favorites,
+      tower_max_floor:  s.towerMaxFloor ?? 0,
+      tower_best_char:  s.towerBestChar ?? null,
+      updated_at:       new Date().toISOString(),
+    }).then(() => {});
+  })();
+}
+
+// Merge two stat objects taking the maximum for each counter.
+// Protects offline progress: if local has more wins than cloud, we keep the higher value.
+function _mergeStats(local, cloud) {
+  const def = _defaults();
+  const maxKeys = (a, b, defaults) => {
+    const result = { ...defaults };
+    for (const k of Object.keys(result)) {
+      result[k] = Math.max((a ?? {})[k] ?? 0, (b ?? {})[k] ?? 0);
+    }
+    return result;
+  };
+  // charUses: take max per character (avoids double-counting across devices)
+  const allCharUses = {};
+  for (const [id, n] of Object.entries(local.charUses ?? {})) allCharUses[id] = n;
+  for (const [id, n] of Object.entries(cloud.charUses ?? {})) {
+    allCharUses[id] = Math.max(allCharUses[id] ?? 0, n);
+  }
+  // favorites: union of both lists
+  const favSet = new Set([...(local.favorites ?? []), ...(cloud.favorites ?? [])]);
+  return {
+    wins:          maxKeys(local.wins,          cloud.wins,          def.wins),
+    losses:        maxKeys(local.losses,        cloud.losses,        def.losses),
+    draws:         maxKeys(local.draws,         cloud.draws,         def.draws),
+    championships: maxKeys(local.championships, cloud.championships, def.championships),
+    charUses:      allCharUses,
+    favorites:     [...favSet],
+    towerMaxFloor: Math.max(local.towerMaxFloor ?? 0, cloud.towerMaxFloor ?? 0),
+    towerBestChar: (cloud.towerMaxFloor ?? 0) >= (local.towerMaxFloor ?? 0)
+      ? (cloud.towerBestChar ?? local.towerBestChar ?? null)
+      : (local.towerBestChar ?? null),
+  };
 }
 
 export async function syncStatsFromCloud() {
@@ -54,9 +102,11 @@ export async function syncStatsFromCloud() {
     .select('*')
     .eq('user_id', uid)
     .single();
+
+  const local = _get();
   if (data) {
     const def = _defaults();
-    _cache = {
+    const cloud = {
       wins:          { ...def.wins,          ...(data.wins          ?? {}) },
       losses:        { ...def.losses,        ...(data.losses        ?? {}) },
       draws:         { ...def.draws,         ...(data.draws         ?? {}) },
@@ -66,8 +116,15 @@ export async function syncStatsFromCloud() {
       towerMaxFloor: data.tower_max_floor ?? 0,
       towerBestChar: data.tower_best_char ?? null,
     };
+    // Merge local + cloud, taking the higher value for all counters
+    const merged = _mergeStats(local, cloud);
+    _cache = merged;
+    // Push merged state back to cloud if local was ahead
+    if (JSON.stringify(merged) !== JSON.stringify(cloud)) _persist(merged);
+    else { _cache = merged; try { localStorage.setItem(LS_STATS, JSON.stringify(merged)); } catch {} }
   } else {
-    _cache = _defaults();
+    // No cloud row yet — persist local state to cloud
+    _persist(local);
   }
 }
 
@@ -120,7 +177,6 @@ export function recordCharUse(powerId) {
   _persist(s);
 }
 
-/** Called when a tower run ends. Updates best floor+char if improved. */
 export function recordTowerRun(run) {
   const s = _get();
   if (run.floor > (s.towerMaxFloor ?? 0)) {

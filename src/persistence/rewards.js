@@ -10,7 +10,16 @@ export const POINTS = {
   EVENT_WIN:            20,
 };
 
-let _cache = { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
+const LS_REWARDS = 'arena_rewards_lc';
+
+function _loadFromLS() {
+  try {
+    const raw = localStorage.getItem(LS_REWARDS);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+let _cache = _loadFromLS() ?? { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
 
 async function _getUID() {
   const { data } = await supabase.auth.getSession();
@@ -19,6 +28,9 @@ async function _getUID() {
 
 async function _persist(d) {
   _cache = d;
+  // Write to localStorage immediately — no network needed
+  try { localStorage.setItem(LS_REWARDS, JSON.stringify(d)); } catch {}
+  // Fire-and-forget cloud write
   const uid = await _getUID();
   if (!uid) return;
   supabase.from('user_rewards').upsert({
@@ -32,6 +44,29 @@ async function _persist(d) {
   }).then(() => {});
 }
 
+function _mergeRewards(local, cloud) {
+  // Merge unlocked skins/arenas: union (additive)
+  const unlocked = { ...(local.unlocked ?? {}) };
+  for (const [charId, skins] of Object.entries(cloud.unlocked ?? {})) {
+    unlocked[charId] = { ...(unlocked[charId] ?? {}), ...skins };
+  }
+  const unlockedArena = { ...(local.unlockedArena ?? {}), ...(cloud.unlockedArena ?? {}) };
+  // masteryClaimedFor: union
+  const masteryClaimedFor = { ...(local.masteryClaimedFor ?? {}) };
+  for (const [charId, milestones] of Object.entries(cloud.masteryClaimedFor ?? {})) {
+    const existing = new Set(masteryClaimedFor[charId] ?? []);
+    for (const m of milestones) existing.add(m);
+    masteryClaimedFor[charId] = [...existing];
+  }
+  return {
+    xp:               Math.max(local.xp      ?? 0, cloud.xp      ?? 0),
+    chests:           Math.max(local.chests  ?? 0, cloud.chests  ?? 0),
+    unlocked,
+    unlockedArena,
+    masteryClaimedFor,
+  };
+}
+
 export async function syncRewardsFromCloud() {
   const uid = await _getUID();
   if (!uid) {
@@ -43,13 +78,25 @@ export async function syncRewardsFromCloud() {
     .select('*')
     .eq('user_id', uid)
     .single();
-  _cache = data ? {
-    xp:               data.xp              ?? 0,
-    chests:           data.chests          ?? 0,
-    unlocked:         data.unlocked        ?? {},
-    unlockedArena:    data.unlocked_arena  ?? {},
-    masteryClaimedFor: data.mastery_claimed ?? {},
-  } : { xp: 0, chests: 0, unlocked: {}, unlockedArena: {}, masteryClaimedFor: {} };
+
+  const local = { ..._cache };
+  if (data) {
+    const cloud = {
+      xp:               data.xp              ?? 0,
+      chests:           data.chests          ?? 0,
+      unlocked:         data.unlocked        ?? {},
+      unlockedArena:    data.unlocked_arena  ?? {},
+      masteryClaimedFor: data.mastery_claimed ?? {},
+    };
+    const merged = _mergeRewards(local, cloud);
+    _cache = merged;
+    // Push merged state back if local was ahead
+    if (JSON.stringify(merged) !== JSON.stringify(cloud)) _persist(merged);
+    else { _cache = merged; try { localStorage.setItem(LS_REWARDS, JSON.stringify(merged)); } catch {} }
+  } else {
+    // No cloud row — persist local to cloud
+    _persist(local);
+  }
 }
 
 export function getXP()     { return _cache.xp     ?? 0; }
